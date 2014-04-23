@@ -30,3 +30,7 @@ You can also use **Visual Studio**.
 
 Each team member should work in separate brunch and merge code into master.
 To describe your work and code review, you can use pull requests ([Guide](https://guides.github.com/introduction/flow/index.html)).
+
+
+### Wiki
+The corresponding wiki can be found [here](https://github.com/sabov/jedi/wiki)
