@@ -33,7 +33,7 @@ glm::uvec2 gPerEyeRenderSize;
 glm::uvec2 gOutputWindowSize;
 
 // 3D Rift rendering or 2D?
-bool gRenderForTheRift = true;
+bool gRenderForTheRift = false;
 
 //
 // A debug callback gets called for each OpenGL error and also for some warnings and even hints.
