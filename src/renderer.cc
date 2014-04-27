@@ -29,7 +29,7 @@ SharedFrameBufferObject gRightEyeFBO;
 // in case of stereo rendering store the render size per eye:
 glm::uvec2 gPerEyeRenderSize;
 
-// the output size in 2D or the resolition of the HMD:
+// the output size in 2D or the resolution of the HMD:
 glm::uvec2 gOutputWindowSize;
 
 // 3D Rift rendering or 2D?
@@ -39,7 +39,7 @@ bool gRenderForTheRift = false;
 // A debug callback gets called for each OpenGL error and also for some warnings and even hints.
 // Here it just prints those messages.
 //
-// If you set a brackpoint in here, you can see where the gl error came from and in which state your application is.
+// If you set a breakpoint in here, you can see where the gl error came from and in which state your application is.
 //
 void APIENTRY ogl_debug_callback( GLenum _source, GLenum _type, GLuint _id, GLenum _severity, GLsizei /*_length*/, const GLchar *_message, void* /* _userParam*/ )
 {

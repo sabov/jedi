@@ -28,7 +28,8 @@ World::World()
     // load audio assets:
     mBeep = new SimpleSound( "audio/musiccensor.wav" );
     mBeep->setLooping( true );
-    mBeep->play();
+    //Disable sound, because it is annoying
+    //mBeep->play();
 }
 
 World::~World()
