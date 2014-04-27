@@ -47,17 +47,17 @@ void initInput( GLFWwindow* window, ACGL::HardwareSupport::SimpleRiftController 
 // hidden. To prevent the mouse to leave the window, the curser will get reset to the
 // center after each run of this function, to not confuse the user it will get
 // moved to the original position when the button gets released.
-// This example code only implements this logic for the left mouse button.
+// Enables FPS View while holding the right mouse button
 void mouseMoveCallback( GLFWwindow *window, double x, double y )
 {
     static glm::dvec2 initialPosition; // to restore the courser pos later
     static glm::dvec2 windowSize;
-    static bool leftMouseButtonDown = false; // button state
+    static bool rightMouseButtonDown = false; // button state
 
 
     // track button state and react (once) on changes:
-    if (!leftMouseButtonDown && glfwGetMouseButton( window, GLFW_MOUSE_BUTTON_1 )) {
-        leftMouseButtonDown = true;
+    if (!rightMouseButtonDown && glfwGetMouseButton( window, GLFW_MOUSE_BUTTON_2 )) {
+        rightMouseButtonDown = true;
 
         // Get the window size (do this each mouse press in case the window was resized,
         // this could be stored and only get refreshed in case a resize happened but this
@@ -72,8 +72,8 @@ void mouseMoveCallback( GLFWwindow *window, double x, double y )
         x = width  * 0.5;
         y = height * 0.5;
         glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN ); // hide the cursor
-    } else if (leftMouseButtonDown && !glfwGetMouseButton( window, GLFW_MOUSE_BUTTON_1 )) {
-        leftMouseButtonDown = false;
+    } else if (rightMouseButtonDown && !glfwGetMouseButton( window, GLFW_MOUSE_BUTTON_2 )) {
+        rightMouseButtonDown = false;
         glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_NORMAL ); // unhide the cursor
         glfwSetCursorPos( window, initialPosition.x, initialPosition.y );
     }
@@ -84,13 +84,14 @@ void mouseMoveCallback( GLFWwindow *window, double x, double y )
     movement *= glm::dvec2( 1.0, -1.0 );
 
 
-    if (leftMouseButtonDown) {
+    if (rightMouseButtonDown) {
         // debug() << glm::to_string( movement ) << endl;
 
         // The input could now be used with a cameras
         // FPSstyleLookAround( relativeMovement.x, relativeMovement.y ) method
         // to get look around functionality by using the mouse, or any other
         // functionality!
+        gSimpleRiftControllerInput->getCamera()->FPSstyleLookAround(movement.x/windowSize.x, -movement.y/windowSize.y);
         glfwSetCursorPos( window, windowSize.x * 0.5, windowSize.y * 0.5 );
     }
 }
