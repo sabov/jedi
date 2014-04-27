@@ -22,12 +22,12 @@ Lightsaber::~Lightsaber()
 {
 }
 
-void Lightsaber::render(glm::mat4 viewMatrix, glm::mat4 projectionMatrix)
+void Lightsaber::render(glm::mat4 &viewMatrix, glm::mat4 &projectionMatrix)
 {
     mLightsaberShader->use();
 
     glm::mat4 modelMatrix = glm::scale( glm::vec3( 0.01f ) );
-    glm::mat4 translateMatrix = glm::translate( glm::mat4(), glm::vec3(-0.5f, 0.0f, -0.5f ) );
+    glm::mat4 translateMatrix = glm::translate( glm::mat4(), glm::vec3(getPosition().x, 1.0f, getPosition().z-0.5f ) );
     modelMatrix = translateMatrix * modelMatrix;
 
     mLightsaberShader->setUniform("uModelMatrix", modelMatrix);

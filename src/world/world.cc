@@ -125,6 +125,7 @@ void World::movePlayer( glm::vec3 direction )
         playerPos.y = 0.0f;
         mPlayer.setPosition( playerPos );
     }
+    mPlayer.mLightsaber.setPosition(mPlayer.getPosition());
 }
 
 void World::rotatePlayer( float dYaw )
