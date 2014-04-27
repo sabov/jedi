@@ -75,7 +75,8 @@ void World::render()
     mWorldShader->setUniform( "uViewMatrix", viewMatrix );
 
     // get the projection from the SimpleRiftController directly:
-    mWorldShader->setUniform( "uProjectionMatrix", mPlayer.getProjectionMatrix() );
+    glm::mat4 projectionMatrix = mPlayer.getProjectionMatrix();
+    mWorldShader->setUniform( "uProjectionMatrix", projectionMatrix );
     mWorldShader->setUniform( "uNormalMatrix", glm::inverseTranspose(glm::mat3(viewMatrix)*glm::mat3(modelMatrix)) );
 
     //
@@ -96,7 +97,7 @@ void World::render()
 
     mBunnyShader->setUniform( "uModelMatrix", modelMatrix );
     mBunnyShader->setUniform( "uViewMatrix",  viewMatrix );
-    mBunnyShader->setUniform( "uProjectionMatrix", mPlayer.getProjectionMatrix() );
+    mBunnyShader->setUniform( "uProjectionMatrix", projectionMatrix );
     mBunnyShader->setUniform( "uNormalMatrix",     glm::inverseTranspose(glm::mat3(viewMatrix)*glm::mat3(modelMatrix)) );
 
     // At least 16 texture units can be used, but multiple texture can also be placed in one
@@ -109,6 +110,8 @@ void World::render()
     //
     mBunnyGeometry->bind();
     mBunnyGeometry->draw();
+
+    mPlayer.mLightsaber.render(viewMatrix, projectionMatrix);
 }
 
 void World::movePlayer( glm::vec3 direction )
