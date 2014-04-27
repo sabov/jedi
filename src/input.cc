@@ -20,6 +20,26 @@ ACGL::HardwareSupport::SimpleRiftController *gSimpleRiftControllerInput;
 // see main.cc:
 extern World *gWorld;
 
+//
+// Some bools to store the desired movements.
+// The player can move the character by using WASD or a gamepad.
+bool sForwardPressed  = false;
+bool sBackwardPressed = false;
+bool sLeftPressed     = false;
+bool sRightPressed    = false;
+bool sRotateLeftPressed  = false;
+bool sRotateRightPressed = false;
+
+bool sForcePressed = false;
+
+//
+// Some floats to store the analog counterparts for gamepad and
+// later the Virtualizer inputs:
+float gAnalogLeftRightMovement   = 0.0f;
+float gAnalogForwardBackMovement = 0.0f;
+float gAnalogLeftRightRotation   = 0.0f;
+float gAnalogDucking             = 1.0f; // 0 = ducked, 1 = standing
+
 void mouseMoveCallback( GLFWwindow *window, double x, double y );
 void keyboardCallback( GLFWwindow* window, int key, int scancode, int action, int modifier );
 
@@ -52,7 +72,8 @@ void mouseMoveCallback( GLFWwindow *window, double x, double y )
 {
     static glm::dvec2 initialPosition; // to restore the courser pos later
     static glm::dvec2 windowSize;
-    static bool rightMouseButtonDown = false; // button state
+    static bool rightMouseButtonDown = false; // right button state
+    static bool leftMouseButtonDown = false;  // left button state
 
 
     // track button state and react (once) on changes:
@@ -78,6 +99,12 @@ void mouseMoveCallback( GLFWwindow *window, double x, double y )
         glfwSetCursorPos( window, initialPosition.x, initialPosition.y );
     }
 
+    if (!leftMouseButtonDown && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1)) {
+        leftMouseButtonDown = true;
+    } else if (leftMouseButtonDown && !glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1)) {
+        leftMouseButtonDown = false;
+    }
+
     // Get the movement in pixels.
     // Y axis up should be positive. A scaling of the mouse speed can be done here as well!
     glm::dvec2 movement = glm::dvec2( x,y ) - 0.5*windowSize;
@@ -94,25 +121,13 @@ void mouseMoveCallback( GLFWwindow *window, double x, double y )
         gSimpleRiftControllerInput->getCamera()->FPSstyleLookAround(movement.x/windowSize.x, -movement.y/windowSize.y);
         glfwSetCursorPos( window, windowSize.x * 0.5, windowSize.y * 0.5 );
     }
+
+    if (leftMouseButtonDown) {
+        sForcePressed = true;
+    } else {
+        sForcePressed = false;
+    }
 }
-
-//
-// Some bools to store the desired movements.
-// The player can move the character by using WASD or a gamepad.
-bool sForwardPressed  = false;
-bool sBackwardPressed = false;
-bool sLeftPressed     = false;
-bool sRightPressed    = false;
-bool sRotateLeftPressed  = false;
-bool sRotateRightPressed = false;
-
-//
-// Some floats to store the analog counterparts for gamepad and
-// later the Virtualizer inputs:
-float gAnalogLeftRightMovement   = 0.0f;
-float gAnalogForwardBackMovement = 0.0f;
-float gAnalogLeftRightRotation   = 0.0f;
-float gAnalogDucking             = 1.0f; // 0 = ducked, 1 = standing
 
 // The keyboard callback: Gets called for each keypress.
 // The scan code is system dependent, use the key to get the button pressed.
@@ -211,6 +226,10 @@ void handleInput()
 
     // apply ducking. TODO: add a gamepad less option (keyboard)
     gWorld->duckPlayer( gAnalogDucking );
+
+    if (sForcePressed){
+        gWorld->useForcePlayer();
+    }
 
     // Grabs the input from the Rift to update the cameras orientation:
     // Note: If no Rift is connected, this will do nothing.

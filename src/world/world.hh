@@ -21,10 +21,10 @@ public:
     // render the world:
     void render();
 
-    // move the player relative to the players bodys orientation:
+    // move the player relative to the players body orientation:
     void movePlayer( glm::vec3 direction );
 
-    // get the currect position in world space
+    // get the current position in world space
     glm::vec3 getPlayerPosition();
 
     // returns the OpenAL compatible orientation which is the orientation on the head (ears)!
@@ -35,6 +35,9 @@ public:
 
     // ducking value is between 0..1
     void duckPlayer( float duckingValue );
+
+    // player is currently using the force
+    void useForcePlayer();
 
 private:
     Player mPlayer;

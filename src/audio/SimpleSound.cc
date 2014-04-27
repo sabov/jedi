@@ -37,3 +37,10 @@ void SimpleSound::play()
 {
     alSourcePlay( mSource );
 }
+
+bool SimpleSound::isPlaying()
+{
+    ALint sourceState;
+    alGetSourcei(mSource, AL_SOURCE_STATE, &sourceState);
+    return sourceState == AL_PLAYING;
+}

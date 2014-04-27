@@ -37,3 +37,8 @@ void Player::duck( float duckingValue )
     //        |----- legs ------------| + upper body
     mHeight = 0.3f + duckingValue*0.70f + 0.87f;
 }
+
+void Player::useForce()
+{
+    //TODO do something useful
+}

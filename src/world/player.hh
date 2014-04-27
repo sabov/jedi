@@ -35,6 +35,9 @@ public:
     // 1.0: not ducked, 0.0: fully ducked
     void duck( float duckingValue );
 
+    // player uses the force
+    void useForce();
+
 private:
     ACGL::Scene::SharedHMDCamera mHMDCamera;
     float mHeight;

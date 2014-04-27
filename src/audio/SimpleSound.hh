@@ -28,6 +28,8 @@ public:
     void setLooping( bool b );
 
     void play();
+
+    bool isPlaying();
 private:
 
     ALuint mSource;

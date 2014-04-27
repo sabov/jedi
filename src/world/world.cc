@@ -27,9 +27,6 @@ World::World()
     //
     // load audio assets:
     mBeep = new SimpleSound( "audio/musiccensor.wav" );
-    mBeep->setLooping( true );
-    //Disable sound, because it is annoying
-    //mBeep->play();
 }
 
 World::~World()
@@ -170,4 +167,12 @@ void World::rotatePlayer( float dYaw )
 void World::duckPlayer( float duckingValue )
 {
     mPlayer.duck( duckingValue );
+}
+
+void World::useForcePlayer()
+{
+    mPlayer.useForce();
+    if (!mBeep->isPlaying()){
+        mBeep->play();
+    }
 }
