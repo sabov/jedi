@@ -9,6 +9,7 @@
 #include <ACGL/OpenGL/Objects/ShaderProgram.hh>
 #include "player.hh"
 #include "../audio/SimpleSound.hh"
+#include "droid.hh"
 
 class World {
 public:
@@ -41,6 +42,7 @@ public:
 
 private:
     Player mPlayer;
+    Droid mDroid;
 
     //
     // The "level":

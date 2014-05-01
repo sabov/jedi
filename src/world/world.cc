@@ -112,6 +112,7 @@ void World::render()
     mBunnyGeometry->draw();
 
     mPlayer.mLightsaber.render(viewMatrix, projectionMatrix);
+    mDroid.render(viewMatrix, projectionMatrix);
 }
 
 void World::movePlayer( glm::vec3 direction )
