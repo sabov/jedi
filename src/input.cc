@@ -123,9 +123,7 @@ void mouseMoveCallback( GLFWwindow *window, double x, double y )
     }
 
     if (leftMouseButtonDown) {
-        sForcePressed = true;
-    } else {
-        sForcePressed = false;
+        // TODO
     }
 }
 
@@ -147,6 +145,8 @@ void keyboardCallback( GLFWwindow* window, int key, int scancode, int action, in
     if ( key == GLFW_KEY_D ) sRightPressed    = (action != GLFW_RELEASE);
     if ( key == GLFW_KEY_Q ) sRotateLeftPressed  = (action != GLFW_RELEASE);
     if ( key == GLFW_KEY_E ) sRotateRightPressed = (action != GLFW_RELEASE);
+
+    if ( key == GLFW_KEY_SPACE) sForcePressed = (action != GLFW_RELEASE);
 
     // prints the events for debugging and finding out keycodes:
 /*
