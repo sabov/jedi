@@ -13,18 +13,18 @@ using namespace ACGL::OpenGL;
 World::World()
 {
     debug() << "loading game world..." << endl;
-    //
-    // load visual assets:
-    mWorldGeometry = VertexArrayObjectCreator("quicktest.obj").create();
-    mWorldShader   = ShaderProgramFileManager::the()->get( ShaderProgramCreator("worldShader") );
-    mWorldGeometry->setAttributeLocations( mWorldShader->getAttributeLocations() );
 
-    mBunnyGeometry = VertexArrayObjectCreator("Bunny.obj").create();
+    //Needs to be done to enable VertexAttributes in OGL 3.0 (don't know why)
+    GLuint VertexArrayID;
+    glGenVertexArrays(1, &VertexArrayID);
+    glBindVertexArray(VertexArrayID);
+
+    mLevel.LoadMesh("geometry/L1/level.obj", CGEngine::CGE_TRIANGULATE);
     mBunnyShader   = ShaderProgramFileManager::the()->get( ShaderProgramCreator("Bunny") );
-    mBunnyGeometry->setAttributeLocations( mBunnyShader->getAttributeLocations() );
-    mBunnyTexture  = loadTexture2D( "clownfishBunny.png" );
+    //GLint n = mBunnyShader->getAttributeLocation("aNormal");
+    //GLint v = mBunnyShader->getAttributeLocation("aPosition");
+    //GLint t = mBunnyShader->getAttributeLocation("aTexCoord");
 
-    //
     // load audio assets:
     mBeep = new SimpleSound( "audio/musiccensor.wav" );
     mBeep->setLooping( true );
@@ -61,40 +61,13 @@ void World::getPlayerOrientation( ALfloat *playerOrientation )
 
 void World::render()
 {
-    //
-    // setup shaders
-    //
-    mWorldShader->use();
+    mMatrixStack.LoadIdentity();
+    mMatrixStack.Translate(CGEngine::Vec3(0.0, -1.0, 0.0));
 
-    //
-    // set uniforms
-    //
-    glm::mat4 modelMatrix = glm::scale( glm::vec3( 1.0f,1.0f,1.0f) );
-    mWorldShader->setUniform( "uModelMatrix", modelMatrix );
-
-    // get the view from a camera that is attached to the SimpleRiftController:
-    glm::mat4 viewMatrix = mPlayer.getHMDViewMatrix();
-    mWorldShader->setUniform( "uViewMatrix", viewMatrix );
-
-    // get the projection from the SimpleRiftController directly:
-    mWorldShader->setUniform( "uProjectionMatrix", mPlayer.getProjectionMatrix() );
-    mWorldShader->setUniform( "uNormalMatrix", glm::inverseTranspose(glm::mat3(viewMatrix)*glm::mat3(modelMatrix)) );
-
-    //
-    // draw geometry
-    //
-    mWorldGeometry->bind();
-    mWorldGeometry->draw();
-
-    //
-    // Textured example:
-    //
     mBunnyShader->use();
 
-    // the bunny gets a different model matrix:
-    modelMatrix = glm::scale( glm::vec3( 0.25f ) );
-    glm::mat4 translateMatrix = glm::translate( glm::mat4(), glm::vec3(8.0f, 0.0f, -10.5f ) );
-    modelMatrix = translateMatrix * modelMatrix;
+    glm::mat4 modelMatrix = mMatrixStack.getCompleteTransform();
+    glm::mat4 viewMatrix = mPlayer.getHMDViewMatrix();
 
     mBunnyShader->setUniform( "uModelMatrix", modelMatrix );
     mBunnyShader->setUniform( "uViewMatrix",  viewMatrix );
@@ -103,14 +76,11 @@ void World::render()
 
     // At least 16 texture units can be used, but multiple texture can also be placed in one
     // texture array and thus only occupy one texture unit!
-    GLint textureUnit = 0;
-    mBunnyTexture->bind( textureUnit );
-    mBunnyShader->setUniform( "uTexture", textureUnit );
+    mBunnyShader->setUniform( "uTexture", 0 );
     //
     // draw geometry
     //
-    mBunnyGeometry->bind();
-    mBunnyGeometry->draw();
+    mLevel.VOnDraw();
 }
 
 void World::movePlayer( glm::vec3 direction )

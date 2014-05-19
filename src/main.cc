@@ -10,6 +10,9 @@
  *
  */
 
+#ifndef __GLEW_H__
+    #include <GL/glew.h>
+#endif
 // OpenGL defines and function pointers. We use this instead of the system GL.h or glew.h.
 // This has to be included before glfw.h !
 #include <ACGL/OpenGL/GL.hh>
@@ -143,6 +146,14 @@ int main( int argc, char *argv[] )
         glfwTerminate();
         exit( -1 );
     }
+    //GLEW Initialization
+    GLenum initStatus = glewInit();
+    if ( initStatus != GLEW_OK )
+    {
+        glfwTerminate();
+        ACGL::Utils::error() << "Failed to initialize GLEW" << std::endl;
+        exit( -1 );
+    }
 
     //
     // Now that a window is open (with OpenGL), we can init ACGL:
@@ -152,7 +163,6 @@ int main( int argc, char *argv[] )
     ACGL::init( true );
     // tell ACGL in which subdirectory the shaders are:
     ACGL::Base::Settings::the()->setShaderPath("shader/");
-
 
     //
     // Create a SimpleRiftController

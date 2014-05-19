@@ -9,6 +9,8 @@
 #include <ACGL/OpenGL/Objects/ShaderProgram.hh>
 #include "player.hh"
 #include "../audio/SimpleSound.hh"
+#include "../mesh/CGEMesh.h"
+#include "../mesh/CGETransformation.h"
 
 class World {
 public:
@@ -39,16 +41,14 @@ public:
 private:
     Player mPlayer;
 
-    //
-    // The "level":
-    ACGL::OpenGL::SharedVertexArrayObject mWorldGeometry;
-    ACGL::OpenGL::SharedShaderProgram     mWorldShader;
+    //Matrix Stack
+    CGEngine::CMatrixStack  mMatrixStack;
 
-    //
-    // Example of a textured object:
-    ACGL::OpenGL::SharedVertexArrayObject mBunnyGeometry;
+    // The "level":
+    CGEngine::CMesh mLevel ;
+
+    //using this shader sinceit supports textures
     ACGL::OpenGL::SharedShaderProgram     mBunnyShader;
-    ACGL::OpenGL::SharedTexture2D         mBunnyTexture;
 
     //
     // One repeating sound as an example of how to use OpenAL:
