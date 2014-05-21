@@ -14,11 +14,6 @@ World::World()
 {
     debug() << "loading game world..." << endl;
 
-    //Needs to be done to enable VertexAttributes in OGL 3.0 (don't know why)
-    GLuint VertexArrayID;
-    glGenVertexArrays(1, &VertexArrayID);
-    glBindVertexArray(VertexArrayID);
-
     mLevel.LoadMesh("geometry/L1/level.obj", CGEngine::CGE_TRIANGULATE);
     mBunnyShader   = ShaderProgramFileManager::the()->get( ShaderProgramCreator("Bunny") );
     //GLint n = mBunnyShader->getAttributeLocation("aNormal");
@@ -26,9 +21,9 @@ World::World()
     //GLint t = mBunnyShader->getAttributeLocation("aTexCoord");
 
     // load audio assets:
-    mBeep = new SimpleSound( "audio/musiccensor.wav" );
-    mBeep->setLooping( true );
-    mBeep->play();
+    //mBeep = new SimpleSound( "audio/musiccensor.wav" );
+    //mBeep->setLooping( true );
+    //mBeep->play();
 }
 
 World::~World()

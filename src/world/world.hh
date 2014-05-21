@@ -9,8 +9,8 @@
 #include <ACGL/OpenGL/Objects/ShaderProgram.hh>
 #include "player.hh"
 #include "../audio/SimpleSound.hh"
-#include "../mesh/CGEMesh.h"
-#include "../mesh/CGETransformation.h"
+#include "mesh/CGEMesh.h"
+#include "math/CGETransformation.h"
 
 class World {
 public:
