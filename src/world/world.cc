@@ -112,7 +112,10 @@ void World::render()
     mBunnyGeometry->draw();
 
     mPlayer.mLightsaber.render(viewMatrix, projectionMatrix);
-    mDroid.render(viewMatrix, projectionMatrix);
+    mDroids[0].render(viewMatrix, projectionMatrix, glm::vec3(-2.0f, 1.0f, -10.0f));
+    mDroids[0].move(glm::vec3(0.0f, 0.0f, 0.01f));
+    mDroids[1].render(viewMatrix, projectionMatrix, glm::vec3(2.0f, 1.0f, -10.0f));
+    mDroids[1].move(glm::vec3(0.0f, 0.0f, 0.01f));
 }
 
 void World::movePlayer( glm::vec3 direction )
@@ -127,6 +130,7 @@ void World::movePlayer( glm::vec3 direction )
         mPlayer.setPosition( playerPos );
     }
     mPlayer.mLightsaber.setPosition(mPlayer.getPosition());
+    //mDroid.setPosition(mPlayer.getPosition());
 }
 
 void World::rotatePlayer( float dYaw )

@@ -12,7 +12,7 @@ out vec4 oColor;
 void main()
 {
     //vec3 color = texture(uTexture, vTexCoord).rgb;
-    vec3 color = vec3(1.0f, 0.0f, 0.0f);
+    vec3 color = vec3(1.0f, 1.3f, 0.0f);
 
     float lightingTerm = dot( normalize(vNormal), vLightDirection );
     lightingTerm = 0.5*lightingTerm + 0.5;

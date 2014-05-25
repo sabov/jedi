@@ -42,7 +42,7 @@ public:
 
 private:
     Player mPlayer;
-    Droid mDroid;
+    Droid mDroids[2];
 
     //
     // The "level":

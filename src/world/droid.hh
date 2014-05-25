@@ -13,7 +13,7 @@ public:
     Droid();
     ~Droid();
 
-    void render(glm::mat4 &viewMatrix, glm::mat4 &projectionMatrix);
+    void render(glm::mat4 &viewMatrix, glm::mat4 &projectionMatrix, glm::vec3 positon);
 
 private:
     //The droid
