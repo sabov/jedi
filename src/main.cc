@@ -24,6 +24,7 @@
 
 #include "audio/audio.hh"
 #include "world/world.hh"
+#include "input.hh"
 
 //
 // Store the world in a global object. This is not pretty nor is it good software design,
@@ -31,11 +32,9 @@
 //
 World *gWorld = NULL;
 
-//
-// external functions so this file does not get too big:
-//
-extern void initInput(    GLFWwindow* window, ACGL::HardwareSupport::SimpleRiftController *simpleRiftController ); // see input.cc
-extern void handleInput();
+// Handles input
+Input *gInput = NULL;
+
 
 extern void initRenderer( GLFWwindow *window, ACGL::HardwareSupport::SimpleRiftController *simpleRiftController ); // see renderer.cc
 extern void renderFrame();
@@ -164,7 +163,9 @@ int main( int argc, char *argv[] )
     //
     // init whatever you need:
     //
-    initInput(    myWindow, simpleRiftController );
+
+    gInput = new Input(myWindow, simpleRiftController);
+
     initRenderer( myWindow, simpleRiftController );
     initAudio();
 
@@ -195,7 +196,7 @@ int main( int argc, char *argv[] )
         // per frame tasks:
         // you might want to add game logic, physics etc.
         //
-        handleInput();
+        gInput->handleInput();
         renderAudio();
         renderFrame();
 
@@ -210,6 +211,7 @@ int main( int argc, char *argv[] )
 
     // clean up:
     delete gWorld;
+    delete gInput;
 
     shutdownAudio();
     shutdownRenderer();
