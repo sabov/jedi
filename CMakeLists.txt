@@ -137,5 +137,13 @@ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 #
 ###############################################################################
 
+###############################################################################
+#
+# Bullet engine
+#
+find_package(Bullet REQUIRED)
+include_directories(${BULLET_INCLUDE_DIRS})
+set(LIBRARIES ${LIBRARIES} ${BULLET_LIBRARIES})
+
 ADD_EXECUTABLE(${CMAKE_PROJECT_NAME} ${SOURCE_FILES} ${HEADER_FILES} ${SHADER_FILES} ${README_FILES})
 TARGET_LINK_LIBRARIES(${CMAKE_PROJECT_NAME} ${LIBRARIES})
