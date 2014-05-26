@@ -59,7 +59,7 @@ void Input::mouseMoveCallback(GLFWwindow *window, double x, double y) {
     glfwGetWindowSize(window, &width, &height);
     windowSize = glm::dvec2(width, height);
 
-    // track button state and react (once) on changes:
+    // Right button
     if (!rightMouseButtonDown && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2)) {
         rightMouseButtonDown = true;
 
@@ -75,6 +75,7 @@ void Input::mouseMoveCallback(GLFWwindow *window, double x, double y) {
         glfwSetCursorPos(window, initialPosition.x, initialPosition.y);
     }
 
+    // Left button
     if (!leftMouseButtonDown && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1)) {
         leftMouseButtonDown = true;
 
@@ -98,20 +99,16 @@ void Input::mouseMoveCallback(GLFWwindow *window, double x, double y) {
     movementScale.y = -movement.y / windowSize.y;
 
     if (rightMouseButtonDown) {
-        // debug() << glm::to_string( movement ) << endl;
-
-        // The input could now be used with a cameras
-        // FPSstyleLookAround( relativeMovement.x, relativeMovement.y ) method
-        // to get look around functionality by using the mouse, or any other
-        // functionality!
+        // LookAround functionality
         Input::gSimpleRiftControllerInput->getCamera()->FPSstyleLookAround(movementScale.x, movementScale.y);
         glfwSetCursorPos(window, windowSize.x * 0.5, windowSize.y * 0.5);
     } else if (leftMouseButtonDown) {
         // move lightsaber
         glm::vec3 lightsaberMovement;
         lightsaberMovement.x = movementScale.x;
-        lightsaberMovement.y = movementScale.y;
+        lightsaberMovement.y = -movementScale.y;
         gWorld->moveLightsaber(lightsaberMovement);
+        glfwSetCursorPos(window, windowSize.x * 0.5, windowSize.y * 0.5);
     } else {
         // TODO
     }
