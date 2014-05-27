@@ -32,6 +32,14 @@ private:
     // Rift controller
     static ACGL::HardwareSupport::SimpleRiftController *gSimpleRiftControllerInput;
 
+    static glm::dvec2 initialPosition; // to restore the courser pos later
+    static glm::dvec2 windowSize;
+    static glm::dvec2 movement; // movement of mouse cursor
+    static glm::dvec2 movementScale; // movement scaled depending on window size
+
+    static bool rightMouseButtonDown; // right button state
+    static bool leftMouseButtonDown; // left button state
+
     // Some bools to store the desired movements.
     // The player can move the character by using WASD or a gamepad.
     static bool sForwardPressed;
@@ -41,6 +49,7 @@ private:
     static bool sRotateLeftPressed;
     static bool sRotateRightPressed;
     static bool sForcePressed;
+    static bool sPlaneXZPressed;
 
     // Some floats to store the analog counterparts for gamepad and
     // later the Virtualizer inputs:

@@ -30,6 +30,6 @@ private:
     ACGL::OpenGL::SharedTexture2D mLightsaberTexture;
 
     //Bounds for distance of lightsaber from player
-    const glm::vec3 upDistanceToPlayer = glm::vec3(0.5f, 1.5f, 0.0f);
-    const glm::vec3 lowDistanceToPlayer = glm::vec3(0.5f, 0.5f, 0.0f);
+    const glm::vec3 upDistanceToPlayer = glm::vec3(0.5f, 1.5f, 0.8f);
+    const glm::vec3 lowDistanceToPlayer = glm::vec3(0.5f, 0.5f, 0.2f);
 };

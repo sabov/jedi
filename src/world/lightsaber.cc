@@ -49,15 +49,23 @@ void Lightsaber::render(glm::mat4 &viewMatrix, glm::mat4 &projectionMatrix) {
 void Lightsaber::move(const glm::vec3 &direction) {
     ACGL::Scene::MoveableObject::move(direction);
 
+    //Check bounds
+    //x-axis
     if (mPosition.x < mPlayerPosition.x - lowDistanceToPlayer.x) {
         mPosition.x = mPlayerPosition.x - lowDistanceToPlayer.x;
     } else if (mPosition.x > mPlayerPosition.x + upDistanceToPlayer.x) {
         mPosition.x = mPlayerPosition.x + upDistanceToPlayer.x;
     }
-
+    //y-axis
     if (mPosition.y < mPlayerPosition.y + lowDistanceToPlayer.y) {
         mPosition.y = mPlayerPosition.y + lowDistanceToPlayer.y;
     } else if (mPosition.y > mPlayerPosition.y + upDistanceToPlayer.y) {
         mPosition.y = mPlayerPosition.y + upDistanceToPlayer.y;
+    }
+    //z-axis
+    if (mPosition.z > mPlayerPosition.z - lowDistanceToPlayer.z) {
+        mPosition.z = mPlayerPosition.z - lowDistanceToPlayer.z;
+    } else if (mPosition.z < mPlayerPosition.z - upDistanceToPlayer.z) {
+        mPosition.z = mPlayerPosition.z - upDistanceToPlayer.z;
     }
 }

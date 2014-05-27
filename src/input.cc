@@ -6,6 +6,13 @@ using namespace std;
 extern World *gWorld;
 
 //initialize static variables
+glm::dvec2 Input::initialPosition;
+glm::dvec2 Input::windowSize;
+glm::dvec2 Input::movement;
+glm::dvec2 Input::movementScale;
+bool Input::rightMouseButtonDown = false;
+bool Input::leftMouseButtonDown = false;
+
 bool Input::sForwardPressed = false;
 bool Input::sBackwardPressed = false;
 bool Input::sLeftPressed = false;
@@ -13,6 +20,7 @@ bool Input::sRightPressed = false;
 bool Input::sRotateLeftPressed = false;
 bool Input::sRotateRightPressed = false;
 bool Input::sForcePressed = false;
+bool Input::sPlaneXZPressed = false;
 
 float Input::gAnalogLeftRightMovement = 0.0f;
 float Input::gAnalogForwardBackMovement = 0.0f;
@@ -22,8 +30,6 @@ float Input::gAnalogDucking = 1.0f;
 ACGL::HardwareSupport::SimpleRiftController *Input::gSimpleRiftControllerInput = NULL;
 
 Input::Input(GLFWwindow* window, ACGL::HardwareSupport::SimpleRiftController *simpleRiftController) {
-    // 0 = ducked, 1 = standing
-
     // don't miss short keypresses, which are shorter than one frame and would be missed otherwise:
     // useful if the keys are read directly and not as a callback.
     glfwSetInputMode(window, GLFW_STICKY_KEYS, true);
@@ -44,52 +50,12 @@ Input::Input(GLFWwindow* window, ACGL::HardwareSupport::SimpleRiftController *si
 // moved to the original position when the button gets released.
 // Enables FPS View while holding the right mouse button
 void Input::mouseMoveCallback(GLFWwindow *window, double x, double y) {
-    static glm::dvec2 initialPosition; // to restore the courser pos later
-    static glm::dvec2 windowSize;
-    static bool rightMouseButtonDown = false; // right button state
-    static bool leftMouseButtonDown = false; // left button state
-
-    glm::dvec2 movement; // movement of mouse cursor
-    glm::dvec2 movementScale; // movement scaled depending on window size
-
     // Get the window size (do this each mouse press in case the window was resized,
     // this could be stored and only get refreshed in case a resize happened but this
     // would need more global state -> let's keep this example simple).
     int width, height;
     glfwGetWindowSize(window, &width, &height);
     windowSize = glm::dvec2(width, height);
-
-    // Right button
-    if (!rightMouseButtonDown && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2)) {
-        rightMouseButtonDown = true;
-
-        initialPosition = glm::dvec2(x, y);
-
-        // no movement in this call:
-        x = width * 0.5;
-        y = height * 0.5;
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN); // hide the cursor
-    } else if (rightMouseButtonDown && !glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2)) {
-        rightMouseButtonDown = false;
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL); // unhide the cursor
-        glfwSetCursorPos(window, initialPosition.x, initialPosition.y);
-    }
-
-    // Left button
-    if (!leftMouseButtonDown && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1)) {
-        leftMouseButtonDown = true;
-
-        initialPosition = glm::dvec2(x, y);
-
-        // no movement in this call:
-        x = width * 0.5;
-        y = height * 0.5;
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN); // hide the cursor
-    } else if (leftMouseButtonDown && !glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1)) {
-        leftMouseButtonDown = false;
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL); // unhide the cursor
-        glfwSetCursorPos(window, initialPosition.x, initialPosition.y);
-    }
 
     // Get the movement in pixels.
     // Y axis up should be positive. A scaling of the mouse speed can be done here as well!
@@ -98,19 +64,41 @@ void Input::mouseMoveCallback(GLFWwindow *window, double x, double y) {
     movementScale.x = movement.x / windowSize.x;
     movementScale.y = -movement.y / windowSize.y;
 
-    if (rightMouseButtonDown) {
-        // LookAround functionality
-        Input::gSimpleRiftControllerInput->getCamera()->FPSstyleLookAround(movementScale.x, movementScale.y);
+    bool leftMouseButtonPressed = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1);
+    bool rightMouseButtonPressed = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2);
+
+    if ((!rightMouseButtonDown && rightMouseButtonPressed) || (!leftMouseButtonDown && leftMouseButtonPressed)) {
+        //New button pressed
+        initialPosition = glm::dvec2(x, y);
+
+        // no movement in this call:
+        x = width * 0.5;
+        y = height * 0.5;
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN); // hide the cursor
+
+        if (!rightMouseButtonDown && rightMouseButtonPressed) {
+            rightMouseButtonDown = true;
+        }
+        if (!leftMouseButtonDown && leftMouseButtonPressed) {
+            leftMouseButtonDown = true;
+        }
+
+    } else if ((rightMouseButtonDown && !rightMouseButtonPressed) || (leftMouseButtonDown && !leftMouseButtonPressed)) {
+        //New button not pressed
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL); // unhide the cursor
+        glfwSetCursorPos(window, initialPosition.x, initialPosition.y);
+
+        if (rightMouseButtonDown && !rightMouseButtonPressed) {
+            rightMouseButtonDown = false;
+        }
+        if (leftMouseButtonDown && !leftMouseButtonPressed) {
+            leftMouseButtonDown = false;
+        }
+    }
+
+    if (rightMouseButtonDown || leftMouseButtonDown) {
+        //Reset current cursor position
         glfwSetCursorPos(window, windowSize.x * 0.5, windowSize.y * 0.5);
-    } else if (leftMouseButtonDown) {
-        // move lightsaber
-        glm::vec3 lightsaberMovement;
-        lightsaberMovement.x = movementScale.x;
-        lightsaberMovement.y = -movementScale.y;
-        gWorld->moveLightsaber(lightsaberMovement);
-        glfwSetCursorPos(window, windowSize.x * 0.5, windowSize.y * 0.5);
-    } else {
-        // TODO
     }
 }
 
@@ -140,6 +128,9 @@ void Input::keyboardCallback(GLFWwindow* window, int key, int scancode, int acti
 
     if (key == GLFW_KEY_SPACE)
         Input::sForcePressed = (action != GLFW_RELEASE);
+
+    if (key == GLFW_KEY_LEFT_CONTROL)
+        Input::sPlaneXZPressed = (action != GLFW_RELEASE);
 
     // prints the events for debugging and finding out keycodes:
     /*
@@ -189,8 +180,25 @@ void Input::handleInput() {
     glfwPollEvents();
     handleGamePad();
 
-    //
-    // move the player:
+    //----------
+    //LIGHTSABER
+    //----------
+    if (leftMouseButtonDown) {
+        // Move lightsaber
+        glm::vec3 lightsaberMovement;
+        lightsaberMovement.x = movementScale.x;
+        if (sPlaneXZPressed) {
+            //Move on z-axis instead of y-axis
+            lightsaberMovement.z = movementScale.y;
+        } else {
+            lightsaberMovement.y = -movementScale.y;
+        }
+        gWorld->moveLightsaber(lightsaberMovement);
+    }
+
+    //------
+    //PLAYER
+    //------
     glm::vec3 playersBodyMovement;
     // TODO: make this framerate independent!
     // The movements should be based on the actual time that has passed since the last
@@ -225,8 +233,17 @@ void Input::handleInput() {
     // apply ducking. TODO: add a gamepad less option (keyboard)
     gWorld->duckPlayer(gAnalogDucking);
 
+    //Use force
     if (sForcePressed) {
         gWorld->useForcePlayer();
+    }
+
+    //----
+    //VIEW
+    //----
+    if (rightMouseButtonDown) {
+        // LookAround functionality
+        Input::gSimpleRiftControllerInput->getCamera()->FPSstyleLookAround(movementScale.x, movementScale.y);
     }
 
     // Grabs the input from the Rift to update the cameras orientation:
