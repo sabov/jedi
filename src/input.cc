@@ -12,20 +12,22 @@ glm::dvec2 Input::movement;
 glm::dvec2 Input::movementScale;
 bool Input::rightMouseButtonDown = false;
 bool Input::leftMouseButtonDown = false;
+bool Input::mouseWheelScrollUp = false;
+bool Input::mouseWheelScrollDown = false;
 
-bool Input::sForwardPressed = false;
-bool Input::sBackwardPressed = false;
-bool Input::sLeftPressed = false;
-bool Input::sRightPressed = false;
-bool Input::sRotateLeftPressed = false;
-bool Input::sRotateRightPressed = false;
-bool Input::sForcePressed = false;
-bool Input::sPlaneXZPressed = false;
+bool Input::forwardPressed = false;
+bool Input::backwardPressed = false;
+bool Input::leftPressed = false;
+bool Input::rightPressed = false;
+bool Input::rotateLeftPressed = false;
+bool Input::rotateRightPressed = false;
+bool Input::forcePressed = false;
+bool Input::controlPressed = false;
 
-float Input::gAnalogLeftRightMovement = 0.0f;
-float Input::gAnalogForwardBackMovement = 0.0f;
-float Input::gAnalogLeftRightRotation = 0.0f;
-float Input::gAnalogDucking = 1.0f;
+float Input::analogLeftRightMovement = 0.0f;
+float Input::analogForwardBackMovement = 0.0f;
+float Input::analogLeftRightRotation = 0.0f;
+float Input::analogDucking = 1.0f;
 
 ACGL::HardwareSupport::SimpleRiftController *Input::gSimpleRiftControllerInput = NULL;
 
@@ -37,7 +39,10 @@ Input::Input(GLFWwindow* window, ACGL::HardwareSupport::SimpleRiftController *si
     // handle the mouse as a callback
     glfwSetCursorPosCallback(window, mouseMoveCallback);
 
-    // handle the keyboard inputs as a callback as well
+    // handle the mouse wheel as a callback
+    glfwSetScrollCallback(window, mouseWheelCallback);
+
+    // handle the keyboard inputs as a callback
     glfwSetKeyCallback(window, keyboardCallback);
 
     // store it to update the attached camera based on the Rifts input later each frame:
@@ -102,6 +107,15 @@ void Input::mouseMoveCallback(GLFWwindow *window, double x, double y) {
     }
 }
 
+//Handles the mouse wheel
+void Input::mouseWheelCallback(GLFWwindow *window, double xoffset, double yoffset) {
+    if (yoffset > 0) {
+        mouseWheelScrollUp = true;
+    } else {
+        mouseWheelScrollDown = true;
+    }
+}
+
 // The keyboard callback: Gets called for each keypress.
 // The scan code is system dependent, use the key to get the button pressed.
 // The repeat action does not get called each frame if the button is pressed down, so
@@ -114,23 +128,23 @@ void Input::keyboardCallback(GLFWwindow* window, int key, int scancode, int acti
     }
 
     if (key == GLFW_KEY_W)
-        Input::sForwardPressed = (action != GLFW_RELEASE);
+        Input::forwardPressed = (action != GLFW_RELEASE);
     if (key == GLFW_KEY_A)
-        Input::sLeftPressed = (action != GLFW_RELEASE);
+        Input::leftPressed = (action != GLFW_RELEASE);
     if (key == GLFW_KEY_S)
-        Input::sBackwardPressed = (action != GLFW_RELEASE);
+        Input::backwardPressed = (action != GLFW_RELEASE);
     if (key == GLFW_KEY_D)
-        Input::sRightPressed = (action != GLFW_RELEASE);
+        Input::rightPressed = (action != GLFW_RELEASE);
     if (key == GLFW_KEY_Q)
-        Input::sRotateLeftPressed = (action != GLFW_RELEASE);
+        Input::rotateLeftPressed = (action != GLFW_RELEASE);
     if (key == GLFW_KEY_E)
-        Input::sRotateRightPressed = (action != GLFW_RELEASE);
+        Input::rotateRightPressed = (action != GLFW_RELEASE);
 
     if (key == GLFW_KEY_SPACE)
-        Input::sForcePressed = (action != GLFW_RELEASE);
+        Input::forcePressed = (action != GLFW_RELEASE);
 
-    if (key == GLFW_KEY_LEFT_CONTROL)
-        Input::sPlaneXZPressed = (action != GLFW_RELEASE);
+    if (key == GLFW_KEY_LEFT_CONTROL || key == GLFW_KEY_RIGHT_CONTROL)
+        Input::controlPressed = (action != GLFW_RELEASE);
 
     // prints the events for debugging and finding out keycodes:
     /*
@@ -165,10 +179,10 @@ void Input::handleGamePad() {
     // In case you want to support more gamepads, see ACGL::HardwareSupport::GamePad on
     // how to extend this or read the raw values from the gamepad based on numbered
     // axes.
-    gAnalogLeftRightMovement = gamePad.getAxis(GamePad::LEFT_ANALOG_STICK_X);
-    gAnalogForwardBackMovement = gamePad.getAxis(GamePad::RIGHT_ANALOG_STICK_Y);
-    gAnalogLeftRightRotation = gamePad.getAxis(GamePad::RIGHT_ANALOG_STICK_X);
-    gAnalogDucking = 1.0f - gamePad.getAxis(GamePad::LEFT_ANALOG_TRIGGER);
+    analogLeftRightMovement = gamePad.getAxis(GamePad::LEFT_ANALOG_STICK_X);
+    analogForwardBackMovement = gamePad.getAxis(GamePad::RIGHT_ANALOG_STICK_Y);
+    analogLeftRightRotation = gamePad.getAxis(GamePad::RIGHT_ANALOG_STICK_X);
+    analogDucking = 1.0f - gamePad.getAxis(GamePad::LEFT_ANALOG_TRIGGER);
 
     // nice for debugging, pressed keys are printed in UPPERCASE:
     //gamePad.printPressedButtons();
@@ -183,17 +197,38 @@ void Input::handleInput() {
     //----------
     //LIGHTSABER
     //----------
+    //Move in space
     if (leftMouseButtonDown) {
         // Move lightsaber
         glm::vec3 lightsaberMovement;
         lightsaberMovement.x = movementScale.x;
-        if (sPlaneXZPressed) {
+        if (controlPressed) {
             //Move on z-axis instead of y-axis
             lightsaberMovement.z = movementScale.y;
         } else {
             lightsaberMovement.y = -movementScale.y;
         }
         gWorld->moveLightsaber(lightsaberMovement);
+    }
+
+    //rotate
+    float rotateRad = ACGL::Math::Functions::calcDegToRad(5.0f);
+    if (mouseWheelScrollUp) {
+        if (controlPressed) {
+            gWorld->rotateLightsaber(0.0f, -rotateRad, 0.0f);
+        } else {
+            gWorld->rotateLightsaber(0.0f, 0.0f, -rotateRad);
+        }
+        //Reset state
+        mouseWheelScrollUp = false;
+    } else if (mouseWheelScrollDown) {
+        if (controlPressed) {
+            gWorld->rotateLightsaber(0.0f, rotateRad, 0.0f);
+        } else {
+            gWorld->rotateLightsaber(0.0f, 0.0f, rotateRad);
+        }
+        //Reset state
+        mouseWheelScrollDown = false;
     }
 
     //------
@@ -204,37 +239,37 @@ void Input::handleInput() {
     // The movements should be based on the actual time that has passed since the last
     // query of the inputs!
     float movementSpeed = 0.1f;
-    if (sForwardPressed)
+    if (forwardPressed)
         playersBodyMovement.z -= movementSpeed;
-    if (sLeftPressed)
+    if (leftPressed)
         playersBodyMovement.x -= movementSpeed;
-    if (sBackwardPressed)
+    if (backwardPressed)
         playersBodyMovement.z += movementSpeed;
-    if (sRightPressed)
+    if (rightPressed)
         playersBodyMovement.x += movementSpeed;
 
     // add analog gamepad movements:
-    playersBodyMovement.z -= gAnalogForwardBackMovement;
-    playersBodyMovement.x += gAnalogLeftRightMovement;
+    playersBodyMovement.z -= analogForwardBackMovement;
+    playersBodyMovement.x += analogLeftRightMovement;
 
     gWorld->movePlayer(playersBodyMovement);
 
     // rotate players body:
     float playersBodyRotation = 0.0f;
-    if (sRotateLeftPressed)
+    if (rotateLeftPressed)
         playersBodyRotation -= 5.0f;
-    if (sRotateRightPressed)
+    if (rotateRightPressed)
         playersBodyRotation += 5.0f;
 
     // add analog gamepad rotation:
-    playersBodyRotation += gAnalogLeftRightRotation;
+    playersBodyRotation += analogLeftRightRotation;
     gWorld->rotatePlayer(ACGL::Math::Functions::calcDegToRad(playersBodyRotation));
 
     // apply ducking. TODO: add a gamepad less option (keyboard)
-    gWorld->duckPlayer(gAnalogDucking);
+    gWorld->duckPlayer(analogDucking);
 
     //Use force
-    if (sForcePressed) {
+    if (forcePressed) {
         gWorld->useForcePlayer();
     }
 

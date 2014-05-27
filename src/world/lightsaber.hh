@@ -20,6 +20,8 @@ public:
     void render(glm::mat4 &viewMatrix, glm::mat4 &projectionMatrix);
 
     void move(const glm::vec3 &direction); //Overwrite of parent method
+
+    void rotate(float yaw, float roll, float pitch);
 private:
     // Current position of player
     glm::vec3 mPlayerPosition;

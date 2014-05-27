@@ -42,6 +42,9 @@ public:
     // move the lightsaber of the player
     void moveLightsaber(const glm::vec3 &direction);
 
+    //rotate the lightsaber, negative values rotate to the left, positive to the right
+    void rotateLightsaber(float dYaw, float dRoll, float dPitch);
+
 private:
     Player mPlayer;
 

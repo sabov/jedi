@@ -176,3 +176,7 @@ void World::useForcePlayer() {
 void World::moveLightsaber(const glm::vec3 &direction) {
     mPlayer.mLightsaber.move(direction);
 }
+
+void World::rotateLightsaber(float dYaw, float dRoll, float dPitch){
+    mPlayer.mLightsaber.rotate(dYaw, dRoll, dPitch);
+}

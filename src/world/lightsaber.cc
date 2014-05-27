@@ -28,7 +28,7 @@ void Lightsaber::render(glm::mat4 &viewMatrix, glm::mat4 &projectionMatrix) {
 
     glm::mat4 modelMatrix = glm::scale(glm::vec3(0.01f));
     glm::mat4 translateMatrix = glm::translate(glm::mat4(), getPosition());
-    modelMatrix = translateMatrix * modelMatrix;
+    modelMatrix = translateMatrix * getRotationMatrix4() * modelMatrix;
 
     mLightsaberShader->setUniform("uModelMatrix", modelMatrix);
     mLightsaberShader->setUniform("uViewMatrix", viewMatrix);
@@ -47,7 +47,12 @@ void Lightsaber::render(glm::mat4 &viewMatrix, glm::mat4 &projectionMatrix) {
  * Move lightsaber in space
  */
 void Lightsaber::move(const glm::vec3 &direction) {
+    //Reset rotation for movement
+    glm::mat3 tmpRotationMatrix = mRotationMatrix;
+    mRotationMatrix = glm::mat3();
     ACGL::Scene::MoveableObject::move(direction);
+    //Set rotation again
+    mRotationMatrix = tmpRotationMatrix;
 
     //Check bounds
     //x-axis
@@ -68,4 +73,13 @@ void Lightsaber::move(const glm::vec3 &direction) {
     } else if (mPosition.z < mPlayerPosition.z - upDistanceToPlayer.z) {
         mPosition.z = mPlayerPosition.z - upDistanceToPlayer.z;
     }
+}
+
+/*
+ * Rotate lightsaber
+ */
+void Lightsaber::rotate(float yaw, float roll, float pitch) {
+    glm::mat4 R = getRotationMatrix4();
+    glm::mat4 newRot = glm::yawPitchRoll(yaw, roll, pitch);
+    setRotationMatrix(R * newRot);
 }
