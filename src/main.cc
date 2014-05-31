@@ -34,6 +34,8 @@
 // but it keeps the example simple.
 //
 World *gWorld = NULL;
+btDiscreteDynamicsWorld* dynamicsWorld;
+btRigidBody* fallRigidBody;
 
 //
 // external functions so this file does not get too big:
@@ -127,7 +129,7 @@ void myGLFWErrorCallback( int errorCode, const char *description )
     ACGL::Utils::error() << "GLFW error " << errorCode << ": " << description << std::endl;
 }
 
-/*int main( int argc, char *argv[] )
+int main( int argc, char *argv[] )
 {
     //
     // Initialise GLFW
@@ -220,12 +222,11 @@ void myGLFWErrorCallback( int errorCode, const char *description )
     glfwDestroyWindow( myWindow );
     glfwTerminate();
     exit(0);
-}*/
-
+}
 
 //Hello world example from
 //http://www.bulletphysics.org/mediawiki-1.5.8/index.php/Hello_World
-int main (void)
+/*int main (void)
 {
         btBroadphaseInterface* broadphase = new btDbvtBroadphase();
 
@@ -291,4 +292,4 @@ int main (void)
         delete broadphase;
 
         return 0;
-}
+}*/
