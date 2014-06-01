@@ -112,7 +112,7 @@ void mouseMoveCallback( GLFWwindow *window, double x, double y )
 
 
     if (rightMouseButtonDown) {
-        // debug() << glm::to_string( movement ) << endl;
+        debug() << glm::to_string( movement ) << endl;
 
         // The input could now be used with a cameras
         // FPSstyleLookAround( relativeMovement.x, relativeMovement.y ) method

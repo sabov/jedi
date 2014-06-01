@@ -111,7 +111,8 @@ void World::render()
     mBunnyGeometry->bind();
     mBunnyGeometry->draw();
 
-    mPlayer.mLightsaber.render(viewMatrix, projectionMatrix);
+    //mPlayer.mLightsaber.render(viewMatrix, projectionMatrix);
+    mPlayer.mRay.render(viewMatrix, projectionMatrix);
 }
 
 void World::movePlayer( glm::vec3 direction )
@@ -125,7 +126,8 @@ void World::movePlayer( glm::vec3 direction )
         playerPos.y = 0.0f;
         mPlayer.setPosition( playerPos );
     }
-    mPlayer.mLightsaber.setPosition(mPlayer.getPosition());
+    //mPlayer.mLightsaber.setPosition(mPlayer.getPosition());
+    mPlayer.mRay.setPosition(mPlayer.getPosition());
 }
 
 void World::rotatePlayer( float dYaw )

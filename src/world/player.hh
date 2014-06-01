@@ -3,6 +3,7 @@
 #include <ACGL/Scene/MoveableObject.hh>
 #include <ACGL/Scene/HMDCamera.hh>
 #include "lightsaber.hh"
+#include "ray.hh"
 
 /*
  * A player can be moved around, the position and orientation are the
@@ -40,6 +41,7 @@ public:
     void useForce();
 
     Lightsaber mLightsaber;
+    Ray mRay;
 private:
     ACGL::Scene::SharedHMDCamera mHMDCamera;
     float mHeight;

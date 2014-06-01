@@ -34,7 +34,7 @@ World *gWorld = NULL;
 //
 // external functions so this file does not get too big:
 //
-extern void initInput(    GLFWwindow* window, ACGL::HardwareSupport::SimpleRiftController *simpleRiftController ); // see input.cc
+extern void initInput(GLFWwindow* window, ACGL::HardwareSupport::SimpleRiftController *simpleRiftController ); // see input.cc
 extern void handleInput();
 
 extern void initRenderer( GLFWwindow *window, ACGL::HardwareSupport::SimpleRiftController *simpleRiftController ); // see renderer.cc
