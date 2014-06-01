@@ -5,6 +5,7 @@
 #include <ACGL/OpenGL/Data/TextureLoadStore.hh>
 #include "../audio/loadWavFile.hh"
 
+
 using namespace std;
 using namespace ACGL;
 using namespace ACGL::Utils;
@@ -24,7 +25,42 @@ World::World()
     mBunnyGeometry->setAttributeLocations( mBunnyShader->getAttributeLocations() );
     mBunnyTexture  = loadTexture2D( "clownfishBunny.png" );
 
-    //
+    //initialize bullet ==============================================================
+
+    btBroadphaseInterface* broadphase = new btDbvtBroadphase();
+    // Set up the collision configuration and dispatcher
+    btDefaultCollisionConfiguration* collisionConfiguration = new btDefaultCollisionConfiguration();
+    btCollisionDispatcher* dispatcher = new btCollisionDispatcher(collisionConfiguration);
+
+     // The actual physics solver
+    btSequentialImpulseConstraintSolver* solver = new btSequentialImpulseConstraintSolver;
+
+     // The world.
+    dynamicsWorld = new btDiscreteDynamicsWorld( dispatcher, broadphase, solver, collisionConfiguration);
+
+    dynamicsWorld->setGravity(btVector3(0,-10,0));
+
+    btScalar mass = 1.0;
+
+    btCollisionShape* groundShape = new btStaticPlaneShape(btVector3(0, 1, 0),0.0);
+
+    btCollisionShape* fallShape = new  btBoxShape(btVector3(1.0, 1.0, 1.0));
+    btDefaultMotionState* mS = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1),btVector3(0, 0, 0)));
+
+
+    btDefaultMotionState* groundMotionState = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1),btVector3(0,0,0)));
+    btRigidBody::btRigidBodyConstructionInfo groundRigidBodyCI(0,groundMotionState,groundShape,btVector3(0,0,0));
+    btRigidBody* groundRigidBody = new btRigidBody(groundRigidBodyCI);
+    dynamicsWorld->addRigidBody(groundRigidBody);
+
+    droidsPhysic = new PhysicsObject[2];
+    droidsPhysic[0].Init(fallShape);
+    droidsPhysic[1].Init(fallShape);
+
+    dynamicsWorld->addRigidBody(droidsPhysic[0].rigidBody);
+    dynamicsWorld->addRigidBody(droidsPhysic[1].rigidBody);
+
+    //=====================================================================================
     // load audio assets:
     mBeep = new SimpleSound( "audio/musiccensor.wav" );
 }
@@ -114,8 +150,18 @@ void World::render()
     mPlayer.mLightsaber.render(viewMatrix, projectionMatrix);
     mDroids[0].render(viewMatrix, projectionMatrix, glm::vec3(-2.0f, 1.0f, -10.0f));
     mDroids[0].move(glm::vec3(0.0f, 0.0f, 0.01f));
+    droidsPhysic[0].SetPosition(mDroids[0].getPosition());
     mDroids[1].render(viewMatrix, projectionMatrix, glm::vec3(2.0f, 1.0f, -10.0f));
     mDroids[1].move(glm::vec3(0.0f, 0.0f, 0.01f));
+    droidsPhysic[1].SetPosition(mDroids[1].getPosition());
+
+    dynamicsWorld->stepSimulation(0.0166f,10);
+    btTransform trans;
+    droidsPhysic[1].rigidBody->getMotionState()->getWorldTransform(trans);
+    std::cout << "physic position: " << trans.getOrigin().getZ() <<"   "<< trans.getOrigin().getX()<< std::endl;
+    std::cout << "droid position: " << mDroids[1].getPosition().z << "   " << mDroids[1].getPosition().x << std::endl;
+
+
 }
 
 void World::movePlayer( glm::vec3 direction )

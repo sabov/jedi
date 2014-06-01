@@ -7,9 +7,12 @@
 #include <ACGL/HardwareSupport/SimpleRiftController.hh>
 #include <ACGL/OpenGL/Objects/VertexArrayObject.hh>
 #include <ACGL/OpenGL/Objects/ShaderProgram.hh>
+#include <btBulletDynamicsCommon.h>
 #include "player.hh"
 #include "../audio/SimpleSound.hh"
 #include "droid.hh"
+#include "PhysicsObject.hh"
+
 
 class World {
 public:
@@ -43,6 +46,11 @@ public:
 private:
     Player mPlayer;
     Droid mDroids[2];
+
+    //bullet
+    btDiscreteDynamicsWorld* dynamicsWorld;
+    PhysicsObject *droidsPhysic;
+
 
     //
     // The "level":

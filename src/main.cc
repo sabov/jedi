@@ -12,8 +12,6 @@
 
 #include <iostream>
 
-#include <btBulletDynamicsCommon.h>
-
 // OpenGL defines and function pointers. We use this instead of the system GL.h or glew.h.
 // This has to be included before glfw.h !
 #include <ACGL/OpenGL/GL.hh>
@@ -34,8 +32,6 @@
 // but it keeps the example simple.
 //
 World *gWorld = NULL;
-btDiscreteDynamicsWorld* dynamicsWorld;
-btRigidBody* fallRigidBody;
 
 //
 // external functions so this file does not get too big:
@@ -224,9 +220,8 @@ int main( int argc, char *argv[] )
     exit(0);
 }
 
-//Hello world example from
-//http://www.bulletphysics.org/mediawiki-1.5.8/index.php/Hello_World
-/*int main (void)
+/*
+void initializeBullet()
 {
         btBroadphaseInterface* broadphase = new btDbvtBroadphase();
 
@@ -292,4 +287,5 @@ int main( int argc, char *argv[] )
         delete broadphase;
 
         return 0;
-}*/
+}
+*/
