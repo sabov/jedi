@@ -38,27 +38,34 @@ World::World()
      // The world.
     dynamicsWorld = new btDiscreteDynamicsWorld( dispatcher, broadphase, solver, collisionConfiguration);
 
-    dynamicsWorld->setGravity(btVector3(0,-10,0));
+    //dynamicsWorld->setGravity(btVector3(0,-10,0));
 
     btScalar mass = 1.0;
 
     btCollisionShape* groundShape = new btStaticPlaneShape(btVector3(0, 1, 0),0.0);
 
-    btCollisionShape* fallShape = new  btBoxShape(btVector3(1.0, 1.0, 1.0));
+    btCollisionShape* fallShape = new  btBoxShape(btVector3(0.0001, 0.0001, 0.0001));
     btDefaultMotionState* mS = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1),btVector3(0, 0, 0)));
 
 
     btDefaultMotionState* groundMotionState = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1),btVector3(0,0,0)));
     btRigidBody::btRigidBodyConstructionInfo groundRigidBodyCI(0,groundMotionState,groundShape,btVector3(0,0,0));
     btRigidBody* groundRigidBody = new btRigidBody(groundRigidBodyCI);
-    dynamicsWorld->addRigidBody(groundRigidBody);
+    //dynamicsWorld->addRigidBody(groundRigidBody);
 
-    droidsPhysic = new PhysicsObject[2];
-    droidsPhysic[0].Init(fallShape);
-    droidsPhysic[1].Init(fallShape);
 
-    dynamicsWorld->addRigidBody(droidsPhysic[0].rigidBody);
-    dynamicsWorld->addRigidBody(droidsPhysic[1].rigidBody);
+    mDroids[0].mPhysicObject.Init(fallShape);
+    mDroids[1].mPhysicObject.Init(fallShape);
+    mPlayer.mLightsaber.mPhysicObject.Init(fallShape);
+
+
+
+    //dynamicsWorld->addRigidBody(mDroids[0].mPhysicObject.rigidBody);
+    dynamicsWorld->addRigidBody(mDroids[0].mPhysicObject.rigidBody);
+    dynamicsWorld->addRigidBody(mPlayer.mLightsaber.mPhysicObject.rigidBody);
+
+
+
 
     //=====================================================================================
     // load audio assets:
@@ -148,20 +155,46 @@ void World::render()
     mBunnyGeometry->draw();
 
     mPlayer.mLightsaber.render(viewMatrix, projectionMatrix);
-    mDroids[0].render(viewMatrix, projectionMatrix, glm::vec3(-2.0f, 1.0f, -10.0f));
-    mDroids[0].move(glm::vec3(0.0f, 0.0f, 0.01f));
-    droidsPhysic[0].SetPosition(mDroids[0].getPosition());
-    mDroids[1].render(viewMatrix, projectionMatrix, glm::vec3(2.0f, 1.0f, -10.0f));
-    mDroids[1].move(glm::vec3(0.0f, 0.0f, 0.01f));
-    droidsPhysic[1].SetPosition(mDroids[1].getPosition());
+    mDroids[0].render(viewMatrix, projectionMatrix, glm::vec3(-4.0f, 1.0f, -8.0f));
+    //mDroids[0].move(glm::vec3(0.01f, 0.0f, 0.01f));
+
+    mDroids[1].render(viewMatrix, projectionMatrix, glm::vec3(4.0f, 1.0f, -8.0f));
+    //mDroids[1].move(glm::vec3(-0.01f, 0.0f, 0.01f));
 
     dynamicsWorld->stepSimulation(0.0166f,10);
+
     btTransform trans;
-    droidsPhysic[1].rigidBody->getMotionState()->getWorldTransform(trans);
-    std::cout << "physic position: " << trans.getOrigin().getZ() <<"   "<< trans.getOrigin().getX()<< std::endl;
-    std::cout << "droid position: " << mDroids[1].getPosition().z << "   " << mDroids[1].getPosition().x << std::endl;
+    mPlayer.mLightsaber.mPhysicObject.rigidBody->getMotionState()->getWorldTransform(trans);
+    //std::cout << "physic position: " << trans.getOrigin().getZ() <<"   "<< trans.getOrigin().getX()<< std::endl;
+    //std::cout << "droid position: " << mDroids[0].getPosition().z << "   " << mDroids[0].getPosition().x << std::endl;
 
 
+    int numManifolds = dynamicsWorld->getDispatcher()->getNumManifolds();
+    cout<< "ManifoldsNum " << numManifolds << endl;
+
+    dynamicsWorld->performDiscreteCollisionDetection();
+
+
+    for (int i=0;i<numManifolds;i++)
+        {
+            btPersistentManifold* contactManifold =  dynamicsWorld->getDispatcher()->getManifoldByIndexInternal(i);
+            btCollisionObject* obA = const_cast<btCollisionObject*>(contactManifold->getBody0());
+            btCollisionObject* obB = const_cast<btCollisionObject*>(contactManifold->getBody1());
+
+            int numContacts = contactManifold->getNumContacts();
+            cout<< "numOfContacts" << numContacts  << endl;
+            for (int j=0;j<numContacts;j++)
+            {
+                btManifoldPoint& pt = contactManifold->getContactPoint(j);
+                if (pt.getDistance()<0.f)
+                {
+                    const btVector3& ptA = pt.getPositionWorldOnA();
+                    const btVector3& ptB = pt.getPositionWorldOnB();
+                    const btVector3& normalOnB = pt.m_normalWorldOnB;
+                    cout<< "in collision" << endl;
+                }
+            }
+        }
 }
 
 void World::movePlayer( glm::vec3 direction )

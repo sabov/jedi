@@ -3,6 +3,7 @@
 #include <ACGL/Scene/MoveableObject.hh>
 #include <ACGL/OpenGL/Objects/VertexArrayObject.hh>
 #include <ACGL/OpenGL/Objects/ShaderProgram.hh>
+#include "PhysicsObject.hh"
 
 /*
  * Class for the lightsaber of the player
@@ -15,6 +16,7 @@ public:
 
     void render(glm::mat4 &viewMatrix, glm::mat4 &projectionMatrix);
 
+    PhysicsObject mPhysicObject;
 private:
     //The lightsaber
     ACGL::OpenGL::SharedVertexArrayObject mLightsaberGeometry;
