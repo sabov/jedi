@@ -15,6 +15,7 @@ World::World()
     debug() << "loading game world..." << endl;
 
     mLevel.LoadMesh("geometry/L1/level.obj", CGEngine::CGE_TRIANGULATE);
+    mDice.LoadMesh("geometry/test/dice.obj");
     mBunnyShader   = ShaderProgramFileManager::the()->get( ShaderProgramCreator("Bunny") );
     //GLint n = mBunnyShader->getAttributeLocation("aNormal");
     //GLint v = mBunnyShader->getAttributeLocation("aPosition");
@@ -24,6 +25,10 @@ World::World()
     //mBeep = new SimpleSound( "audio/musiccensor.wav" );
     //mBeep->setLooping( true );
     //mBeep->play();
+
+    mpRotProcess = GameLogic::RotationProcessPtr( new GameLogic::RotationProcess() );
+    mpProcessManager = GameLogic::CProcessManager::getInstance();
+    mpProcessManager->attachProcess( mpRotProcess );
 }
 
 World::~World()
@@ -76,6 +81,24 @@ void World::render()
     // draw geometry
     //
     mLevel.VOnDraw();
+
+    mMatrixStack.LoadIdentity();
+    mMatrixStack.Translate(CGEngine::Vec3(0.0,1.0,-4.0));
+    mMatrixStack.Rotate( glm::radians( mpRotProcess->rotAngle ), CGEngine::Vec3(0.0,1.0,0.0) );
+
+    mBunnyShader->use();
+
+    modelMatrix = mMatrixStack.getCompleteTransform();
+    viewMatrix = mPlayer.getHMDViewMatrix();
+
+    mBunnyShader->setUniform( "uModelMatrix", modelMatrix );
+    mBunnyShader->setUniform( "uViewMatrix",  viewMatrix );
+    mBunnyShader->setUniform( "uProjectionMatrix", mPlayer.getProjectionMatrix() );
+    mBunnyShader->setUniform( "uNormalMatrix",     glm::inverseTranspose(glm::mat3(viewMatrix)*glm::mat3(modelMatrix)) );
+
+    mBunnyShader->setUniform( "uTexture", 0 );
+
+    mDice.VOnDraw();
 }
 
 void World::movePlayer( glm::vec3 direction )
@@ -134,4 +157,9 @@ void World::rotatePlayer( float dYaw )
 void World::duckPlayer( float duckingValue )
 {
     mPlayer.duck( duckingValue );
+}
+
+void World::update(int time)
+{
+    mpProcessManager->updateProcesses(time);
 }

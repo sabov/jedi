@@ -8,9 +8,12 @@
 #include <ACGL/OpenGL/Objects/VertexArrayObject.hh>
 #include <ACGL/OpenGL/Objects/ShaderProgram.hh>
 #include "player.hh"
+#include "events.hh"
 #include "../audio/SimpleSound.hh"
 #include "mesh/CGEMesh.h"
 #include "math/CGETransformation.h"
+#include "process_sys/GLGProcessManager.h"
+#include "process_sys/GLGExampleProcesses.h"
 
 class World {
 public:
@@ -38,6 +41,8 @@ public:
     // ducking value is between 0..1
     void duckPlayer( float duckingValue );
 
+    void update(int time);
+
 private:
     Player mPlayer;
 
@@ -45,12 +50,18 @@ private:
     CGEngine::CMatrixStack  mMatrixStack;
 
     // The "level":
-    CGEngine::CMesh mLevel ;
+    CGEngine::CMesh mLevel  ;
+    //test oject
+    CGEngine::CMesh mDice   ;
 
-    //using this shader sinceit supports textures
+    //using this shader since it supports textures
     ACGL::OpenGL::SharedShaderProgram     mBunnyShader;
 
     //
     // One repeating sound as an example of how to use OpenAL:
     SimpleSound *mBeep;
+
+    //process manager per level
+    GameLogic::ProcessManagerPtr    mpProcessManager;
+    GameLogic::RotationProcessPtr   mpRotProcess;
 };

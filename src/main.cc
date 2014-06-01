@@ -25,6 +25,8 @@
 #include <ACGL/HardwareSupport/SimpleRiftController.hh>
 #include <ACGL/Base/Settings.hh>
 
+#include <qtimer.h>
+
 #include "audio/audio.hh"
 #include "world/world.hh"
 
@@ -192,6 +194,7 @@ int main( int argc, char *argv[] )
     double startTimeInSeconds = glfwGetTime();
     do {
         double now = glfwGetTime() - startTimeInSeconds;
+        std::cout << now << std::endl ;
 
         //
         // shader file reloading once a second:
@@ -201,6 +204,12 @@ int main( int argc, char *argv[] )
         if (now > nextReloadTime) {
             ACGL::OpenGL::ShaderProgramFileManager::the()->updateAll();
             nextReloadTime = now + 1.0; // check again in one second
+        }
+
+        static double nextUpdateTime = 0.1;
+        if (now > nextUpdateTime) {
+            gWorld->update((int)(1000.0 * 0.1));
+            nextUpdateTime = now + 0.1;
         }
 
         //
