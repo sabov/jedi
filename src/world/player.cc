@@ -3,37 +3,43 @@
 using namespace std;
 using namespace ACGL::Scene;
 
-
-void Player::setCamera( ACGL::Scene::SharedHMDCamera sHMDCamera )
-{
-    mHMDCamera = sHMDCamera;
-    setPosition( glm::vec3( 0.0f, 0.0f, 0.0f ) ); // feet position
-    duck( 1.0f ); // standing up
+Player::Player() :
+        mLightsaber(getPosition()) {
 }
 
-glm::mat4 Player::getHMDViewMatrix()
-{
+Player::~Player() {
+}
+
+void Player::setCamera(ACGL::Scene::SharedHMDCamera sHMDCamera) {
+    mHMDCamera = sHMDCamera;
+    setPosition(glm::vec3(0.0f, 0.0f, 0.0f)); // feet position
+    duck(1.0f); // standing up
+}
+
+glm::mat4 Player::getHMDViewMatrix() {
     glm::mat4 playerInTheWorld = this->getModelMatrix();
-    glm::mat4 headOnBody       = mHMDCamera->getViewMatrix();
+    glm::mat4 headOnBody = mHMDCamera->getViewMatrix();
 
     float heightOfEyes = mHeight - 0.12f; // estimated distance eyes to head
-    headOnBody = glm::translate( headOnBody, glm::vec3( 0.0f, -heightOfEyes, 0.0f ) );
+    headOnBody = glm::translate(headOnBody, glm::vec3(0.0f, -heightOfEyes, 0.0f));
 
     return headOnBody * playerInTheWorld;
 }
 
-glm::mat4 Player::getProjectionMatrix()
-{
+glm::mat4 Player::getProjectionMatrix() {
     return mHMDCamera->getProjectionMatrix();
 }
 
-void Player::duck( float duckingValue )
-{
-    duckingValue = min( duckingValue, 1.0f );
-    duckingValue = max( duckingValue, 0.0f );
+void Player::duck(float duckingValue) {
+    duckingValue = min(duckingValue, 1.0f);
+    duckingValue = max(duckingValue, 0.0f);
 
     // values are rough estimates, need to be measured correctly
     // for the Virtualizer
     //        |----- legs ------------| + upper body
-    mHeight = 0.3f + duckingValue*0.70f + 0.87f;
+    mHeight = 0.3f + duckingValue * 0.70f + 0.87f;
+}
+
+void Player::useForce() {
+    //TODO do something useful
 }

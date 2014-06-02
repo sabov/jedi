@@ -16,25 +16,34 @@ public:
     ~World();
 
     // called once to connect the player with the Rift:
-    void setPlayerCamera( ACGL::HardwareSupport::SimpleRiftController *riftControl );
+    void setPlayerCamera(ACGL::HardwareSupport::SimpleRiftController *riftControl);
 
     // render the world:
     void render();
 
-    // move the player relative to the players bodys orientation:
-    void movePlayer( glm::vec3 direction );
+    // move the player relative to the players body orientation:
+    void movePlayer(const glm::vec3 &direction);
 
-    // get the currect position in world space
+    // get the current position in world space
     glm::vec3 getPlayerPosition();
 
     // returns the OpenAL compatible orientation which is the orientation on the head (ears)!
-    void getPlayerOrientation( ALfloat *playerOrientation );
+    void getPlayerOrientation(ALfloat *playerOrientation);
 
     // rotate the players body, negative values rotate to the left, positive to the right
-    void rotatePlayer( float dYaw );
+    void rotatePlayer(float dYaw);
 
     // ducking value is between 0..1
-    void duckPlayer( float duckingValue );
+    void duckPlayer(float duckingValue);
+
+    // player is currently using the force
+    void useForcePlayer();
+
+    // move the lightsaber of the player
+    void moveLightsaber(const glm::vec3 &direction);
+
+    //rotate the lightsaber, negative values rotate to the left, positive to the right
+    void rotateLightsaber(float dYaw, float dRoll, float dPitch);
 
 private:
     Player mPlayer;
@@ -42,13 +51,13 @@ private:
     //
     // The "level":
     ACGL::OpenGL::SharedVertexArrayObject mWorldGeometry;
-    ACGL::OpenGL::SharedShaderProgram     mWorldShader;
+    ACGL::OpenGL::SharedShaderProgram mWorldShader;
 
     //
     // Example of a textured object:
     ACGL::OpenGL::SharedVertexArrayObject mBunnyGeometry;
-    ACGL::OpenGL::SharedShaderProgram     mBunnyShader;
-    ACGL::OpenGL::SharedTexture2D         mBunnyTexture;
+    ACGL::OpenGL::SharedShaderProgram mBunnyShader;
+    ACGL::OpenGL::SharedTexture2D mBunnyTexture;
 
     //
     // One repeating sound as an example of how to use OpenAL:
