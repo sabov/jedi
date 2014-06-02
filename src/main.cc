@@ -10,6 +10,10 @@
  *
  */
 
+#include <iostream>
+
+#include <btBulletDynamicsCommon.h>
+
 // OpenGL defines and function pointers. We use this instead of the system GL.h or glew.h.
 // This has to be included before glfw.h !
 #include <ACGL/OpenGL/GL.hh>
@@ -213,4 +217,3 @@ int main(int argc, char *argv[]) {
     glfwTerminate();
     exit(0);
 }
-
