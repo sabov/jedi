@@ -6,6 +6,7 @@ PROJECT(Jedi)
 message("Jedi - Occulus Rift - Starting Project Build")
 
 #include "findASSIMP.cmake"...
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/extern/acgl/cmake/")
 
 # ACGL setup:
@@ -165,7 +166,7 @@ include_directories(${BULLET_INCLUDE_DIRS})
 set(LIBRARIES ${LIBRARIES} ${BULLET_LIBRARIES})
 
 #Assimp Library
-find_package(ASSIMP)
+find_package(Assimp REQUIRED)
 if(NOT ASSIMP_FOUND)
   message(FATAL_ERROR "ASSIMP not found!")
 endif ()
