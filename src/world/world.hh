@@ -45,7 +45,7 @@ public:
 
 private:
     Player mPlayer;
-    Droid mDroids[2];
+    Droid mDroids[3];
 
     //bullet
     btDiscreteDynamicsWorld* dynamicsWorld;

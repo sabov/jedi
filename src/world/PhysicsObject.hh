@@ -13,7 +13,8 @@ public:
    btRigidBody *rigidBody;
    btCollisionShape *colShape;
 
-   void Init(btCollisionShape*);
+   void Init(btCollisionShape*, glm::vec3);
+   glm::vec3 GetPosition();
    bool SetPosition(glm::vec3);
    bool SetRotation(glm::vec4);
    bool SetVelocity(glm::vec3);

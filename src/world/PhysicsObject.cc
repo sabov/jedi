@@ -12,15 +12,24 @@ PhysicsObject::~PhysicsObject(void)
    delete [] colShape;
 }
 
-void PhysicsObject::Init(btCollisionShape* cS) {
+void PhysicsObject::Init(btCollisionShape* cS, glm::vec3 startPosition) {
    colShape = cS;
    btScalar mass = 1;
 
-   btDefaultMotionState* mS = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1),btVector3(0,0,0)));
+   btDefaultMotionState* mS = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1),btVector3(startPosition.x,startPosition.y,startPosition.z)));
    btVector3 fallInertia(0,0,0);
    colShape->calculateLocalInertia(mass,fallInertia);
    btRigidBody::btRigidBodyConstructionInfo rigidBodyCI(mass,mS,cS,fallInertia);
    rigidBody = new btRigidBody(rigidBodyCI);
+}
+
+glm::vec3 PhysicsObject::GetPosition(){
+        btTransform trans;
+        rigidBody->getMotionState()->getWorldTransform(trans);
+        float x = trans.getOrigin().getX();
+        float y = trans.getOrigin().getY();
+        float z = trans.getOrigin().getZ();
+        return glm::vec3(x,y,z);
 }
 
 bool PhysicsObject::SetPosition(glm::vec3 nPos)
