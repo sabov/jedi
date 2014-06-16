@@ -13,6 +13,9 @@
 #ifndef __GLEW_H__
     #include <GL/glew.h>
 #endif
+
+#include <btBulletDynamicsCommon.h>
+
 // OpenGL defines and function pointers. We use this instead of the system GL.h or glew.h.
 // This has to be included before glfw.h !
 #include <ACGL/OpenGL/GL.hh>
@@ -27,6 +30,7 @@
 
 #include "audio/audio.hh"
 #include "world/world.hh"
+#include "input.hh"
 
 //
 // Store the world in a global object. This is not pretty nor is it good software design,
@@ -34,13 +38,10 @@
 //
 World *gWorld = NULL;
 
-//
-// external functions so this file does not get too big:
-//
-extern void initInput(    GLFWwindow* window, ACGL::HardwareSupport::SimpleRiftController *simpleRiftController ); // see input.cc
-extern void handleInput();
+// Handles input
+Input *gInput = NULL;
 
-extern void initRenderer( GLFWwindow *window, ACGL::HardwareSupport::SimpleRiftController *simpleRiftController ); // see renderer.cc
+extern void initRenderer(GLFWwindow *window, ACGL::HardwareSupport::SimpleRiftController *simpleRiftController); // see renderer.cc
 extern void renderFrame();
 extern void shutdownRenderer();
 
@@ -50,14 +51,13 @@ extern void shutdownRenderer();
 // Requested OpenGL version gets set by ACGL defines.
 //
 // if monitorNumber is < 0 or > number of displays the primary display is used
-GLFWwindow* createWindow( bool fullscreen, int monitorNumber )
-{
+GLFWwindow* createWindow(bool fullscreen, int monitorNumber) {
     // we assume a core profile here to stay Mac compatible:
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    #ifndef ACGL_OPENGL_PROFILE_CORE
-    #error "Compatibility profiles will break Mac support, use Core"
-    #endif
+#ifndef ACGL_OPENGL_PROFILE_CORE
+#error "Compatibility profiles will break Mac support, use Core"
+#endif
 
 #ifdef __APPLE__
 #if (ACGL_OPENGL_VERSION >= 30)
@@ -69,21 +69,21 @@ GLFWwindow* createWindow( bool fullscreen, int monitorNumber )
 #endif
 #else
     // non-apple: request the actual version:
-    glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, ACGL_OPENGL_VERSION / 10 );
-    glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, ACGL_OPENGL_VERSION % 10 );
+    glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, ACGL_OPENGL_VERSION / 10);
+    glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, ACGL_OPENGL_VERSION % 10);
 #endif
 
     //
     // Try to get a native debug context, this will slow down GL a bit but be helpful for finding
     // errors.
-    glfwWindowHint( GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE );
+    glfwWindowHint( GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 
     // Define whether the window can get resized:
-    glfwWindowHint( GLFW_RESIZABLE, true );
+    glfwWindowHint( GLFW_RESIZABLE, true);
 
     // The framebuffer should support sRGB if possible - note: this does not activate the support itself!
     // sRGB framebuffers are needed for gamma correct rendering.
-    glfwWindowHint( GLFW_SRGB_CAPABLE, true );
+    glfwWindowHint( GLFW_SRGB_CAPABLE, true);
 
     //
     // try to create an OpenGL context in a window and check the supported OpenGL version:
@@ -91,60 +91,57 @@ GLFWwindow* createWindow( bool fullscreen, int monitorNumber )
     GLFWwindow* window = NULL;
     if (!fullscreen) {
         // windowed:
-        window = glfwCreateWindow( 1280, 800, "SimpleVRGame", NULL, NULL );
+        window = glfwCreateWindow(1280, 800, "SimpleVRGame", NULL, NULL);
     } else {
         // fullscreen:
         int numberOfMonitors = 1;
-        GLFWmonitor **monitors = glfwGetMonitors( &numberOfMonitors );
-        GLFWmonitor  *monitor = NULL;
+        GLFWmonitor **monitors = glfwGetMonitors(&numberOfMonitors);
+        GLFWmonitor *monitor = NULL;
 
         if (monitorNumber >= numberOfMonitors || monitorNumber < 0) {
-            monitor         = glfwGetPrimaryMonitor();
+            monitor = glfwGetPrimaryMonitor();
         } else {
-            monitor         = monitors[monitorNumber];
+            monitor = monitors[monitorNumber];
         }
 
-        const GLFWvidmode *currentVideoMode = glfwGetVideoMode( monitor );
-        window = glfwCreateWindow( currentVideoMode->width, currentVideoMode->height, "SimpleVRGame", monitor, NULL );
+        const GLFWvidmode *currentVideoMode = glfwGetVideoMode(monitor);
+        window = glfwCreateWindow(currentVideoMode->width, currentVideoMode->height, "SimpleVRGame", monitor, NULL);
     }
     if (!window) {
-        ACGL::Utils::error() << "Failed to open a GLFW window - requested OpenGL version: " <<  ACGL_OPENGL_VERSION << std::endl;
+        ACGL::Utils::error() << "Failed to open a GLFW window - requested OpenGL version: " << ACGL_OPENGL_VERSION << std::endl;
         return NULL;
     }
 
     //
     // "activate" this context. Only called once as this application only has one context / window.
     //
-    glfwMakeContextCurrent( window );
+    glfwMakeContextCurrent(window);
 
     return window;
 }
 
 // the callback GLFW calls if there were any problems (uncommon) :
-void myGLFWErrorCallback( int errorCode, const char *description )
-{
+void myGLFWErrorCallback(int errorCode, const char *description) {
     ACGL::Utils::error() << "GLFW error " << errorCode << ": " << description << std::endl;
 }
 
-int main( int argc, char *argv[] )
-{
+int main(int argc, char *argv[]) {
     //
     // Initialise GLFW
     //
-    glfwSetErrorCallback( myGLFWErrorCallback ); // yes, this can be called before the init!
-    if ( !glfwInit() )
-    {
+    glfwSetErrorCallback(myGLFWErrorCallback); // yes, this can be called before the init!
+    if (!glfwInit()) {
         ACGL::Utils::error() << "Failed to initialize GLFW" << std::endl;
-        exit( -1 );
+        exit(-1);
     }
     //
     // Create an OpenGL capable window:
     // parameter is whether the window should be fullscreen or not and which monitor to use if fullscreen
     //
-    GLFWwindow* myWindow = createWindow( !false, 1 );
-    if ( !myWindow ) {
+    GLFWwindow* myWindow = createWindow(!false, 1);
+    if (!myWindow) {
         glfwTerminate();
-        exit( -1 );
+        exit(-1);
     }
 
     //
@@ -152,7 +149,7 @@ int main( int argc, char *argv[] )
     // The true parameter tells ACGL to simulate the debug functions of OpenGL 4.3 if they are not supported.
     // The final version should have a false here to increase the games speed a bit.
     //
-    ACGL::init( true );
+    ACGL::init(true);
     // tell ACGL in which subdirectory the shaders are:
     ACGL::Base::Settings::the()->setShaderPath("shader/");
 
@@ -171,20 +168,22 @@ int main( int argc, char *argv[] )
     //
     ACGL::HardwareSupport::SimpleRiftController *simpleRiftController = new ACGL::HardwareSupport::SimpleRiftController();
     // use a larger field of view:
-    simpleRiftController->setDistortionScaleFactor( 1.75f );
+    simpleRiftController->setDistortionScaleFactor(1.75f);
 
     //
     // init whatever you need:
     //
-    initInput(    myWindow, simpleRiftController );
-    initRenderer( myWindow, simpleRiftController );
+
+    gInput = new Input(myWindow, simpleRiftController);
+
+    initRenderer(myWindow, simpleRiftController);
     initAudio();
 
     //
     // Create a world object
     //
     gWorld = new World();
-    gWorld->setPlayerCamera( simpleRiftController );
+    gWorld->setPlayerCamera(simpleRiftController);
 
     //
     // main loop
@@ -207,26 +206,26 @@ int main( int argc, char *argv[] )
         // per frame tasks:
         // you might want to add game logic, physics etc.
         //
-        handleInput();
+        gInput->handleInput();
         renderAudio();
         renderFrame();
 
         // Swap the front and the back buffer to display the rendered image:
         // If VSync is active, this will block until the next frame can get displayed (up to 16.6msec)
         // Note that in VR you want VSync as tearing lines are very distractive!
-        glfwSwapBuffers( myWindow );
+        glfwSwapBuffers(myWindow);
 
-    // until either the user pressed the X of the window (in case it has a windowbar (== not fullscreen)
-    // or the program signaled to get closed by setting glfwSetWindowShouldClose( window, true ) somewhere!
-    } while( !glfwWindowShouldClose( myWindow ) );
+        // until either the user pressed the X of the window (in case it has a windowbar (== not fullscreen)
+        // or the program signaled to get closed by setting glfwSetWindowShouldClose( window, true ) somewhere!
+    } while (!glfwWindowShouldClose(myWindow));
 
     // clean up:
     delete gWorld;
+    delete gInput;
 
     shutdownAudio();
     shutdownRenderer();
-    glfwDestroyWindow( myWindow );
+    glfwDestroyWindow(myWindow);
     glfwTerminate();
     exit(0);
 }
-
