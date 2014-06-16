@@ -2,5 +2,5 @@
 cd ..
 make
 RETVAL=$?
-[ $RETVAL -eq 0 ] && cd bin && ./SimpleVRGame
+[ $RETVAL -eq 0 ] && cd bin && ./Jedi
 [ $RETVAL -ne 0 ] && cd bin
