@@ -10,7 +10,9 @@
  *
  */
 
-#include <iostream>
+#ifndef __GLEW_H__
+    #include <GL/glew.h>
+#endif
 
 #include <btBulletDynamicsCommon.h>
 
@@ -150,6 +152,16 @@ int main(int argc, char *argv[]) {
     ACGL::init(true);
     // tell ACGL in which subdirectory the shaders are:
     ACGL::Base::Settings::the()->setShaderPath("shader/");
+
+    //GLEW Initialization
+    glewExperimental = TRUE; // <--- Depends on your graphics card
+    GLenum initStatus = glewInit();
+    if ( initStatus != GLEW_OK )
+    {
+        glfwTerminate();
+        ACGL::Utils::error() << "Failed to initialize GLEW" << std::endl;
+        exit( -1 );
+    }
 
     //
     // Create a SimpleRiftController

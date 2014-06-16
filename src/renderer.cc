@@ -146,8 +146,8 @@ void initRenderer(GLFWwindow *window, ACGL::HardwareSupport::SimpleRiftControlle
     glfwSetWindowSizeCallback(window, resizeCallback);
 
     // define the color the glClear should draw:
-    glClearColor(0.8f, 0.8f, 1.0f, 1.0f);
-    glEnable( GL_DEPTH_TEST);
+    glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
+    glEnable( GL_DEPTH_TEST );
 }
 
 void shutdownRenderer() {
