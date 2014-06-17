@@ -10,9 +10,9 @@ using namespace std;
 using namespace ACGL;
 using namespace ACGL::Utils;
 using namespace ACGL::OpenGL;
-glm::vec3 droidPosition = glm::vec3(-4.0f, 10.0f, -8.0f);
-glm::vec3 droidPosition2 = glm::vec3(0.0f, 20.0f, -5.0f);
-glm::vec3 droidPosition3 = glm::vec3(0.0f, 10.0f, -5.0f);
+glm::vec3 droidPosition = glm::vec3(-4.0f, 1.0f, -8.0f);
+glm::vec3 droidPosition2 = glm::vec3(-4.0f, 1.0f, -3.0f);
+glm::vec3 droidPosition3 = glm::vec3(4.0f, 1.0f, -3.0f);
 
 World::World()
 {
@@ -41,16 +41,16 @@ World::World()
      // The world.
     dynamicsWorld = new btDiscreteDynamicsWorld( dispatcher, broadphase, solver, collisionConfiguration);
 
-    dynamicsWorld->setGravity(btVector3(0,-10,0));
+    //dynamicsWorld->setGravity(btVector3(0,-10,0));
 
 
     btCollisionShape* groundShape = new btStaticPlaneShape(btVector3(0, 1, 0),0.0);
 
-    btCollisionShape* fallShape = new btSphereShape(1);
+    btCollisionShape* sphereShape = new btSphereShape(1);
 
     btScalar mass = 1.0;
     btVector3 fallInertia(0,0,0);
-    fallShape->calculateLocalInertia(mass,fallInertia);
+    //sphereShape->calculateLocalInertia(mass,fallInertia);
 
 
     btDefaultMotionState* groundMotionState = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1),btVector3(0,-1,0)));
@@ -59,9 +59,13 @@ World::World()
     //dynamicsWorld->addRigidBody(groundRigidBody);
 
 
-    mDroids[0].mPhysicObject.Init(fallShape, droidPosition);
-    mDroids[1].mPhysicObject.Init(fallShape, droidPosition2);
-    mDroids[2].mPhysicObject.Init(fallShape, droidPosition3);
+    mDroids[0].mPhysicObject.Init(sphereShape, droidPosition);
+
+    mDroids[1].setPosition(droidPosition2);
+    mDroids[1].mPhysicObject.Init(sphereShape, droidPosition2);
+
+    mDroids[2].setPosition(droidPosition3);
+    mDroids[2].mPhysicObject.Init(sphereShape, droidPosition3);
     //mPlayer.mLightsaber.mPhysicObject.Init(fallShape);
 
 
@@ -162,26 +166,25 @@ void World::render()
     mBunnyGeometry->draw();
 
     mPlayer.mLightsaber.render(viewMatrix, projectionMatrix);
-    mDroids[0].render(viewMatrix, projectionMatrix, droidPosition);
+    mDroids[0].render(viewMatrix, projectionMatrix);
     mDroids[0].setPosition(mDroids[0].mPhysicObject.GetPosition());
 
-    mDroids[1].render(viewMatrix, projectionMatrix, glm::vec3(4.0f, 1.0f, -8.0f));
-    mDroids[1].setPosition(mDroids[1].mPhysicObject.GetPosition());
-    //mDroids[1].move(glm::vec3(-0.01f, 0.0f, 0.01f));
+    mDroids[1].render(viewMatrix, projectionMatrix);
+    //mDroids[1].setPosition(mDroids[1].mPhysicObject.GetPosition());
+    mDroids[1].mPhysicObject.SetPosition(mDroids[1].getPosition());
+    //mDroids[1].move(glm::vec3(0.01f, 0.0f, 0.0f));
 
-    mDroids[2].render(viewMatrix, projectionMatrix, glm::vec3(4.0f, 1.0f, -8.0f));
-    mDroids[2].setPosition(mDroids[2].mPhysicObject.GetPosition());
+    mDroids[2].render(viewMatrix, projectionMatrix);
+    mDroids[2].mPhysicObject.SetPosition(mDroids[2].getPosition());
+    //mDroids[2].setPosition(mDroids[2].mPhysicObject.GetPosition());
 
     dynamicsWorld->stepSimulation(0.0166f,10);
 
-    //btTransform trans;
-    //mPlayer.mLightsaber.mPhysicObject.rigidBody->getMotionState()->getWorldTransform(trans);
-    //std::cout << "physic position: " << trans.getOrigin().getZ() <<"   "<< trans.getOrigin().getX()<< std::endl;
-    //std::cout << "droid position: " << mDroids[0].getPosition().z << "   " << mDroids[0].getPosition().x << std::endl;
-    std::cout << "physic obj position: "  << mDroids[0].mPhysicObject.GetPosition().y << std::endl;
+    //std::cout << "physic obj1 position: "  << mDroids[1].mPhysicObject.GetPosition().x << std::endl;
+    //std::cout << "physic obj2 position: "  << mDroids[2].mPhysicObject.GetPosition().x << std::endl;
 
     int numManifolds = dynamicsWorld->getDispatcher()->getNumManifolds();
-    //cout<< "ManifoldsNum " << numManifolds << endl;
+    cout<< "ManifoldsNum " << numManifolds << endl;
 
 
     dynamicsWorld->performDiscreteCollisionDetection();
@@ -194,7 +197,7 @@ void World::render()
             btCollisionObject* obB = const_cast<btCollisionObject*>(contactManifold->getBody1());
 
             int numContacts = contactManifold->getNumContacts();
-            //cout<< "numOfContacts" << numContacts  << endl;
+            cout<< "numOfContacts" << numContacts  << endl;
             for (int j=0;j<numContacts;j++)
             {
                 btManifoldPoint& pt = contactManifold->getContactPoint(j);
@@ -203,7 +206,7 @@ void World::render()
                     const btVector3& ptA = pt.getPositionWorldOnA();
                     const btVector3& ptB = pt.getPositionWorldOnB();
                     const btVector3& normalOnB = pt.m_normalWorldOnB;
-                    //cout<< "in collision" << endl;
+                    cout<< "in collision" << endl;
                 }
             }
         }

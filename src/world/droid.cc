@@ -22,16 +22,16 @@ Droid::~Droid()
 {
 }
 
-void Droid::render(glm::mat4 &viewMatrix, glm::mat4 &projectionMatrix, glm::vec3 positon)
+void Droid::render(glm::mat4 &viewMatrix, glm::mat4 &projectionMatrix)
 {
     mDroidShader->use();
 
     glm::mat4 modelMatrix = glm::scale( glm::vec3( 0.8f ) );
 
     glm::mat4 translateMatrix = glm::translate( glm::mat4(),
-                                                glm::vec3(getPosition().x + positon.x,
-                                                          getPosition().y + positon.y,
-                                                          getPosition().z + positon.z ) );
+                                                glm::vec3(getPosition().x,
+                                                          getPosition().y,
+                                                          getPosition().z) );
     modelMatrix = translateMatrix * modelMatrix;
 
     //mPhysicObject.SetPosition(getPosition());

@@ -14,7 +14,7 @@ PhysicsObject::~PhysicsObject(void)
 
 void PhysicsObject::Init(btCollisionShape* cS, glm::vec3 startPosition) {
    colShape = cS;
-   btScalar mass = 1;
+   btScalar mass = 0.1;
 
    btDefaultMotionState* mS = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1),btVector3(startPosition.x,startPosition.y,startPosition.z)));
    btVector3 fallInertia(0,0,0);
