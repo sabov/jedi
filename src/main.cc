@@ -30,7 +30,10 @@
 
 #include "audio/audio.hh"
 #include "world/world.hh"
-#include "input.hh"
+
+//Set input device
+#include "input/mouse.hh"
+typedef Mouse INPUT;
 
 //
 // Store the world in a global object. This is not pretty nor is it good software design,
@@ -39,7 +42,7 @@
 World *gWorld = NULL;
 
 // Handles input
-Input *gInput = NULL;
+INPUT *gInput = NULL;
 
 extern void initRenderer(GLFWwindow *window, ACGL::HardwareSupport::SimpleRiftController *simpleRiftController); // see renderer.cc
 extern void renderFrame();
@@ -173,9 +176,6 @@ int main(int argc, char *argv[]) {
     //
     // init whatever you need:
     //
-
-    gInput = new Input(myWindow, simpleRiftController);
-
     initRenderer(myWindow, simpleRiftController);
     initAudio();
 
@@ -184,6 +184,9 @@ int main(int argc, char *argv[]) {
     //
     gWorld = new World();
     gWorld->setPlayerCamera(simpleRiftController);
+
+    //Use mouse input
+    gInput = new INPUT(myWindow, simpleRiftController, gWorld);
 
     //
     // main loop

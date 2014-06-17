@@ -12,38 +12,29 @@
 #include <ACGL/Utils/Log.hh>
 #include <ACGL/HardwareSupport/GamePad.hh>
 #include <ACGL/HardwareSupport/SimpleRiftController.hh>
-#include "world/world.hh"
+#include "../world/world.hh"
 
 using namespace ACGL::Utils;
 using namespace ACGL::HardwareSupport;
 
 class Input {
+    friend class Mouse;
 public:
-    Input(GLFWwindow* window, ACGL::HardwareSupport::SimpleRiftController *simpleRiftController);
+    Input(GLFWwindow* window, ACGL::HardwareSupport::SimpleRiftController *simpleRiftController, World *world);
     ~Input() {
     }
     ;
-    static void mouseMoveCallback(GLFWwindow *window, double x, double y);
-    static void mouseWheelCallback(GLFWwindow *window, double xoffset, double yoffset);
     static void keyboardCallback(GLFWwindow* window, int key, int scancode, int action, int modifier);
     void handleGamePad();
     void handleInput();
 
 private:
+    static World *world;
+
     // Rift controller
     static ACGL::HardwareSupport::SimpleRiftController *gSimpleRiftControllerInput;
 
-    static glm::dvec2 initialPosition; // to restore the courser pos later
     static glm::dvec2 windowSize;
-    static glm::dvec2 movement; // movement of mouse cursor
-    static glm::dvec2 movementScale; // movement scaled depending on window size
-
-    //mouse button states
-    static bool rightMouseButtonDown;
-    static bool leftMouseButtonDown;
-    //mouse wheel states
-    static bool mouseWheelScrollUp;
-    static bool mouseWheelScrollDown;
 
     // Some bools to store the desired movements.
     // The player can move the character by using WASD or a gamepad.
