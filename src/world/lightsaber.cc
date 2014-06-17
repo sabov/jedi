@@ -11,9 +11,16 @@ using namespace ACGL::OpenGL;
 
 Lightsaber::Lightsaber(const glm::vec3 &playerPosition) {
     debug() << "loading lightsaber..." << endl;
-    mLightsaberGeometry = VertexArrayObjectCreator("lightsaber.obj").create();
+
+    mLightsaberGeometry = VertexArrayObjectCreator("anakin-lightsaber.obj").create();
+    mRayGeometry = VertexArrayObjectCreator("ray.obj").create();
+
     mLightsaberShader = ShaderProgramFileManager::the()->get(ShaderProgramCreator("lightsaberShader"));
+    mRayShader = ShaderProgramFileManager::the()->get(ShaderProgramCreator("ray"));
+
     mLightsaberGeometry->setAttributeLocations(mLightsaberShader->getAttributeLocations());
+    mRayGeometry->setAttributeLocations(mRayShader->getAttributeLocations());
+
     mLightsaberTexture = loadTexture2D("lightsaber.png");
 
     setPlayerPosition(playerPosition);
@@ -26,7 +33,7 @@ Lightsaber::~Lightsaber() {
 void Lightsaber::render(glm::mat4 &viewMatrix, glm::mat4 &projectionMatrix) {
     mLightsaberShader->use();
 
-    glm::mat4 modelMatrix = glm::scale(glm::vec3(0.01f));
+    glm::mat4 modelMatrix = glm::scale(glm::vec3(0.001f));
     glm::mat4 translateMatrix = glm::translate(glm::mat4(), getPosition());
     modelMatrix = translateMatrix * getRotationMatrix4() * modelMatrix;
 
@@ -41,6 +48,26 @@ void Lightsaber::render(glm::mat4 &viewMatrix, glm::mat4 &projectionMatrix) {
 
     mLightsaberGeometry->bind();
     mLightsaberGeometry->draw();
+
+    mRayShader->use();
+
+    modelMatrix = glm::scale(glm::vec3(0.01f));
+    glm::vec3 pos = getPosition();
+    pos.y -= 0.21;
+    translateMatrix = glm::translate(glm::mat4(), pos);
+    modelMatrix = translateMatrix * getRotationMatrix4() * modelMatrix;
+
+    mRayShader->setUniform("uModelMatrix", modelMatrix);
+    mRayShader->setUniform("uViewMatrix", viewMatrix);
+    mRayShader->setUniform("uProjectionMatrix", projectionMatrix);
+    mRayShader->setUniform("uNormalMatrix", glm::inverseTranspose(glm::mat3(viewMatrix) * glm::mat3(modelMatrix)));
+    mRayShader->setUniform("uColor", glm::vec4(1.0, 0, 0, 0.5));
+
+    glEnable(GL_BLEND);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    mRayGeometry->bind();
+    mRayGeometry->draw();
+    glDisable(GL_BLEND);
 }
 
 /*

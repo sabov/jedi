@@ -28,7 +28,11 @@ private:
 
     //The lightsaber
     ACGL::OpenGL::SharedVertexArrayObject mLightsaberGeometry;
+    ACGL::OpenGL::SharedVertexArrayObject mRayGeometry;
+
     ACGL::OpenGL::SharedShaderProgram mLightsaberShader;
+    ACGL::OpenGL::SharedShaderProgram mRayShader;
+
     ACGL::OpenGL::SharedTexture2D mLightsaberTexture;
 
     //Bounds for distance of lightsaber from player
