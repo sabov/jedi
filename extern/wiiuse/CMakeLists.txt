@@ -15,7 +15,7 @@ if(NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
 	set(SUBPROJECT YES)
 endif()
 
-include("./ParseVersion.cmake")
+include("ParseVersion.cmake")
 message(STATUS "Configuring WiiUse version ${CPACK_PACKAGE_VERSION}")
 
 option(BUILD_EXAMPLE "Should we build the example app?" YES)
@@ -30,7 +30,7 @@ option(CPACK_MONOLITHIC_INSTALL "Only produce a single component installer, rath
 ###
 
 # Locally-developed modules dist'ed with this app - always have this first.
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(UseBackportedModules)
 include(DoxygenTargets)
 
