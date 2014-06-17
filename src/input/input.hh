@@ -19,6 +19,7 @@ using namespace ACGL::HardwareSupport;
 
 class Input {
     friend class Mouse;
+    friend class Wii;
 public:
     Input(GLFWwindow* window, ACGL::HardwareSupport::SimpleRiftController *simpleRiftController, World *world);
     ~Input() {

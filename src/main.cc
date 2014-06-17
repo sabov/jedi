@@ -30,10 +30,12 @@
 
 #include "audio/audio.hh"
 #include "world/world.hh"
+#include "input/mouse.hh"
+#include "input/wii.hh"
 
 //Set input device
-#include "input/mouse.hh"
-typedef Mouse INPUT;
+
+typedef Wii INPUT;
 
 //
 // Store the world in a global object. This is not pretty nor is it good software design,

@@ -1,16 +1,16 @@
 /*
- * Mouse input for lightsaber.
+ * Wiimote as input device for lightsaber.
  */
 
-#ifndef MOUSE_H_
-#define MOUSE_H_
+#ifndef WII_H_
+#define WII_H_
 
 #include "input.hh"
 
-class Mouse: public Input {
+class Wii: public Input {
 public:
-    Mouse(GLFWwindow* window, ACGL::HardwareSupport::SimpleRiftController *simpleRiftController, World *world);
-    ~Mouse() {
+    Wii(GLFWwindow* window, ACGL::HardwareSupport::SimpleRiftController *simpleRiftController, World *world);
+    ~Wii() {
     }
     ;
     static void mouseMoveCallback(GLFWwindow *window, double x, double y);
@@ -29,4 +29,4 @@ private:
     static bool mouseWheelScrollUp;
     static bool mouseWheelScrollDown;
 };
-#endif /* MOUSE_H_ */
+#endif /* WII_H_ */
