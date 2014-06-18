@@ -10,9 +10,9 @@ using namespace std;
 using namespace ACGL;
 using namespace ACGL::Utils;
 using namespace ACGL::OpenGL;
-glm::vec3 droidPosition = glm::vec3(-4.0f, 1.0f, -8.0f);
-glm::vec3 droidPosition2 = glm::vec3(-4.0f, 1.0f, -3.0f);
-glm::vec3 droidPosition3 = glm::vec3(4.0f, 1.0f, -3.0f);
+glm::vec3 droidPosition = glm::vec3(-3.0f, 1.0f, -5.0f);
+glm::vec3 droidPosition2 = glm::vec3(0.0f, 1.0f, -5.0f);
+glm::vec3 droidPosition3 = glm::vec3(3.0f, 1.0f, -5.0f);
 bool LocalContactProcessedCallback(btManifoldPoint& cp, void* body0, void* body1);
 
 
@@ -179,7 +179,7 @@ void World::render()
     if (mDroids[1].mDroidRenderFlag){
         mDroids[1].render(viewMatrix, projectionMatrix);
         //mDroids[1].setPosition(mDroids[1].mPhysicObject.GetPosition());
-        mDroids[1].move(glm::vec3(0.01f, 0.0f, 0.0f));
+        mDroids[1].move(glm::vec3(0.0f, 0.0f, 0.001f));
     }
 
     if (mDroids[2].mDroidRenderFlag){
