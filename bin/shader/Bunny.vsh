@@ -5,9 +5,9 @@ uniform mat4 uProjectionMatrix;
 uniform mat4 uModelMatrix;
 uniform mat3 uNormalMatrix;
 
-in vec3 aNormal;
 in vec3 aPosition;
 in vec2 aTexCoord;
+in vec3 aNormal;
 
 out vec3 vNormal;
 out vec2 vTexCoord;
