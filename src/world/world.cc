@@ -5,10 +5,16 @@
 #include <ACGL/OpenGL/Data/TextureLoadStore.hh>
 #include "../audio/loadWavFile.hh"
 
+
 using namespace std;
 using namespace ACGL;
 using namespace ACGL::Utils;
 using namespace ACGL::OpenGL;
+glm::vec3 droidPosition = glm::vec3(-3.0f, 1.0f, -5.0f);
+glm::vec3 droidPosition2 = glm::vec3(0.0f, 1.0f, -5.0f);
+glm::vec3 droidPosition3 = glm::vec3(3.0f, 1.0f, -5.0f);
+bool LocalContactProcessedCallback(btManifoldPoint& cp, void* body0, void* body1);
+
 
 World::World() {
     debug() << "loading game world..." << endl;
@@ -19,6 +25,61 @@ World::World() {
     //GLint v = mBunnyShader->getAttributeLocation("aPosition");
     //GLint t = mBunnyShader->getAttributeLocation("aTexCoord");
     
+    mBunnyGeometry->setAttributeLocations( mBunnyShader->getAttributeLocations() );
+    mBunnyTexture  = loadTexture2D( "clownfishBunny.png" );
+
+    //initialize bullet ==============================================================
+
+    btBroadphaseInterface* broadphase = new btDbvtBroadphase();
+    // Set up the collision configuration and dispatcher
+    btDefaultCollisionConfiguration* collisionConfiguration = new btDefaultCollisionConfiguration();
+    btCollisionDispatcher* dispatcher = new btCollisionDispatcher(collisionConfiguration);
+
+     // The actual physics solver
+    btSequentialImpulseConstraintSolver* solver = new btSequentialImpulseConstraintSolver;
+
+     // The world.
+    dynamicsWorld = new btDiscreteDynamicsWorld( dispatcher, broadphase, solver, collisionConfiguration);
+
+    //dynamicsWorld->setGravity(btVector3(0,-10,0));
+
+
+    btCollisionShape* groundShape = new btStaticPlaneShape(btVector3(0, 1, 0),0.0);
+
+    btCollisionShape* sphereShape = new btSphereShape(1);
+    btCollisionShape* saberShape = new btCylinderShape(btVector3(0.2, 2, 0.2));
+
+    btScalar mass = 1.0;
+    btVector3 fallInertia(0,0,0);
+    //sphereShape->calculateLocalInertia(mass,fallInertia);
+
+
+    btDefaultMotionState* groundMotionState = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1),btVector3(0,-1,0)));
+    btRigidBody::btRigidBodyConstructionInfo groundRigidBodyCI(0,groundMotionState,groundShape,btVector3(0,0,0));
+    btRigidBody* groundRigidBody = new btRigidBody(groundRigidBodyCI);
+    //dynamicsWorld->addRigidBody(groundRigidBody);
+
+
+    mDroids[0].mDroidRenderFlag = true;
+    mDroids[0].mPhysicObject.Init(sphereShape, droidPosition);
+    mDroids[0].setPosition(droidPosition);
+
+    mDroids[1].mDroidRenderFlag = true;
+    mDroids[1].setPosition(droidPosition2);
+    mDroids[1].mPhysicObject.Init(sphereShape, droidPosition2);
+
+    mDroids[2].mDroidRenderFlag = true;
+    mDroids[2].setPosition(droidPosition3);
+    mDroids[2].mPhysicObject.Init(sphereShape, droidPosition3);
+
+    mPlayer.mLightsaber.mPhysicObject.Init(saberShape, mPlayer.mLightsaber.getPosition());
+
+    dynamicsWorld->addRigidBody(mDroids[0].mPhysicObject.rigidBody);
+    dynamicsWorld->addRigidBody(mDroids[1].mPhysicObject.rigidBody);
+    dynamicsWorld->addRigidBody(mDroids[2].mPhysicObject.rigidBody);
+    dynamicsWorld->addRigidBody(mPlayer.mLightsaber.mPhysicObject.rigidBody);
+
+    //=====================================================================================
     // load audio assets:
     //mBeep = new SimpleSound( "audio/musiccensor.wav" );
     //mBeep->setLooping( true );
@@ -73,6 +134,53 @@ void World::render() {
     mLevel.VOnDraw();
     
     mPlayer.mLightsaber.render(viewMatrix, projectionMatrix);
+    mPlayer.mLightsaber.mPhysicObject.SetPosition(mPlayer.mLightsaber.getPosition());
+
+    if (mDroids[0].mDroidRenderFlag){
+        mDroids[0].render(viewMatrix, projectionMatrix);
+        //mDroids[0].setPosition(mDroids[0].mPhysicObject.GetPosition());
+    }
+
+    if (mDroids[1].mDroidRenderFlag){
+        mDroids[1].render(viewMatrix, projectionMatrix);
+        //mDroids[1].setPosition(mDroids[1].mPhysicObject.GetPosition());
+        mDroids[1].move(glm::vec3(0.0f, 0.0f, 0.001f));
+    }
+
+    if (mDroids[2].mDroidRenderFlag){
+        mDroids[2].render(viewMatrix, projectionMatrix);
+        //mDroids[2].setPosition(mDroids[2].mPhysicObject.GetPosition());
+    }
+
+
+
+    dynamicsWorld->stepSimulation(0.0166f,10);
+
+    int numManifolds = dynamicsWorld->getDispatcher()->getNumManifolds();
+    for (int i=0;i<numManifolds;i++)
+        {
+            btPersistentManifold* contactManifold =  dynamicsWorld->getDispatcher()->getManifoldByIndexInternal(i);
+            btRigidBody *obj1 = btRigidBody::upcast((btCollisionObject*)contactManifold->getBody0());
+            btRigidBody *obj2 = btRigidBody::upcast((btCollisionObject*)contactManifold->getBody1());
+
+            //checking for lightsaber collision
+            if (obj1 == mPlayer.mLightsaber.mPhysicObject.rigidBody || obj2 == mPlayer.mLightsaber.mPhysicObject.rigidBody){
+                if (obj1 == mPlayer.mLightsaber.mPhysicObject.rigidBody){
+                    if ( mDroids[i].mPhysicObject.rigidBody == obj2){
+                        //mDroids[i].;
+                    }
+
+                }
+                else{
+                    for (int i = 0; i < 3; i++){
+                        if ( mDroids[i].mPhysicObject.rigidBody == obj1){
+                            mDroids[i].mDroidRenderFlag = false;
+                        }
+                    }
+                }
+            }
+
+        }
 }
 
 void World::movePlayer(const glm::vec3 &direction) {

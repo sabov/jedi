@@ -45,6 +45,9 @@ void Lightsaber::render(glm::mat4 &viewMatrix, glm::mat4 &projectionMatrix) {
     mLightsaberShader->setUniform("uProjectionMatrix", projectionMatrix);
     mLightsaberShader->setUniform("uNormalMatrix", glm::inverseTranspose(glm::mat3(viewMatrix) * glm::mat3(modelMatrix)));
 
+    mPhysicObject.SetPosition(getPosition());
+    mPhysicObject.rigidBody->setUserPointer(this);
+
     GLint textureUnit = 0;
     mLightsaberTexture->bind(textureUnit);
     mLightsaberShader->setUniform("uTexture", textureUnit);

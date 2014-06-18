@@ -3,6 +3,7 @@
 #include <ACGL/Scene/MoveableObject.hh>
 #include <ACGL/OpenGL/Objects/VertexArrayObject.hh>
 #include <ACGL/OpenGL/Objects/ShaderProgram.hh>
+#include "PhysicsObject.hh"
 
 /*
  * Class for the lightsaber of the player
@@ -24,6 +25,8 @@ public:
     void rotate(float yaw, float roll, float pitch);
 
     void toggle();
+
+    PhysicsObject mPhysicObject;
 private:
     // Current position of player
     glm::vec3 mPlayerPosition;
