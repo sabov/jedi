@@ -17,6 +17,7 @@ public:
     void render(glm::mat4 &viewMatrix, glm::mat4 &projectionMatrix);
 
     PhysicsObject mPhysicObject;
+    bool mDroidRenderFlag;
 private:
     //The droid
     ACGL::OpenGL::SharedVertexArrayObject mDroidGeometry;
