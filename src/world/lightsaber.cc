@@ -12,6 +12,9 @@ using namespace ACGL::OpenGL;
 Lightsaber::Lightsaber(const glm::vec3 &playerPosition) {
     debug() << "loading lightsaber..." << endl;
 
+    turnedOn = false;
+    rayHeight = 0;
+
     mLightsaberGeometry = VertexArrayObjectCreator("lightsaber.obj").create();
     mRayGeometry = VertexArrayObjectCreator("ray.obj").create();
 
@@ -51,36 +54,39 @@ void Lightsaber::render(glm::mat4 &viewMatrix, glm::mat4 &projectionMatrix) {
 
     mRayShader->use();
 
-    modelMatrix = glm::scale(glm::vec3(0.012f, 0.0101f, 0.012f));
-    glm::vec3 pos = getPosition();
-    translateMatrix = glm::translate(glm::mat4(), pos);
-    modelMatrix = translateMatrix * getRotationMatrix4() * modelMatrix;
+    //Ray
+    if(turnedOn) {
+        modelMatrix = glm::scale(glm::vec3(0.012f, 0.0101f * rayHeight, 0.012f));
+        glm::vec3 pos = getPosition();
+        translateMatrix = glm::translate(glm::mat4(), pos);
+        modelMatrix = translateMatrix * getRotationMatrix4() * modelMatrix;
 
-    mRayShader->setUniform("uModelMatrix", modelMatrix);
-    mRayShader->setUniform("uViewMatrix", viewMatrix);
-    mRayShader->setUniform("uProjectionMatrix", projectionMatrix);
-    mRayShader->setUniform("uNormalMatrix", glm::inverseTranspose(glm::mat3(viewMatrix) * glm::mat3(modelMatrix)));
-    mRayShader->setUniform("uColor", glm::vec4(1.0, 1.0, 1.0, 1.0));
+        mRayShader->setUniform("uModelMatrix", modelMatrix);
+        mRayShader->setUniform("uViewMatrix", viewMatrix);
+        mRayShader->setUniform("uProjectionMatrix", projectionMatrix);
+        mRayShader->setUniform("uNormalMatrix", glm::inverseTranspose(glm::mat3(viewMatrix) * glm::mat3(modelMatrix)));
+        mRayShader->setUniform("uColor", glm::vec4(1.0, 1.0, 1.0, 1.0));
 
-    glEnable(GL_BLEND);
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    mRayGeometry->bind();
-    mRayGeometry->draw();
+        glEnable(GL_BLEND);
+        glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        mRayGeometry->bind();
+        mRayGeometry->draw();
 
-    modelMatrix = glm::scale(glm::vec3(0.022f, 0.0102f, 0.022f));
-    pos = getPosition();
-    translateMatrix = glm::translate(glm::mat4(), pos);
-    modelMatrix = translateMatrix * getRotationMatrix4() * modelMatrix;
+        modelMatrix = glm::scale(glm::vec3(0.022f, 0.0102f * rayHeight, 0.022f));
+        pos = getPosition();
+        translateMatrix = glm::translate(glm::mat4(), pos);
+        modelMatrix = translateMatrix * getRotationMatrix4() * modelMatrix;
 
-    mRayShader->setUniform("uModelMatrix", modelMatrix);
-    mRayShader->setUniform("uViewMatrix", viewMatrix);
-    mRayShader->setUniform("uProjectionMatrix", projectionMatrix);
-    mRayShader->setUniform("uNormalMatrix", glm::inverseTranspose(glm::mat3(viewMatrix) * glm::mat3(modelMatrix)));
-    mRayShader->setUniform("uColor", glm::vec4(0, 1.0f, 0, 0.2f));
+        mRayShader->setUniform("uModelMatrix", modelMatrix);
+        mRayShader->setUniform("uViewMatrix", viewMatrix);
+        mRayShader->setUniform("uProjectionMatrix", projectionMatrix);
+        mRayShader->setUniform("uNormalMatrix", glm::inverseTranspose(glm::mat3(viewMatrix) * glm::mat3(modelMatrix)));
+        mRayShader->setUniform("uColor", glm::vec4(0, 1.0f, 0, 0.2f));
 
-    mRayGeometry->bind();
-    mRayGeometry->draw();
-    glDisable(GL_BLEND);
+        mRayGeometry->bind();
+        mRayGeometry->draw();
+        glDisable(GL_BLEND);
+    }
 }
 
 /*
@@ -113,6 +119,18 @@ void Lightsaber::move(const glm::vec3 &direction) {
     } else if (mPosition.z < mPlayerPosition.z - upDistanceToPlayer.z) {
         mPosition.z = mPlayerPosition.z - upDistanceToPlayer.z;
     }
+}
+
+/*
+ * Turn on/off lightsaber
+ */
+void Lightsaber::toggle() {
+    if (turnedOn) {
+        rayHeight = 0;
+    } else {
+        rayHeight = 1.0f;
+    }
+    turnedOn = !turnedOn;
 }
 
 /*

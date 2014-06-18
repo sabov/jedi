@@ -54,6 +54,7 @@ private:
     static bool rotateLeftPressed;
     static bool rotateRightPressed;
     static bool forcePressed;
+    static bool previousForceState;
     static bool controlPressed;
 
     // Some floats to store the analog counterparts for gamepad and

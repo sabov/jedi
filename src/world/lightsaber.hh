@@ -22,6 +22,8 @@ public:
     void move(const glm::vec3 &direction); //Overwrite of parent method
 
     void rotate(float yaw, float roll, float pitch);
+
+    void toggle();
 private:
     // Current position of player
     glm::vec3 mPlayerPosition;
@@ -38,4 +40,7 @@ private:
     //Bounds for distance of lightsaber from player
     const glm::vec3 upDistanceToPlayer = glm::vec3(0.5f, 1.5f, 0.8f);
     const glm::vec3 lowDistanceToPlayer = glm::vec3(0.5f, 0.5f, 0.2f);
+
+    bool turnedOn;
+    float rayHeight;
 };
