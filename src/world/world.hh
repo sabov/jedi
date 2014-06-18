@@ -19,6 +19,8 @@ public:
     World();
     ~World();
 
+    static bool ContactProcessedCallback(btManifoldPoint& manifold, void* object0, void* object1);
+
     // called once to connect the player with the Rift:
     void setPlayerCamera( ACGL::HardwareSupport::SimpleRiftController *riftControl );
 

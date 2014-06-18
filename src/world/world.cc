@@ -13,6 +13,8 @@ using namespace ACGL::OpenGL;
 glm::vec3 droidPosition = glm::vec3(-4.0f, 1.0f, -8.0f);
 glm::vec3 droidPosition2 = glm::vec3(-4.0f, 1.0f, -3.0f);
 glm::vec3 droidPosition3 = glm::vec3(4.0f, 1.0f, -3.0f);
+bool LocalContactProcessedCallback(btManifoldPoint& cp, void* body0, void* body1);
+
 
 World::World()
 {
@@ -47,6 +49,7 @@ World::World()
     btCollisionShape* groundShape = new btStaticPlaneShape(btVector3(0, 1, 0),0.0);
 
     btCollisionShape* sphereShape = new btSphereShape(1);
+    btCollisionShape* saberShape = new btCylinderShape(btVector3(0.2, 2, 0.2));
 
     btScalar mass = 1.0;
     btVector3 fallInertia(0,0,0);
@@ -66,16 +69,21 @@ World::World()
 
     mDroids[2].setPosition(droidPosition3);
     mDroids[2].mPhysicObject.Init(sphereShape, droidPosition3);
-    //mPlayer.mLightsaber.mPhysicObject.Init(fallShape);
+    //mDroids[2].mPhysicObject.rigidBody->setCollisionFlags(mDroids[2].mPhysicObject  .rigidBody->getCollisionFlags() |
+        //btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 
+
+    mPlayer.mLightsaber.mPhysicObject.Init(saberShape, mPlayer.mLightsaber.getPosition());
+    mPlayer.mLightsaber.mPhysicObject.rigidBody->setCollisionFlags(mPlayer.mLightsaber.mPhysicObject.rigidBody->getCollisionFlags() |
+        btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 
 
     //dynamicsWorld->addRigidBody(mDroids[0].mPhysicObject.rigidBody);
     dynamicsWorld->addRigidBody(mDroids[1].mPhysicObject.rigidBody);
     dynamicsWorld->addRigidBody(mDroids[2].mPhysicObject.rigidBody);
-    //dynamicsWorld->addRigidBody(mPlayer.mLightsaber.mPhysicObject.rigidBody);
+    dynamicsWorld->addRigidBody(mPlayer.mLightsaber.mPhysicObject.rigidBody);
 
-
+    gContactProcessedCallback = ContactProcessedCallback;
 
 
     //=====================================================================================
@@ -166,49 +174,58 @@ void World::render()
     mBunnyGeometry->draw();
 
     mPlayer.mLightsaber.render(viewMatrix, projectionMatrix);
+    mPlayer.mLightsaber.mPhysicObject.SetPosition(mPlayer.mLightsaber.getPosition());
+
     mDroids[0].render(viewMatrix, projectionMatrix);
-    mDroids[0].setPosition(mDroids[0].mPhysicObject.GetPosition());
+    //mDroids[0].setPosition(mDroids[0].mPhysicObject.GetPosition());
 
     mDroids[1].render(viewMatrix, projectionMatrix);
     //mDroids[1].setPosition(mDroids[1].mPhysicObject.GetPosition());
-    mDroids[1].mPhysicObject.SetPosition(mDroids[1].getPosition());
-    //mDroids[1].move(glm::vec3(0.01f, 0.0f, 0.0f));
+    //mDroids[1].mPhysicObject.SetPosition(mDroids[1].getPosition());
+    mDroids[1].move(glm::vec3(0.01f, 0.0f, 0.0f));
 
     mDroids[2].render(viewMatrix, projectionMatrix);
     mDroids[2].mPhysicObject.SetPosition(mDroids[2].getPosition());
     //mDroids[2].setPosition(mDroids[2].mPhysicObject.GetPosition());
 
+
+
     dynamicsWorld->stepSimulation(0.0166f,10);
 
     //std::cout << "physic obj1 position: "  << mDroids[1].mPhysicObject.GetPosition().x << std::endl;
-    //std::cout << "physic obj2 position: "  << mDroids[2].mPhysicObject.GetPosition().x << std::endl;
+    //std::cout << "saber position: "  << mPlayer.mLightsaber.mPhysicObject.GetPosition().x << std::endl;
 
     int numManifolds = dynamicsWorld->getDispatcher()->getNumManifolds();
-    cout<< "ManifoldsNum " << numManifolds << endl;
-
-
-    dynamicsWorld->performDiscreteCollisionDetection();
+    //cout<< "ManifoldsNum " << numManifolds << endl;
 
 
     for (int i=0;i<numManifolds;i++)
         {
             btPersistentManifold* contactManifold =  dynamicsWorld->getDispatcher()->getManifoldByIndexInternal(i);
-            btCollisionObject* obA = const_cast<btCollisionObject*>(contactManifold->getBody0());
-            btCollisionObject* obB = const_cast<btCollisionObject*>(contactManifold->getBody1());
+            btRigidBody *obj1 = btRigidBody::upcast((btCollisionObject*)contactManifold->getBody0());
+            btRigidBody *obj2 = btRigidBody::upcast((btCollisionObject*)contactManifold->getBody1());
 
-            int numContacts = contactManifold->getNumContacts();
-            cout<< "numOfContacts" << numContacts  << endl;
-            for (int j=0;j<numContacts;j++)
-            {
-                btManifoldPoint& pt = contactManifold->getContactPoint(j);
-                if (pt.getDistance()<0.f)
-                {
-                    const btVector3& ptA = pt.getPositionWorldOnA();
-                    const btVector3& ptB = pt.getPositionWorldOnB();
-                    const btVector3& normalOnB = pt.m_normalWorldOnB;
-                    cout<< "in collision" << endl;
-                }
+            if (obj1 == mDroids[1].mPhysicObject.rigidBody){
+                cout << "needed droid!!!!" << endl;
             }
+            //checking for lightsaber collision
+            if (obj1 == mPlayer.mLightsaber.mPhysicObject.rigidBody || obj2 == mPlayer.mLightsaber.mPhysicObject.rigidBody){
+                if (obj1 == mPlayer.mLightsaber.mPhysicObject.rigidBody){
+                    for (int i = 0; i < 3; i++){
+                        cout <<  mDroids[i].getPosition().x << endl;
+                    }
+
+                }
+                else{
+                    for (int i = 0; i < 3; i++){
+                        if ( mDroids[i].mPhysicObject.rigidBody == obj1){
+                            mDroids[i].~Droid();
+                        }
+                    }
+                }
+                cout << "lightSaber colision!!!!" << endl;
+            }
+
         }
 }
 
@@ -278,4 +295,14 @@ void World::useForcePlayer()
     if (!mBeep->isPlaying()){
         mBeep->play();
     }
+}
+
+bool World::ContactProcessedCallback(btManifoldPoint& cp, void* body0, void* body1)
+{
+    btRigidBody *obj1 = btRigidBody::upcast((btCollisionObject*)body0);
+    btRigidBody *obj2 = btRigidBody::upcast((btCollisionObject*)body1);
+    void* Collidingobject;
+    Collidingobject = obj1->getUserPointer();
+
+    return true;
 }

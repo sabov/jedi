@@ -34,7 +34,8 @@ void Droid::render(glm::mat4 &viewMatrix, glm::mat4 &projectionMatrix)
                                                           getPosition().z) );
     modelMatrix = translateMatrix * modelMatrix;
 
-    //mPhysicObject.SetPosition(getPosition());
+    mPhysicObject.SetPosition(getPosition());
+    mPhysicObject.rigidBody->setUserPointer(this);
 
     mDroidShader->setUniform("uModelMatrix", modelMatrix);
     mDroidShader->setUniform("uViewMatrix", viewMatrix);
