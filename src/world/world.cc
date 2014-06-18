@@ -136,12 +136,16 @@ void World::duckPlayer(float duckingValue) {
 void World::useForcePlayer() {
     mPlayer.useForce();
     if (!mBeep->isPlaying()) {
-        mBeep->play();
+        //mBeep->play();
     }
 }
 
 void World::moveLightsaber(const glm::vec3 &direction) {
     mPlayer.mLightsaber.move(direction);
+}
+
+void World::toggleLightsaber() {
+    mPlayer.mLightsaber.toggle();
 }
 
 void World::rotateLightsaber(float dYaw, float dRoll, float dPitch){

@@ -24,6 +24,8 @@ bool Input::rotateRightPressed = false;
 bool Input::forcePressed = false;
 bool Input::controlPressed = false;
 
+bool Input::previousForceState = false;
+
 float Input::analogLeftRightMovement = 0.0f;
 float Input::analogForwardBackMovement = 0.0f;
 float Input::analogLeftRightRotation = 0.0f;
@@ -197,6 +199,15 @@ void Input::handleInput() {
     //----------
     //LIGHTSABER
     //----------
+    //Turn off/on
+    if (forcePressed) {
+        if(previousForceState != forcePressed) {
+            gWorld->toggleLightsaber();
+        }
+    }
+    previousForceState = forcePressed;
+
+
     //Move in space
     if (leftMouseButtonDown) {
         // Move lightsaber
