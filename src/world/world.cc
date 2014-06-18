@@ -25,8 +25,8 @@ World::World() {
     //GLint v = mBunnyShader->getAttributeLocation("aPosition");
     //GLint t = mBunnyShader->getAttributeLocation("aTexCoord");
     
-    mBunnyGeometry->setAttributeLocations( mBunnyShader->getAttributeLocations() );
-    mBunnyTexture  = loadTexture2D( "clownfishBunny.png" );
+    //mBunnyGeometry->setAttributeLocations( mBunnyShader->getAttributeLocations() );
+    //mBunnyTexture  = loadTexture2D( "clownfishBunny.png" );
 
     //initialize bullet ==============================================================
 

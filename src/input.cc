@@ -281,7 +281,7 @@ void Input::handleInput() {
 
     //Use force
     if (forcePressed) {
-        gWorld->useForcePlayer();
+        //gWorld->useForcePlayer();
     }
 
     //----

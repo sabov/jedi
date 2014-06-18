@@ -160,11 +160,6 @@ include(${QT_USE_FILE})
 add_definitions(${QT_DEFINITIONS})
 set(LIBRARIES ${LIBRARIES} ${QT_LIBRARIES})
 
-#Bullet Engine
-find_package(Bullet REQUIRED)
-include_directories(${BULLET_INCLUDE_DIRS})
-set(LIBRARIES ${LIBRARIES} ${BULLET_LIBRARIES})
-
 #Assimp Library
 find_package(Assimp REQUIRED)
 if(NOT ASSIMP_FOUND)
