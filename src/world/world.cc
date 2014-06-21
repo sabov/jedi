@@ -10,13 +10,13 @@ using namespace std;
 using namespace ACGL;
 using namespace ACGL::Utils;
 using namespace ACGL::OpenGL;
-glm::vec3 droidPosition = glm::vec3(-3.0f, 1.0f, -5.0f);
+glm::vec3 droidPosition1 = glm::vec3(-3.0f, 1.0f, -5.0f);
 glm::vec3 droidPosition2 = glm::vec3(0.0f, 1.0f, -5.0f);
 glm::vec3 droidPosition3 = glm::vec3(3.0f, 1.0f, -5.0f);
 bool LocalContactProcessedCallback(btManifoldPoint& cp, void* body0, void* body1);
 
 
-World::World() {
+World::World() : mDroids{Droid(droidPosition1), Droid(droidPosition2), Droid(droidPosition3)}{
     debug() << "loading game world..." << endl;
 
     mLevel.LoadMesh("geometry/L1/level.obj", CGEngine::CGE_TRIANGULATE);
@@ -46,9 +46,6 @@ World::World() {
 
     btCollisionShape* groundShape = new btStaticPlaneShape(btVector3(0, 1, 0),0.0);
 
-    btCollisionShape* sphereShape = new btSphereShape(1);
-    btCollisionShape* saberShape = new btCylinderShape(btVector3(0.2, 2, 0.2));
-
     btScalar mass = 1.0;
     btVector3 fallInertia(0,0,0);
     //sphereShape->calculateLocalInertia(mass,fallInertia);
@@ -60,20 +57,6 @@ World::World() {
     //dynamicsWorld->addRigidBody(groundRigidBody);
 
 
-    mDroids[0].mDroidRenderFlag = true;
-    mDroids[0].mPhysicObject.Init(sphereShape, droidPosition);
-    mDroids[0].setPosition(droidPosition);
-
-    mDroids[1].mDroidRenderFlag = true;
-    mDroids[1].setPosition(droidPosition2);
-    mDroids[1].mPhysicObject.Init(sphereShape, droidPosition2);
-
-    mDroids[2].mDroidRenderFlag = true;
-    mDroids[2].setPosition(droidPosition3);
-    mDroids[2].mPhysicObject.Init(sphereShape, droidPosition3);
-
-    mPlayer.mLightsaber.mPhysicObject.Init(saberShape, mPlayer.mLightsaber.getPosition());
-
     dynamicsWorld->addRigidBody(mDroids[0].mPhysicObject.rigidBody);
     dynamicsWorld->addRigidBody(mDroids[1].mPhysicObject.rigidBody);
     dynamicsWorld->addRigidBody(mDroids[2].mPhysicObject.rigidBody);
@@ -81,13 +64,16 @@ World::World() {
 
     //=====================================================================================
     // load audio assets:
-    //mBeep = new SimpleSound( "audio/musiccensor.wav" );
-    //mBeep->setLooping( true );
+    mBeep = new SimpleSound( "audio/musiccensor.wav" );
+    mBeep->setLooping( true );
     //mBeep->play();
 }
 
 World::~World() {
+    cout << "deleting world..." << endl;
     delete mBeep;
+    delete dynamicsWorld;
+    delete droidsPhysic;
 }
 
 void World::setPlayerCamera(ACGL::HardwareSupport::SimpleRiftController *riftControl) {

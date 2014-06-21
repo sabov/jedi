@@ -10,16 +10,21 @@ using namespace ACGL;
 using namespace ACGL::Utils;
 using namespace ACGL::OpenGL;
 
-Droid::Droid()
+Droid::Droid(glm::vec3 startPosition)
 {
     debug() << "loading droid..." << endl;
     mDroidGeometry = VertexArrayObjectCreator("droid.obj").create();
     mDroidShader   = ShaderProgramFileManager::the()->get( ShaderProgramCreator("droidShader") );
     mDroidGeometry->setAttributeLocations( mDroidShader->getAttributeLocations() );
+    mDroidRenderFlag = true;
+    setPosition(startPosition);
+    mPhysicObject.Init(cShape, startPosition);
 }
 
 Droid::~Droid()
 {
+    cout << "deleting droid..." << endl;
+    delete cShape;
 }
 
 void Droid::render(glm::mat4 &viewMatrix, glm::mat4 &projectionMatrix)

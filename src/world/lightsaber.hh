@@ -46,4 +46,6 @@ private:
 
     bool turnedOn;
     float rayHeight;
+
+    btCollisionShape* cShape = new btCylinderShape(btVector3(0.2, 2, 0.2));
 };

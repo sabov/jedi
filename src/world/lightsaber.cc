@@ -9,7 +9,7 @@ using namespace ACGL;
 using namespace ACGL::Utils;
 using namespace ACGL::OpenGL;
 
-Lightsaber::Lightsaber(const glm::vec3 &playerPosition) {
+Lightsaber::Lightsaber(const glm::vec3 &playerPosition){
     debug() << "loading lightsaber..." << endl;
 
     turnedOn = false;
@@ -28,9 +28,12 @@ Lightsaber::Lightsaber(const glm::vec3 &playerPosition) {
 
     setPlayerPosition(playerPosition);
     setPosition(glm::vec3(mPlayerPosition.x, mPlayerPosition.y + 1.0f, mPlayerPosition.z - 0.5f));
+    mPhysicObject.Init(cShape, getPosition());
 }
 
 Lightsaber::~Lightsaber() {
+    cout << "deleting lightsaber..." << endl;
+    delete cShape;
 }
 
 void Lightsaber::render(glm::mat4 &viewMatrix, glm::mat4 &projectionMatrix) {

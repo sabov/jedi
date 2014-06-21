@@ -11,7 +11,7 @@
 
 class Droid : public ACGL::Scene::MoveableObject {
 public:
-    Droid();
+    Droid(glm::vec3 startPosition);
     ~Droid();
 
     void render(glm::mat4 &viewMatrix, glm::mat4 &projectionMatrix);
@@ -23,4 +23,6 @@ private:
     ACGL::OpenGL::SharedVertexArrayObject mDroidGeometry;
     ACGL::OpenGL::SharedShaderProgram     mDroidShader;
     ACGL::OpenGL::SharedTexture2D         mDroidTexture;
+
+    btCollisionShape* cShape = new btSphereShape(1);
 };

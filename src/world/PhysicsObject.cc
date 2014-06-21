@@ -1,15 +1,14 @@
 #include "PhysicsObject.hh"
+#include <iostream>
 
-PhysicsObject::PhysicsObject()
-{
-
+PhysicsObject::PhysicsObject() {
 }
 
 
-PhysicsObject::~PhysicsObject(void)
-{
-   delete [] rigidBody;
-   delete [] colShape;
+PhysicsObject::~PhysicsObject(void) {
+    std::cout << "deleting physics object..." << std::endl;
+    delete rigidBody;
+    // we do not delete colShape as it is deleted from its corresponding game object
 }
 
 void PhysicsObject::Init(btCollisionShape* cS, glm::vec3 startPosition) {
