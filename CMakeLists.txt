@@ -16,8 +16,10 @@ ADD_DEFINITIONS(-DACGL_OPENGL_PROFILE_CORE)
 INCLUDE(${CMAKE_SOURCE_DIR}/extern/acgl/CMakeListsStaticInclude.txt)
 
 # Wiiuse setup
-add_subdirectory(extern/wiiuse)
-include_directories(extern/wiiuse/src)
+add_subdirectory(extern/wiic/src/wiicpp)
+include_directories(extern/wiic/src/wiicpp)
+include_directories(extern/wiic/src/wiic)
+include_directories(extern/wiic/src/log)
 
 ###############################################################################
 #

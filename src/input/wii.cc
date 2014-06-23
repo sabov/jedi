@@ -1,5 +1,5 @@
 #include "wii.hh"
-#include "wiiuse.h"
+#include "wiicpp.h"
 
 using namespace std;
 
