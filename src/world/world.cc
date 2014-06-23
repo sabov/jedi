@@ -14,17 +14,13 @@ World::World()
 {
     debug() << "loading game world..." << endl;
 
-    mLevel.LoadMesh("geometry/L1/level.obj", CGEngine::CGE_TRIANGULATE);
+    mLevel.LoadMesh("geometry/L1/level.obj");
     mDice.LoadMesh("geometry/test/dice.obj");
+    mQuad.LoadMesh("");
+    mTex.VLoadTexture("geometry/L1/Textures/metalbridgetoprailbig.jpg");
     mBunnyShader   = ShaderProgramFileManager::the()->get( ShaderProgramCreator("Bunny") );
-    //GLint n = mBunnyShader->getAttributeLocation("aNormal");
-    //GLint v = mBunnyShader->getAttributeLocation("aPosition");
-    //GLint t = mBunnyShader->getAttributeLocation("aTexCoord");
 
-    // load audio assets:
-    //mBeep = new SimpleSound( "audio/musiccensor.wav" );
-    //mBeep->setLooping( true );
-    //mBeep->play();
+    CGEngine::LoadLightsFromFile("geometry/L1/level_lights.dae", mDirLights, mPointLights);
 
     mpRotProcess = GameLogic::RotationProcessPtr( new GameLogic::RotationProcess() );
     mpProcessManager = GameLogic::CProcessManager::getInstance();
@@ -64,41 +60,46 @@ void World::render()
     mMatrixStack.LoadIdentity();
     mMatrixStack.Translate(CGEngine::Vec3(0.0, -1.0, 0.0));
 
-    mBunnyShader->use();
-
     glm::mat4 modelMatrix = mMatrixStack.getCompleteTransform();
     glm::mat4 viewMatrix = mPlayer.getHMDViewMatrix();
 
-    mBunnyShader->setUniform( "uModelMatrix", modelMatrix );
-    mBunnyShader->setUniform( "uViewMatrix",  viewMatrix );
-    mBunnyShader->setUniform( "uProjectionMatrix", mPlayer.getProjectionMatrix() );
-    mBunnyShader->setUniform( "uNormalMatrix",     glm::inverseTranspose(glm::mat3(viewMatrix)*glm::mat3(modelMatrix)) );
+    {
+        mBunnyShader->use();
+        mBunnyShader->setUniform( "uModelMatrix", modelMatrix );
+        mBunnyShader->setUniform( "uViewMatrix",  viewMatrix );
+        mBunnyShader->setUniform( "uProjectionMatrix", mPlayer.getProjectionMatrix() );
+        mBunnyShader->setUniform( "uNormalMatrix",     glm::inverseTranspose(glm::mat3(viewMatrix)*glm::mat3(modelMatrix)) );
 
-    // At least 16 texture units can be used, but multiple texture can also be placed in one
-    // texture array and thus only occupy one texture unit!
-    mBunnyShader->setUniform( "uTexture", 0 );
+        // At least 16 texture units can be used, but multiple texture can also be placed in one
+        // texture array and thus only occupy one texture unit!
+        mBunnyShader->setUniform( "uTexture", 0 );
+    }
     //
     // draw geometry
     //
     mLevel.VOnDraw();
 
+
     mMatrixStack.LoadIdentity();
     mMatrixStack.Translate(CGEngine::Vec3(0.0,1.0,-4.0));
     mMatrixStack.Rotate( glm::radians( mpRotProcess->rotAngle ), CGEngine::Vec3(0.0,1.0,0.0) );
 
-    mBunnyShader->use();
-
     modelMatrix = mMatrixStack.getCompleteTransform();
     viewMatrix = mPlayer.getHMDViewMatrix();
 
-    mBunnyShader->setUniform( "uModelMatrix", modelMatrix );
-    mBunnyShader->setUniform( "uViewMatrix",  viewMatrix );
-    mBunnyShader->setUniform( "uProjectionMatrix", mPlayer.getProjectionMatrix() );
-    mBunnyShader->setUniform( "uNormalMatrix",     glm::inverseTranspose(glm::mat3(viewMatrix)*glm::mat3(modelMatrix)) );
+    {
+r        mBunnyShader->use();
+        mBunnyShader->setUniform( "uModelMatrix", modelMatrix );
+        mBunnyShader->setUniform( "uViewMatrix",  viewMatrix );
+        mBunnyShader->setUniform( "uProjectionMatrix", mPlayer.getProjectionMatrix() );
+        mBunnyShader->setUniform( "uNormalMatrix",     glm::inverseTranspose(glm::mat3(viewMatrix)*glm::mat3(modelMatrix)) );
 
-    mBunnyShader->setUniform( "uTexture", 0 );
+        mBunnyShader->setUniform( "uTexture", 1 );
+    }
 
-    mDice.VOnDraw();
+    mTex.Bind(GL_TEXTURE1);
+    mQuad.VOnDraw();
+
 }
 
 void World::movePlayer( glm::vec3 direction )
@@ -162,4 +163,43 @@ void World::duckPlayer( float duckingValue )
 void World::update(int time)
 {
     mpProcessManager->updateProcesses(time);
+}
+
+void World::setWidthHeight(unsigned int _w, unsigned int _h)
+{
+    window_width = _w; window_height = _h;
+}
+
+void World::DSRender()
+{
+    GLint err = GL_NO_ERROR;
+    m_GBuffer.StartFrame();
+    err = glGetError();
+
+    DSGeometryPass();
+    err = glGetError();
+
+    // We need stencil to be enabled in the stencil pass to get the stencil buffer
+    // updated and we also need it in the light pass because we render the light
+    // only if the stencil passes.
+    glEnable(GL_STENCIL_TEST);
+    err = glGetError();
+
+    unsigned int num_lights1 = mPointLights.size();
+
+    for (unsigned int i = 0 ; i < num_lights1; i++) {
+        DSStencilPass(i);
+        DSPointLightPass(i);
+    }
+    err = glGetError();
+
+    // The directional light does not need a stencil test because its volume
+    // is unlimited and the final pass simply copies the texture.
+    glDisable(GL_STENCIL_TEST);
+    err = glGetError();
+
+    //DSDirectionalLightPass();
+
+    DSFinalPass();
+    err = glGetError();
 }

@@ -14,8 +14,10 @@ SimpleSound::SimpleSound( const std::string &wavFileName )
 
 SimpleSound::~SimpleSound()
 {
-    alDeleteSources((ALsizei) 1, &mSource );
-    alDeleteBuffers((ALsizei) 1, &mBuffer );
+    if (mSource)
+        alDeleteSources((ALsizei) 1, &mSource );
+    if (mBuffer)
+        alDeleteBuffers((ALsizei) 1, &mBuffer );
 }
 
 void SimpleSound::setPosition( glm::vec3 position )

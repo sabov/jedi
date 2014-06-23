@@ -3,6 +3,7 @@
 #include <ACGL/OpenGL/Debug.hh>
 #include <ACGL/HardwareSupport/SimpleRiftController.hh>
 #include <ACGL/OpenGL/Objects.hh>
+#include <ACGL/OpenGL/Creator/ShaderProgramCreator.hh>
 #include <GLFW/glfw3.h>
 #include "world/world.hh"
 
@@ -34,6 +35,11 @@ glm::uvec2 gOutputWindowSize;
 
 // 3D Rift rendering or 2D?
 bool gRenderForTheRift = false;
+
+//Render to texture etc ...
+CGEngine::FullScreenQuadPtr gFullScreenQuad;
+ACGL::OpenGL::SharedShaderProgram gPassThroughShader;
+CGEngine::CGLTexture2D gTex;
 
 //
 // A debug callback gets called for each OpenGL error and also for some warnings and even hints.
@@ -76,6 +82,10 @@ void resizeCallback( GLFWwindow*, int newWidth, int newHeight )
 //
 void initRenderer( GLFWwindow *window, ACGL::HardwareSupport::SimpleRiftController *simpleRiftController )
 {
+    gFullScreenQuad = CGEngine::FullScreenQuadPtr( new CGEngine::CFullScreenQuad );
+    gFullScreenQuad->LoadMesh("");
+    gPassThroughShader = ShaderProgramFileManager::the()->get( ShaderProgramCreator("pass_through") );
+    gTex.VLoadTexture("geometry/L1/Textures/metalbridgetoprailbig.jpg");
     //
     // Register our own OpenGL debug callback:
     //
@@ -159,7 +169,18 @@ void shutdownRenderer()
 void renderScene()
 {
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-    gWorld->render();
+
+    /**************************************************************************************
+     * ***********************************************************************************/
+    //
+    //Here we swap direct lighting with Deferred Shading!
+    //
+    //gWorld->render();
+
+    gWorld->DSRender();
+
+    /**************************************************************************************
+     * ***********************************************************************************/
 }
 
 //
@@ -174,8 +195,6 @@ void renderFrame()
     // independent on the exact camera position ( == independent on the eye) first
     // ( and only once! )
     //
-
-
     if (gRenderForTheRift) {
         // as the viewport gets changed during rendering onto the screen
         // (gSimpleRiftControllerRenderer->renderDistorted), this has to be reset each
@@ -211,9 +230,20 @@ void renderFrame()
         //
         gSimpleRiftControllerRenderer->getCamera()->setEye( GenericCamera::EYE_LEFT );
 
+        renderScene();
+
         // the screen is framebuffer 0, bind that:
         glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
-        renderScene();
+        gPassThroughShader->use();
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, gWorld->final_texture);
+
+        gPassThroughShader->setUniform( "renderedTexture", 0 );
+
+        gFullScreenQuad->VOnDraw();
+
+
+
     }
 }

@@ -25,8 +25,6 @@
 #include <ACGL/HardwareSupport/SimpleRiftController.hh>
 #include <ACGL/Base/Settings.hh>
 
-#include <qtimer.h>
-
 #include "audio/audio.hh"
 #include "world/world.hh"
 
@@ -188,13 +186,18 @@ int main( int argc, char *argv[] )
     gWorld = new World();
     gWorld->setPlayerCamera( simpleRiftController );
 
+    /************************************************************************
+     * Deferred Shading - Setup
+     * *********************************************************************/
+    gWorld->setWidthHeight(1280, 800);
+    gWorld->InitDS();
+
     //
     // main loop
     //
     double startTimeInSeconds = glfwGetTime();
     do {
         double now = glfwGetTime() - startTimeInSeconds;
-        std::cout << now << std::endl ;
 
         //
         // shader file reloading once a second:

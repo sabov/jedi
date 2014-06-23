@@ -12,6 +12,20 @@
 
 typedef unsigned int ActorID    ;
 
+class CEvtData_CreateActor : public GameLogic::CBaseEventData
+{
+private:
+    static const GameLogic::EventType   m_EventType ;
+    ActorID                             m_id        ;
+public:
+    explicit CEvtData_CreateActor ( ActorID _id )
+        : m_id(_id) {}
+
+    virtual const GameLogic::EventType & VGetEventType() const { return m_EventType; }
+    virtual ~CEvtData_CreateActor() {}
+    virtual void VSerialize(std::ostream &out) const { out << m_id; }
+};
+
 class CEvtData_DestroyActor : public GameLogic::CBaseEventData
 {
 private:
