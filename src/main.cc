@@ -143,7 +143,7 @@ int main(int argc, char *argv[]) {
     // Create an OpenGL capable window:
     // parameter is whether the window should be fullscreen or not and which monitor to use if fullscreen
     //
-    GLFWwindow* myWindow = createWindow(!false, 1);
+    GLFWwindow* myWindow = createWindow(false, 1);
     if (!myWindow) {
         glfwTerminate();
         exit(-1);
@@ -190,6 +190,8 @@ int main(int argc, char *argv[]) {
     //Use mouse input
     gInput = new INPUT(myWindow, simpleRiftController, gWorld);
 
+    gInput->main();
+/*
     //
     // main loop
     //
@@ -223,7 +225,7 @@ int main(int argc, char *argv[]) {
         // until either the user pressed the X of the window (in case it has a windowbar (== not fullscreen)
         // or the program signaled to get closed by setting glfwSetWindowShouldClose( window, true ) somewhere!
     } while (!glfwWindowShouldClose(myWindow));
-
+*/
     // clean up:
     delete gWorld;
     delete gInput;
