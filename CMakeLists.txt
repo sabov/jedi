@@ -17,6 +17,7 @@ INCLUDE(${CMAKE_SOURCE_DIR}/extern/acgl/CMakeListsStaticInclude.txt)
 
 # Wiiuse setup
 add_subdirectory(extern/wiiuse)
+include_directories(extern/wiiuse/src)
 
 ###############################################################################
 #
