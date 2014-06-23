@@ -408,7 +408,7 @@ typedef struct wiimote_t {
 		WCONST IOBluetoothL2CAPChannelRef outputCh;	/**  Output L2CAP channel					*/
 		WCONST IOBluetoothUserNotificationRef disconnectionRef;	/**  Disconnection Notification Reference **/
 		WCONST void* connectionHandler; /** Wiimote connection handler for MACOSX **/
-	#elif LINUX
+	#elif __linux
 		WCONST bdaddr_t bdaddr;				/**< bt address								*/
 		WCONST char bdaddr_str[18];			/**< readable bt address					*/
 		WCONST int out_sock;				/**< output socket							*/

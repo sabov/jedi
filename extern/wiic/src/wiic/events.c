@@ -55,6 +55,8 @@
 #include "classic.h"
 #include "guitar_hero_3.h"
 #include "events.h"
+#include "motionplus.h"
+#include "balanceboard.h"
 
 static void idle_cycle(struct wiimote_t* wm);
 void clear_dirty_reads(struct wiimote_t* wm);
@@ -647,7 +649,7 @@ void handshake_expansion(struct wiimote_t* wm, byte* data, unsigned short len) {
 		wiic_write_data(wm, WM_EXP_MEM_ENABLE, &buf, 1);
 
 		/* get the calibration data */
-		handshake_buf = malloc(EXP_HANDSHAKE_LEN * sizeof(byte));
+		handshake_buf = (byte*)malloc(EXP_HANDSHAKE_LEN * sizeof(byte));
 		wiic_read_data_cb(wm, handshake_expansion, handshake_buf, WM_EXP_MEM_CALIBR, EXP_HANDSHAKE_LEN);
 
 		/* tell the wiimote to send expansion data */

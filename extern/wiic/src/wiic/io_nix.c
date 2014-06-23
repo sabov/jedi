@@ -74,8 +74,10 @@ int wiic_find(struct wiimote_t** wm, int max_wiimotes, int timeout) {
 	int found_wiimotes;
 
 	/* reset all wiimote bluetooth device addresses */
-	for (found_wiimotes = 0; found_wiimotes < max_wiimotes; ++found_wiimotes)
-		wm[found_wiimotes]->bdaddr = *BDADDR_ANY;
+	for (found_wiimotes = 0; found_wiimotes < max_wiimotes; ++found_wiimotes){
+	    bdaddr_t tmp = { };
+		wm[found_wiimotes]->bdaddr = tmp;
+	}
 	found_wiimotes = 0;
 
 	/* get the id of the first bluetooth device. */

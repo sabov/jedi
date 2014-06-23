@@ -27,6 +27,7 @@
  */
 #include "balanceboard.h"
 #include "events.h"
+#include <cstdlib>
 
 /**
  *	@brief Handle the handshake data from the balance board.
@@ -71,7 +72,7 @@ int balance_board_handshake(struct wiimote_t* wm, struct balance_board_t* bb, by
 	 */
 	if (data[offset+offset] == 0xFF && data[offset+offset+16] == 0xFF) {
 		/* get the calibration data */
-		byte* handshake_buf = malloc(EXP_HANDSHAKE_LEN * sizeof(byte));
+		byte* handshake_buf = (byte*)malloc(EXP_HANDSHAKE_LEN * sizeof(byte));
 
 		WIIC_DEBUG("Balance board handshake appears invalid, trying again.");
 		wiic_read_data_cb(wm, handshake_expansion, handshake_buf, WM_EXP_MEM_CALIBR, EXP_HANDSHAKE_LEN);

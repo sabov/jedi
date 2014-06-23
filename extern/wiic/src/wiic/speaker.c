@@ -33,6 +33,7 @@
 //#pragma pack(nopack)
 #include "wiic_internal.h"
 #include "speaker.h"
+#include <unistd.h>
 
 void wiic_set_speaker(struct wiimote_t* wm, int status) {
 		

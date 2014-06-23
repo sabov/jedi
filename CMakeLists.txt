@@ -8,7 +8,7 @@ message("Jedi - Occulus Rift - Starting Project Build")
 #include "findASSIMP.cmake"...
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/extern/acgl/cmake/")
-#set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/extern/wiiuse/cmake/")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/extern/wiic/src/cmake_modules/")
 
 # ACGL setup:
 ADD_DEFINITIONS(-DACGL_OPENGL_VERSION_32)
@@ -16,10 +16,11 @@ ADD_DEFINITIONS(-DACGL_OPENGL_PROFILE_CORE)
 INCLUDE(${CMAKE_SOURCE_DIR}/extern/acgl/CMakeListsStaticInclude.txt)
 
 # Wiiuse setup
-add_subdirectory(extern/wiic/src/wiicpp)
+INCLUDE(${CMAKE_SOURCE_DIR}/extern/wiic/CMakeListsStaticInclude.txt)
 include_directories(extern/wiic/src/wiicpp)
 include_directories(extern/wiic/src/wiic)
 include_directories(extern/wiic/src/log)
+SET(LIBRARIES ${LIBRARIES} "-lbluetooth")
 
 ###############################################################################
 #
