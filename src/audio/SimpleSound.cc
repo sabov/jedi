@@ -14,9 +14,7 @@ SimpleSound::SimpleSound( const std::string &wavFileName )
 
 SimpleSound::~SimpleSound()
 {
-    if (mSource)
         alDeleteSources((ALsizei) 1, &mSource );
-    if (mBuffer)
         alDeleteBuffers((ALsizei) 1, &mBuffer );
 }
 

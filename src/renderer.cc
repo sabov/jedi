@@ -223,6 +223,9 @@ void renderFrame()
 
         glViewport( 0, 0, gOutputWindowSize.x, gOutputWindowSize.y );
 
+        float x = gOutputWindowSize.x;
+        float y = gOutputWindowSize.y;
+
         //
         // Render the left eye onto the screen as the only eye:
         // (note: this mode is not complete ;-) it would be better to also deactivate
@@ -231,7 +234,7 @@ void renderFrame()
         gSimpleRiftControllerRenderer->getCamera()->setEye( GenericCamera::EYE_LEFT );
 
         renderScene();
-
+/*
         // the screen is framebuffer 0, bind that:
         glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
@@ -242,8 +245,7 @@ void renderFrame()
         gPassThroughShader->setUniform( "renderedTexture", 0 );
 
         gFullScreenQuad->VOnDraw();
-
-
+*/
 
     }
 }

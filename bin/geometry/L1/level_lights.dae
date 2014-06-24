@@ -5,8 +5,8 @@
       <author>Blender User</author>
       <authoring_tool>Blender 2.70.0 commit date:2014-04-10, commit time:11:49, hash:f93bc76</authoring_tool>
     </contributor>
-    <created>2014-06-12T19:58:14</created>
-    <modified>2014-06-12T19:58:14</modified>
+    <created>2014-06-24T21:20:04</created>
+    <modified>2014-06-24T21:20:04</modified>
     <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -1239,7 +1239,6 @@
     </light>
   </library_lights>
   <library_images/>
-  <library_controllers/>
   <library_visual_scenes>
     <visual_scene id="Scene" name="Scene">
       <node id="Point" name="Point" type="NODE">

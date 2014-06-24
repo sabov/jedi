@@ -85,7 +85,8 @@ void World::DSGeometryPass()
 
     // When we get here the depth buffer is already populated and the stencil pass
     // depends on it, but it does not write to it.
-    glDepthMask(GL_FALSE);
+    //glDepthMask(GL_FALSE);
+
 }
 
 void World::DSStencilPass(unsigned int _PointLightIndex)
@@ -94,6 +95,7 @@ void World::DSStencilPass(unsigned int _PointLightIndex)
 
     // Disable color/depth write and enable stencil
     m_GBuffer.BindForStencilPass();
+
     glEnable(GL_DEPTH_TEST);
 
     glDisable(GL_CULL_FACE);
@@ -107,8 +109,10 @@ void World::DSStencilPass(unsigned int _PointLightIndex)
     glStencilOpSeparate(GL_BACK, GL_KEEP, GL_INCR_WRAP, GL_KEEP);
     glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_DECR_WRAP, GL_KEEP);
 
-    float BBoxScale = CalcPointLightBSphere(mPointLights[_PointLightIndex]);
+    float BBoxScale = CalcPointLightBSphere( mPointLights[_PointLightIndex] );
     mMatrixStack.LoadIdentity();
+    mMatrixStack.Translate( mPointLights[_PointLightIndex].getPositionV3() );   //Translate to Light Postion
+    mMatrixStack.Translate(CGEngine::Vec3(0.0,-1.0,0.0));   //Translate to fit to world
     mMatrixStack.UniformScale( BBoxScale );
 
     glm::mat4 modelMatrix = mMatrixStack.getCompleteTransform();
@@ -123,9 +127,9 @@ void World::DSStencilPass(unsigned int _PointLightIndex)
 
 void World::DSPointLightPass(unsigned int _PointLightIndex)
 {
+    m_PointLightPassShader->use();
     m_GBuffer.BindForLightPass();
 
-    m_PointLightPassShader->use();
     m_PointLightPassShader->setUniform( m_eyeWorldPosLoc, mPlayer.getPosition() );
 
     glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
@@ -140,6 +144,8 @@ void World::DSPointLightPass(unsigned int _PointLightIndex)
 
     float BBoxScale = CalcPointLightBSphere( mPointLights[_PointLightIndex] );
     mMatrixStack.LoadIdentity();
+    mMatrixStack.Translate( mPointLights[_PointLightIndex].getPositionV3() );   //Translate to Light Postion
+    mMatrixStack.Translate(CGEngine::Vec3(0.0,-1.0,0.0));   //Translate to fit to world
     mMatrixStack.UniformScale( BBoxScale );
 
     glm::mat4 modelMatrix = mMatrixStack.getCompleteTransform();
@@ -153,6 +159,7 @@ void World::DSPointLightPass(unsigned int _PointLightIndex)
     mPointLights[_PointLightIndex].VSendToShader(s);
 
     m_bSphere.VOnDraw();
+
     glCullFace(GL_BACK);
 
     glDisable(GL_BLEND);
@@ -167,13 +174,13 @@ void World::DSFinalPass()
 
 float World::CalcPointLightBSphere(const CGEngine::CPositionalLight &Light)
 {
+    float intensity = 1.0;
+    float cnst = Light.GetConstAttenuation();
+    float lin = Light.GetLinAttenuation();
+    float exp = Light.GetExpAttenuation();
     float MaxChannel = fmax(fmax(Light.getDiffuseColor()[0], Light.getDiffuseColor()[1]), Light.getDiffuseColor()[2]);
 
-    float ret = (-Light.GetLinAttenuation() +
-                 sqrtf(Light.GetLinAttenuation() * Light.GetLinAttenuation() -
-                    4 * Light.GetExpAttenuation() * (Light.GetExpAttenuation() -
-                    256 * MaxChannel))) /
-                2 * Light.GetExpAttenuation();
+    float ret = ( -lin + sqrt( lin*lin - 4.0*exp*( cnst - 256.0*MaxChannel*intensity ) ) );
 
     return ret;
 }

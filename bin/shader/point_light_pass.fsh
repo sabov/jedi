@@ -21,11 +21,11 @@ struct sPositionalLight
         float ExponentialAttenuation            ;
 };
 
-uniform sampler2D gPositionMap;
-uniform sampler2D gColorMap;
-uniform sampler2D gNormalMap;
-uniform vec3    g_EyeWorldPos;
-uniform vec2    gScreenSize;
+uniform sampler2D   gPositionMap;
+uniform sampler2D   gColorMap;
+uniform sampler2D   gNormalMap;
+uniform vec3        g_EyeWorldPos;
+uniform vec2        gScreenSize;
 uniform sPositionalLight    PositionalLight;
 
 vec4 phong_positional_light(
@@ -70,7 +70,6 @@ vec2 CalcTexCoord()
     return gl_FragCoord.xy / gScreenSize;
 }
 
-
 out vec4 FragColor;
 
 void main()
@@ -82,8 +81,8 @@ void main()
     Normal = normalize(Normal);
 
     vec3 VertexToEye = g_EyeWorldPos- WorldPos;
-    vec3 LightDirection = normalize(PositionalLight.Position.xyz - WorldPos);
+    vec3 LightDirection = PositionalLight.Position.xyz - WorldPos;
 
-    //FragColor = phong_positional_light( vec4(0.0), vec4(Color, 1.0), vec4(0.0), 1.0, Normal, VertexToEye, LightDirection, PositionalLight );
-    FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+    FragColor = phong_positional_light( vec4(0.0), vec4(Color, 1.0), vec4(0.0), 1.0, Normal, VertexToEye, LightDirection, PositionalLight );
+    //FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 }

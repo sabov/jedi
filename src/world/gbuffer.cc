@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include <iostream>
 #include <cstring>
 
 #include "gbuffer.hh"
@@ -68,7 +68,7 @@ bool GBuffer::Init(unsigned int WindowWidth, unsigned int WindowHeight)
     GLenum Status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 
     if (Status != GL_FRAMEBUFFER_COMPLETE) {
-        printf("FB error, status: 0x%x\n", Status);
+        std::cout << "FB error, status: 0x" << Status << "x" << std::endl;
         return false;
     }
 
@@ -83,7 +83,7 @@ void GBuffer::StartFrame()
 {
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);
     glDrawBuffer(GL_COLOR_ATTACHMENT4);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 }
 
 
@@ -93,7 +93,7 @@ void GBuffer::BindForGeomPass()
 
     GLenum DrawBuffers[] = { GL_COLOR_ATTACHMENT0,
                              GL_COLOR_ATTACHMENT1,
-                             GL_COLOR_ATTACHMENT2 };
+                             GL_COLOR_ATTACHMENT2};
 
     glDrawBuffers(ARRAY_SIZE_IN_ELEMENTS(DrawBuffers), DrawBuffers);
 }
@@ -109,7 +109,7 @@ void GBuffer::BindForStencilPass()
 
 void GBuffer::BindForLightPass()
 {
-    glDrawBuffer(GL_COLOR_ATTACHMENT4);
+    //glDrawBuffer(GL_COLOR_ATTACHMENT4);
 
     for (unsigned int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_textures); i++) {
         glActiveTexture(GL_TEXTURE0 + i);

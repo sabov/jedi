@@ -77,6 +77,13 @@ public:
     {
         return m_Position;
     }
+
+    //Get position of point light
+    Vec3 getPositionV3() const
+    {
+        return Vec3(m_Position[0], m_Position[1], m_Position[2]);
+    }
+
     //Get Ambient Lightcolor
     Vec4 getAmbientColor() const
     {

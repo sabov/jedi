@@ -9,6 +9,7 @@
 #include <ACGL/OpenGL/GL.hh>
 #include <GLFW/glfw3.h>
 #include <ACGL/OpenGL/Objects/ShaderProgram.hh>
+#include "math/CGEGeometry.h"
 
 #ifndef SHADER_ADAPER_H
 #define SHADER_ADAPER_H
@@ -46,20 +47,26 @@ public:
                           bool _TransposeMatrix = false)
     {
         bool ret = true;
-        GLuint h = shaderProgram->getObjectName();
         GLint loc = glGetUniformLocation( shaderProgram->getObjectName(), _UniformName.c_str() );
         switch ( _UniformType )
         {
         case CGE_FLOAT:
+        {
             shaderProgram->setUniform( loc, *(static_cast<GLfloat*>(_Values)) );
             if ( glGetError() != GL_NO_ERROR )
                 ret = false;
             break;
+        }
         case CGE_FLOAT_VEC4:
-            shaderProgram->setUniform( loc, 4, static_cast<GLfloat*>(_Values) );
+        {
+            glm::vec4 v;
+            for (int i = 0; i < 4 ; ++i)
+                v[i] = *(static_cast<float*>(_Values) + i);
+            shaderProgram->setUniform( loc, v );
             if ( glGetError() != GL_NO_ERROR )
                 ret = false;
             break;
+        }
         default:
             ret = false;
             break;

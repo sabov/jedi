@@ -97,6 +97,7 @@ bool LoadLightsFromFile(std::string _FileName,
     const aiScene* pScene = Importer.ReadFile(_FileName.c_str(), 0);
 
     aiNode* root = pScene->mRootNode;
+    aiMatrix4x4 root_m = root->mTransformation;
 
     if (pScene)
     {
@@ -115,7 +116,7 @@ bool LoadLightsFromFile(std::string _FileName,
             std::string light_name( paiLight->mName.C_Str() );
 
             aiNode* child = root->mChildren[i]; //This probably only works as long as the scene does not contain other things than lights
-            aiMatrix4x4 m = child->mTransformation;
+            aiMatrix4x4 m = root_m * child->mTransformation;
             std::string child_name( child->mName.C_Str() );
 
             assert( light_name.compare( child_name ) == 0 ) ;

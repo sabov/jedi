@@ -9,11 +9,11 @@ CLight::CLight()
     //Position
     m_Position      = Vec4(0.0);
     //Ambient
-    m_AmbientColor  = Vec4(1.0);
+    m_AmbientColor  = Vec4(0.0);
     //Diffuse
     m_DiffuseColor  = Vec4(1.0);
     //Ambient
-    m_SpecularColor = Vec4(1.0);
+    m_SpecularColor = Vec4(0.0);
 }
 
 CLight::~CLight()

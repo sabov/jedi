@@ -189,7 +189,7 @@ int main( int argc, char *argv[] )
     /************************************************************************
      * Deferred Shading - Setup
      * *********************************************************************/
-    gWorld->setWidthHeight(1280, 800);
+    gWorld->setWidthHeight(1600, 900);
     gWorld->InitDS();
 
     //

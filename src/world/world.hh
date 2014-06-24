@@ -96,6 +96,7 @@ private:
     GLint   m_normalTexLoc  ;
     GLint   m_screenSizeLoc ;
     GLint   m_eyeWorldPosLoc;
+    GLint   m_testTexLoc    ;
     //ACGL::OpenGL::SharedShaderProgram   m_DirLightPassShader    ;
     ACGL::OpenGL::SharedShaderProgram   m_NullShader            ;
     GBuffer                             m_GBuffer               ;

@@ -29,7 +29,6 @@ World::World()
 
 World::~World()
 {
-    delete mBeep;
 }
 
 void World::setPlayerCamera( ACGL::HardwareSupport::SimpleRiftController *riftControl )
@@ -88,17 +87,17 @@ void World::render()
     viewMatrix = mPlayer.getHMDViewMatrix();
 
     {
-r        mBunnyShader->use();
+        mBunnyShader->use();
         mBunnyShader->setUniform( "uModelMatrix", modelMatrix );
         mBunnyShader->setUniform( "uViewMatrix",  viewMatrix );
         mBunnyShader->setUniform( "uProjectionMatrix", mPlayer.getProjectionMatrix() );
         mBunnyShader->setUniform( "uNormalMatrix",     glm::inverseTranspose(glm::mat3(viewMatrix)*glm::mat3(modelMatrix)) );
 
-        mBunnyShader->setUniform( "uTexture", 1 );
+        mBunnyShader->setUniform( "uTexture", 0 );
     }
 
-    mTex.Bind(GL_TEXTURE1);
-    mQuad.VOnDraw();
+    mTex.Bind(GL_TEXTURE0);
+    mDice.VOnDraw();
 
 }
 
@@ -172,34 +171,34 @@ void World::setWidthHeight(unsigned int _w, unsigned int _h)
 
 void World::DSRender()
 {
-    GLint err = GL_NO_ERROR;
     m_GBuffer.StartFrame();
-    err = glGetError();
 
     DSGeometryPass();
-    err = glGetError();
 
     // We need stencil to be enabled in the stencil pass to get the stencil buffer
     // updated and we also need it in the light pass because we render the light
     // only if the stencil passes.
     glEnable(GL_STENCIL_TEST);
-    err = glGetError();
+
+    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+    //glViewport( 0, 0, window_width, window_height );
+    glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glDisable(GL_CULL_FACE);
 
     unsigned int num_lights1 = mPointLights.size();
 
     for (unsigned int i = 0 ; i < num_lights1; i++) {
-        DSStencilPass(i);
+        //DSStencilPass(i);
         DSPointLightPass(i);
     }
-    err = glGetError();
 
     // The directional light does not need a stencil test because its volume
     // is unlimited and the final pass simply copies the texture.
     glDisable(GL_STENCIL_TEST);
-    err = glGetError();
 
     //DSDirectionalLightPass();
 
-    DSFinalPass();
-    err = glGetError();
+    //DSFinalPass();
 }
