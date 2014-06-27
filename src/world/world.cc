@@ -21,6 +21,9 @@ World::World()
     mBunnyShader   = ShaderProgramFileManager::the()->get( ShaderProgramCreator("Bunny") );
 
     CGEngine::LoadLightsFromFile("geometry/L1/level_lights.dae", mDirLights, mPointLights);
+    glm::mat4 t = glm::translate(glm::mat4(1.0), glm::vec3(0.0, -1.0, 0.0));
+    for (unsigned int i = 0 ; i < mPointLights.size() ; ++i)
+        mPointLights[i].Transform(t);
 
     mpRotProcess = GameLogic::RotationProcessPtr( new GameLogic::RotationProcess() );
     mpProcessManager = GameLogic::CProcessManager::getInstance();
@@ -178,10 +181,10 @@ void World::DSRender()
     // We need stencil to be enabled in the stencil pass to get the stencil buffer
     // updated and we also need it in the light pass because we render the light
     // only if the stencil passes.
+
     glEnable(GL_STENCIL_TEST);
 
-    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
-    //glViewport( 0, 0, window_width, window_height );
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
     glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -201,4 +204,5 @@ void World::DSRender()
     //DSDirectionalLightPass();
 
     //DSFinalPass();
+
 }

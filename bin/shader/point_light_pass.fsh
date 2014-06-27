@@ -27,6 +27,7 @@ uniform sampler2D   gNormalMap;
 uniform vec3        g_EyeWorldPos;
 uniform vec2        gScreenSize;
 uniform sPositionalLight    PositionalLight;
+uniform mat4        gLightTransform;
 
 vec4 phong_positional_light(
                             in vec4 matAmbient,
@@ -58,8 +59,8 @@ vec4 phong_positional_light(
         if (shininess > 0.0)
         {
             specular = pow( max(dot(R, E), 0.0), shininess );
-        }
-        final_color += light.SpecularColor * matSpecular * specular;
+            final_color += light.SpecularColor * matSpecular * specular;
+        }   
     }
    return final_color * attenuation_factor;
 }
@@ -70,7 +71,7 @@ vec2 CalcTexCoord()
     return gl_FragCoord.xy / gScreenSize;
 }
 
-out vec4 FragColor;
+layout (location = 0) out vec4 FragColor;
 
 void main()
 {
@@ -78,11 +79,12 @@ void main()
     vec3 WorldPos = texture(gPositionMap, TexCoord).xyz;
     vec3 Color = texture(gColorMap, TexCoord).xyz;
     vec3 Normal = texture(gNormalMap, TexCoord).xyz;
-    Normal = normalize(Normal);
+    //Normal = normalize(Normal);
 
     vec3 VertexToEye = g_EyeWorldPos- WorldPos;
-    vec3 LightDirection = PositionalLight.Position.xyz - WorldPos;
+    vec4 LightPos = gLightTransform * PositionalLight.Position ;
+    vec3 LightDirection = LightPos.xyz - WorldPos;
 
-    FragColor = phong_positional_light( vec4(0.0), vec4(Color, 1.0), vec4(0.0), 1.0, Normal, VertexToEye, LightDirection, PositionalLight );
+    FragColor = phong_positional_light( vec4(0.0), vec4(Color, 1.0), vec4(0.0), 0.0, Normal, VertexToEye, LightDirection, PositionalLight );
     //FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 }

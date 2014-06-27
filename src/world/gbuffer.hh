@@ -34,7 +34,7 @@ public:
     void BindForFinalPass();
 
     GLuint getFinalTextureName() const {
-        //return m_textures[GBUFFER_TEXTURE_TYPE_TEST];
+        //return m_textures[GBUFFER_TEXTURE_TYPE_NORMAL];
         return m_finalTexture;
     }
 

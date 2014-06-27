@@ -62,7 +62,7 @@ bool GBuffer::Init(unsigned int WindowWidth, unsigned int WindowHeight)
 
     // final
     glBindTexture(GL_TEXTURE_2D, m_finalTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, WindowWidth, WindowHeight, 0, GL_RGB, GL_FLOAT, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA , WindowWidth, WindowHeight, 0, GL_RGB, GL_FLOAT, NULL);
     glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT4, GL_TEXTURE_2D, m_finalTexture, 0);
 
     GLenum Status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -82,8 +82,10 @@ bool GBuffer::Init(unsigned int WindowWidth, unsigned int WindowHeight)
 void GBuffer::StartFrame()
 {
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);
+
     glDrawBuffer(GL_COLOR_ATTACHMENT4);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
 }
 
 
@@ -109,7 +111,11 @@ void GBuffer::BindForStencilPass()
 
 void GBuffer::BindForLightPass()
 {
-    //glDrawBuffer(GL_COLOR_ATTACHMENT4);
+    /*
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);
+    GLenum DrawBuffers[] = { GL_COLOR_ATTACHMENT4 };
+    glDrawBuffers(ARRAY_SIZE_IN_ELEMENTS(DrawBuffers), DrawBuffers);
+    */
 
     for (unsigned int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_textures); i++) {
         glActiveTexture(GL_TEXTURE0 + i);

@@ -94,8 +94,8 @@ void World::DSStencilPass(unsigned int _PointLightIndex)
     m_NullShader->use();
 
     // Disable color/depth write and enable stencil
-    m_GBuffer.BindForStencilPass();
-
+    //m_GBuffer.BindForStencilPass();
+/*
     glEnable(GL_DEPTH_TEST);
 
     glDisable(GL_CULL_FACE);
@@ -123,6 +123,7 @@ void World::DSStencilPass(unsigned int _PointLightIndex)
     m_NullShader->setUniform( "uProjectionMatrix", mPlayer.getProjectionMatrix() );
 
     m_bSphere.VOnDraw();
+    */
 }
 
 void World::DSPointLightPass(unsigned int _PointLightIndex)
@@ -152,6 +153,7 @@ void World::DSPointLightPass(unsigned int _PointLightIndex)
     glm::mat4 viewMatrix = mPlayer.getHMDViewMatrix();
 
     m_PointLightPassShader->setUniform( "uModelMatrix", modelMatrix );
+    m_PointLightPassShader->setUniform( "gLightTransform", viewMatrix );
     m_PointLightPassShader->setUniform( "uViewMatrix",  viewMatrix );
     m_PointLightPassShader->setUniform( "uProjectionMatrix", mPlayer.getProjectionMatrix() );
 

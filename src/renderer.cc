@@ -234,7 +234,8 @@ void renderFrame()
         gSimpleRiftControllerRenderer->getCamera()->setEye( GenericCamera::EYE_LEFT );
 
         renderScene();
-/*
+
+        /*
         // the screen is framebuffer 0, bind that:
         glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
@@ -245,7 +246,7 @@ void renderFrame()
         gPassThroughShader->setUniform( "renderedTexture", 0 );
 
         gFullScreenQuad->VOnDraw();
-*/
+        */
 
     }
 }
