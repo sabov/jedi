@@ -185,9 +185,9 @@ endif ()
 message(STATUS "Boost libraries are ${Boost_LIBRARIES}")
 include_directories(${Boost_INCLUDE_DIRS})
 link_directories( ${Boost_LIBRARY_DIRS} )
-set(CXX_FLAGS "-lboost_system")
+#set(CXX_FLAGS "-lboost_system")
 set(LIBRARIES ${LIBRARIES} ${Boost_LIBRARIES})
-set(LIBRARIES ${LIBRARIES} -lboost_system)
+#set(LIBRARIES ${LIBRARIES} -lboost_system)
 
 # just print out the variables to see their values...
 MESSAGE(STATUS "Boost information:")
