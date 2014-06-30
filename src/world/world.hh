@@ -7,6 +7,7 @@
 #include <ACGL/HardwareSupport/SimpleRiftController.hh>
 #include <ACGL/OpenGL/Objects/VertexArrayObject.hh>
 #include <ACGL/OpenGL/Objects/ShaderProgram.hh>
+#include <btBulletDynamicsCommon.h>
 #include "player.hh"
 #include "events.hh"
 #include "../audio/SimpleSound.hh"
@@ -19,6 +20,9 @@
 #include "process_sys/GLGProcessManager.h"
 #include "process_sys/GLGExampleProcesses.h"
 #include "gbuffer.hh"
+#include "droid.hh"
+#include "PhysicsObject.hh"
+
 
 class World {
 public:
@@ -26,25 +30,37 @@ public:
     ~World();
 
     // called once to connect the player with the Rift:
-    void setPlayerCamera( ACGL::HardwareSupport::SimpleRiftController *riftControl );
+    void setPlayerCamera(ACGL::HardwareSupport::SimpleRiftController *riftControl);
 
     // render the world:
     void render();
 
-    // move the player relative to the players bodys orientation:
-    void movePlayer( glm::vec3 direction );
+    // move the player relative to the players body orientation:
+    void movePlayer(const glm::vec3 &direction);
 
-    // get the currect position in world space
+    // get the current position in world space
     glm::vec3 getPlayerPosition();
 
     // returns the OpenAL compatible orientation which is the orientation on the head (ears)!
-    void getPlayerOrientation( ALfloat *playerOrientation );
+    void getPlayerOrientation(ALfloat *playerOrientation);
 
     // rotate the players body, negative values rotate to the left, positive to the right
-    void rotatePlayer( float dYaw );
+    void rotatePlayer(float dYaw);
 
     // ducking value is between 0..1
-    void duckPlayer( float duckingValue );
+    void duckPlayer(float duckingValue);
+
+    // player is currently using the force
+    void useForcePlayer();
+
+    // move the lightsaber of the player
+    void moveLightsaber(const glm::vec3 &direction);
+
+    //turn on/off lightsaber
+    void toggleLightsaber();
+
+    //rotate the lightsaber, negative values rotate to the left, positive to the right
+    void rotateLightsaber(float dYaw, float dRoll, float dPitch);
 
     void update(int time);
 
@@ -59,6 +75,12 @@ private:
     unsigned int window_height;
 
     Player mPlayer;
+    Droid mDroids[3];
+
+    //bullet
+    btDiscreteDynamicsWorld* dynamicsWorld;
+    PhysicsObject *droidsPhysic;
+
 
     //Matrix Stack
     CGEngine::CMatrixStack  mMatrixStack;

@@ -6,6 +6,7 @@ PROJECT(Jedi)
 message("Jedi - Occulus Rift - Starting Project Build")
 
 #include "findASSIMP.cmake"...
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/extern/acgl/cmake/")
 
 # ACGL setup:
@@ -159,13 +160,8 @@ include(${QT_USE_FILE})
 add_definitions(${QT_DEFINITIONS})
 set(LIBRARIES ${LIBRARIES} ${QT_LIBRARIES})
 
-#Bullet Engine
-find_package(Bullet REQUIRED)
-include_directories(${BULLET_INCLUDE_DIRS})
-set(LIBRARIES ${LIBRARIES} ${BULLET_LIBRARIES})
-
 #Assimp Library
-find_package(ASSIMP)
+find_package(Assimp REQUIRED)
 if(NOT ASSIMP_FOUND)
   message(FATAL_ERROR "ASSIMP not found!")
 endif ()
@@ -208,6 +204,14 @@ endif ()
 include_directories(${GLEW_INCLUDE_DIR})
 set(LIBRARIES ${LIBRARIES} ${OPENGL_LIBRARIES})
 set(LIBRARIES ${LIBRARIES} ${GLEW_LIBRARIES})
+
+###############################################################################
+#
+# Bullet engine
+#
+find_package(Bullet REQUIRED)
+include_directories(${BULLET_INCLUDE_DIRS})
+set(LIBRARIES ${LIBRARIES} ${BULLET_LIBRARIES})
 
 ADD_EXECUTABLE(${CMAKE_PROJECT_NAME} ${SOURCE_FILES} ${HEADER_FILES} ${SHADER_FILES} ${README_FILES})
 TARGET_LINK_LIBRARIES(${CMAKE_PROJECT_NAME} ${LIBRARIES})

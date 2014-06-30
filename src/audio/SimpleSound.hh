@@ -16,18 +16,19 @@
  * but multiple sources playing the data!
  */
 
-
 class SimpleSound {
 public:
-    SimpleSound( const std::string &wavFileName );
+    SimpleSound(const std::string &wavFileName);
     ~SimpleSound();
 
-    void setPosition( glm::vec3 position );
-    void setVelocity( glm::vec3 velocity );
+    void setPosition(glm::vec3 position);
+    void setVelocity(glm::vec3 velocity);
 
-    void setLooping( bool b );
+    void setLooping(bool b);
 
     void play();
+
+    bool isPlaying();
 private:
 
     ALuint mSource;

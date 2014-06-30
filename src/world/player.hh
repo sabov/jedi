@@ -2,6 +2,7 @@
 
 #include <ACGL/Scene/MoveableObject.hh>
 #include <ACGL/Scene/HMDCamera.hh>
+#include "lightsaber.hh"
 
 /*
  * A player can be moved around, the position and orientation are the
@@ -17,10 +18,13 @@
  * relative to the bodies center.
  */
 
-class Player : public ACGL::Scene::MoveableObject {
+class Player: public ACGL::Scene::MoveableObject {
 public:
+    Player();
+    ~Player();
+
     // connect to the HMD
-    void setCamera( ACGL::Scene::SharedHMDCamera sHMDCamera );
+    void setCamera(ACGL::Scene::SharedHMDCamera sHMDCamera);
 
     // get the view matrix for rendering (of the HMD controlled eye positions)
     // this is a combination of the player position and the
@@ -30,11 +34,17 @@ public:
     glm::mat4 getProjectionMatrix();
 
     // returns the camera as a shared pointer to let others get/set camera parameters
-    ACGL::Scene::SharedHMDCamera getCamera() { return mHMDCamera; }
+    ACGL::Scene::SharedHMDCamera getCamera() {
+        return mHMDCamera;
+    }
 
     // 1.0: not ducked, 0.0: fully ducked
-    void duck( float duckingValue );
+    void duck(float duckingValue);
 
+    // player uses the force
+    void useForce();
+
+    Lightsaber mLightsaber;
 private:
     ACGL::Scene::SharedHMDCamera mHMDCamera;
     float mHeight;

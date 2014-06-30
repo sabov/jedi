@@ -10,4 +10,4 @@
 // channel of audio.
 //
 // You might want to add your own loading functions to support more file formats.
-ALuint createBufferFromWAV( const std::string &_filename );
+ALuint createBufferFromWAV(const std::string &_filename);
