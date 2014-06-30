@@ -152,7 +152,6 @@ void World::render() {
     mTex.Bind(GL_TEXTURE0);
     mDice.VOnDraw();
 
-=======
 
     mPlayer.mLightsaber.render(viewMatrix, projectionMatrix);
     mPlayer.mLightsaber.mPhysicObject.SetPosition(mPlayer.mLightsaber.getPosition());
