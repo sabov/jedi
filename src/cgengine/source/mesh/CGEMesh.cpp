@@ -183,15 +183,31 @@ bool CMesh::initMaterials(const aiScene *_pScene, const std::string &_filename)
         const aiMaterial* pMaterial = _pScene->mMaterials[i];
 
         if (pMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
-            aiString Path;
+            aiString aiPath;
 
-            if (pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
+            if (pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &aiPath, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS)
+            {
+                std::string path(aiPath.data);
 #ifdef _WIN32
                 std::string slash("\\");
 #else
                 std::string slash("/");
 #endif
-                std::string fullPath = current_dir + slash + Path.data;
+                size_t p = path.find("..\\");
+                size_t len = 3;
+                if ( p != std::string::npos )
+                {
+                    path.replace(p, len, "");
+                }
+                std::string fullPath = current_dir + slash + path;
+#ifndef _WIN32
+                p = fullPath.find_first_of("\\");
+                while ( p != std::string::npos )
+                {
+                    fullPath.replace(p, 1, slash);
+                    p = fullPath.find_first_of("\\");
+                } ;
+#endif
 
                 GLTexture2DPointer tex_ptr(new CGLTexture2D);
 

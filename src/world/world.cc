@@ -19,12 +19,24 @@ bool LocalContactProcessedCallback(btManifoldPoint& cp, void* body0, void* body1
 World::World() : mDroids{Droid(droidPosition1), Droid(droidPosition2), Droid(droidPosition3)}{
     debug() << "loading game world..." << endl;
 
-    mLevel.LoadMesh("geometry/L1/level.obj", CGEngine::CGE_TRIANGULATE);
+    mLevel.LoadMesh("geometry/L1/level.obj");
+    mDice.LoadMesh("geometry/test/dice.obj");
+    mQuad.LoadMesh("");
+    mTex.VLoadTexture("geometry/L1/Textures/metalbridgetoprailbig.jpg");
     mBunnyShader   = ShaderProgramFileManager::the()->get( ShaderProgramCreator("Bunny") );
+
+    CGEngine::LoadLightsFromFile("geometry/L1/level_lights.dae", mDirLights, mPointLights);
+    glm::mat4 t = glm::translate(glm::mat4(1.0), glm::vec3(0.0, -1.0, 0.0));
+    for (unsigned int i = 0 ; i < mPointLights.size() ; ++i)
+        mPointLights[i].Transform(t);
+
+    mpRotProcess = GameLogic::RotationProcessPtr( new GameLogic::RotationProcess() );
+    mpProcessManager = GameLogic::CProcessManager::getInstance();
+    mpProcessManager->attachProcess( mpRotProcess );
     //GLint n = mBunnyShader->getAttributeLocation("aNormal");
     //GLint v = mBunnyShader->getAttributeLocation("aPosition");
     //GLint t = mBunnyShader->getAttributeLocation("aTexCoord");
-    
+
     //mBunnyGeometry->setAttributeLocations( mBunnyShader->getAttributeLocations() );
     //mBunnyTexture  = loadTexture2D( "clownfishBunny.png" );
 
@@ -100,25 +112,47 @@ void World::render() {
     mMatrixStack.LoadIdentity();
     mMatrixStack.Translate(CGEngine::Vec3(0.0, -1.0, 0.0));
 
-    mBunnyShader->use();
-
     glm::mat4 modelMatrix = mMatrixStack.getCompleteTransform();
     glm::mat4 viewMatrix = mPlayer.getHMDViewMatrix();
     glm::mat4 projectionMatrix = mPlayer.getProjectionMatrix();
 
-    mBunnyShader->setUniform("uModelMatrix", modelMatrix);
-    mBunnyShader->setUniform("uViewMatrix", viewMatrix);
-    mBunnyShader->setUniform("uProjectionMatrix", projectionMatrix);
-    mBunnyShader->setUniform("uNormalMatrix", glm::inverseTranspose(glm::mat3(viewMatrix) * glm::mat3(modelMatrix)));
+    {
+        mBunnyShader->use();
+        mBunnyShader->setUniform( "uModelMatrix", modelMatrix );
+        mBunnyShader->setUniform( "uViewMatrix",  viewMatrix );
+        mBunnyShader->setUniform( "uProjectionMatrix", mPlayer.getProjectionMatrix() );
+        mBunnyShader->setUniform( "uNormalMatrix",     glm::inverseTranspose(glm::mat3(viewMatrix)*glm::mat3(modelMatrix)) );
 
-    // At least 16 texture units can be used, but multiple texture can also be placed in one
-    // texture array and thus only occupy one texture unit!
-    mBunnyShader->setUniform( "uTexture", 0 );
+        // At least 16 texture units can be used, but multiple texture can also be placed in one
+        // texture array and thus only occupy one texture unit!
+        mBunnyShader->setUniform( "uTexture", 0 );
+    }
     //
     // draw geometry
     //
     mLevel.VOnDraw();
-    
+
+    mMatrixStack.LoadIdentity();
+    mMatrixStack.Translate(CGEngine::Vec3(0.0,1.0,-4.0));
+    mMatrixStack.Rotate( glm::radians( mpRotProcess->rotAngle ), CGEngine::Vec3(0.0,1.0,0.0) );
+
+    modelMatrix = mMatrixStack.getCompleteTransform();
+    viewMatrix = mPlayer.getHMDViewMatrix();
+
+    {
+        mBunnyShader->use();
+        mBunnyShader->setUniform( "uModelMatrix", modelMatrix );
+        mBunnyShader->setUniform( "uViewMatrix",  viewMatrix );
+        mBunnyShader->setUniform( "uProjectionMatrix", mPlayer.getProjectionMatrix() );
+        mBunnyShader->setUniform( "uNormalMatrix",     glm::inverseTranspose(glm::mat3(viewMatrix)*glm::mat3(modelMatrix)) );
+
+        mBunnyShader->setUniform( "uTexture", 0 );
+    }
+
+    mTex.Bind(GL_TEXTURE0);
+    mDice.VOnDraw();
+
+
     mPlayer.mLightsaber.render(viewMatrix, projectionMatrix);
     mPlayer.mLightsaber.mPhysicObject.SetPosition(mPlayer.mLightsaber.getPosition());
 
@@ -244,4 +278,49 @@ void World::toggleLightsaber() {
 
 void World::rotateLightsaber(float dYaw, float dRoll, float dPitch){
     mPlayer.mLightsaber.rotate(dYaw, dRoll, dPitch);
+}
+
+void World::update(int time)
+{
+    mpProcessManager->updateProcesses(time);
+}
+
+void World::setWidthHeight(unsigned int _w, unsigned int _h)
+{
+    window_width = _w; window_height = _h;
+}
+
+void World::DSRender()
+{
+    m_GBuffer.StartFrame();
+
+    DSGeometryPass();
+
+    // We need stencil to be enabled in the stencil pass to get the stencil buffer
+    // updated and we also need it in the light pass because we render the light
+    // only if the stencil passes.
+
+    glEnable(GL_STENCIL_TEST);
+
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glDisable(GL_CULL_FACE);
+
+    unsigned int num_lights1 = mPointLights.size();
+
+    for (unsigned int i = 0 ; i < num_lights1; i++) {
+        //DSStencilPass(i);
+        DSPointLightPass(i);
+    }
+
+    // The directional light does not need a stencil test because its volume
+    // is unlimited and the final pass simply copies the texture.
+    glDisable(GL_STENCIL_TEST);
+
+    //DSDirectionalLightPass();
+
+    //DSFinalPass();
+
 }
