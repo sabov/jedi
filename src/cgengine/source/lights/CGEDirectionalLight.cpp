@@ -4,8 +4,8 @@ namespace CGEngine {
 
 bool CDirectionalLight::Initialize(const Vec4 &_Position, const Vec4 &_AmbientColor, const Vec4 &_DiffuseColor, const Vec4 &_SpecularColor)
 {
-    bool b = CLight::Initialize(_Position, _AmbientColor, _DiffuseColor, _SpecularColor);
-    m_Position[3] = 0.0f;
+    bool b          = CLight::Initialize(_Position, _AmbientColor, _DiffuseColor, _SpecularColor);
+    m_Position[3]   = 0.0f;
     return b;
 }
 

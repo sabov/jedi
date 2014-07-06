@@ -5,11 +5,11 @@ namespace CGEngine {
 bool CPositionalLight::Initialize(const Vec4 &_Position, const Vec4 &_AmbientColor, const Vec4 &_DiffuseColor, const Vec4 &_SpecularColor,
                                   float _ConstAttenuation, float _LinAttenuation, float _ExpAttenuation)
 {
-    bool b = CLight::Initialize(_Position, _AmbientColor, _DiffuseColor, _SpecularColor);
-    m_Position[3] = 1.0f;
-    m_const_att = _ConstAttenuation;
-    m_lin_att = _LinAttenuation;
-    m_exp_att = _ExpAttenuation;
+    bool b          = CLight::Initialize(_Position, _AmbientColor, _DiffuseColor, _SpecularColor);
+    m_Position[3]   = 1.0f;
+    m_const_att     = _ConstAttenuation;
+    m_lin_att       = _LinAttenuation;
+    m_exp_att       = _ExpAttenuation;
     return b;
 }
 

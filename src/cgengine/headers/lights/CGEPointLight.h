@@ -42,11 +42,11 @@ public:
         m_ShSpecName    = std::string("SpecularColor")      ;
     }
 
-    bool Initialize(const Vec4 &_Position, const Vec4 &_AmbientColor, const Vec4 &_DiffuseColor, const Vec4 &_SpecularColor,
-                    float _ConstAttenuation = 0.8f, float _LinAttenuation = 0.1f, float _ExpAttenuation = 0.1f);
-
     virtual ~CPositionalLight() {}
 
+    //Initialize Point Light
+    bool Initialize(const Vec4 &_Position, const Vec4 &_AmbientColor, const Vec4 &_DiffuseColor, const Vec4 &_SpecularColor,
+                    float _ConstAttenuation = 0.8f, float _LinAttenuation = 0.1f, float _ExpAttenuation = 0.1f);
 
     //Send Light-Information to Shader
     virtual bool VSendToShader(CShader &_shader);
@@ -89,22 +89,22 @@ public:
     }
 
     //Gets the name of the Positional Light-Structure variable in the Shader
-    std::string GetPositionName()
+    std::string GetPositionName() const
     {
         return m_ShPositionName ;
     }
     //Gets the name of the Const. Att. -Field in the Light-Structure variable in the Shader
-    std::string GetConstantAttenuationName()
+    std::string GetConstantAttenuationName() const
     {
         return m_ShConstAttribName ;
     }
     //Gets the name of the Lin. Att. -Field in the Light-Structure variable in the Shader
-    std::string GetLinearAttenuationName()
+    std::string GetLinearAttenuationName() const
     {
         return m_ShLinAttribName ;
     }
     //Gets the name of the Exp. Att. -Field in the Light-Structure variable in the Shader
-    std::string GetExponentialAttenuationName()
+    std::string GetExponentialAttenuationName() const
     {
         return m_ShExpAttribName ;
     }

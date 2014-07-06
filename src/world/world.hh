@@ -90,15 +90,13 @@ private:
     //test oject
     CGEngine::CMesh mDice   ;
 
-    CGEngine::CFullScreenQuad mQuad;
-    CGEngine::CGLTexture2D mTex;
-
     //using this shader since it supports textures
     ACGL::OpenGL::SharedShaderProgram     mBunnyShader;
 
     //Lights
     std::vector<CGEngine::CPositionalLight>     mPointLights   ;
     std::vector<CGEngine::CDirectionalLight>    mDirLights     ;
+    std::vector<CGEngine::CSpotLight>           mSpotLights    ;
 
     //
     // One repeating sound as an example of how to use OpenAL:
@@ -109,24 +107,29 @@ private:
     GameLogic::RotationProcessPtr   mpRotProcess;
 
     //Deferred Shading
-    bool use_direct_lighting ;
     ACGL::OpenGL::SharedShaderProgram   m_GeometryPassShader    ;
-    GLint                               m_ColorTexUnitLoc       ;
     ACGL::OpenGL::SharedShaderProgram   m_PointLightPassShader  ;
-    GLint   m_posTexLoc     ;
-    GLint   m_colorTexLoc   ;
-    GLint   m_normalTexLoc  ;
-    GLint   m_screenSizeLoc ;
-    GLint   m_eyeWorldPosLoc;
-    GLint   m_testTexLoc    ;
-    //ACGL::OpenGL::SharedShaderProgram   m_DirLightPassShader    ;
+    ACGL::OpenGL::SharedShaderProgram   m_DirLightPassShader    ;
+    ACGL::OpenGL::SharedShaderProgram   m_SpotLightPassShader   ;
     ACGL::OpenGL::SharedShaderProgram   m_NullShader            ;
-    GBuffer                             m_GBuffer               ;
-    CGEngine::CMesh                     m_bSphere               ;
+    GLint   m_ColorTexUnitLoc       ;
+    GLint   m_posTexLoc[3]          ;
+    GLint   m_colorTexLoc[3]        ;
+    GLint   m_normalTexLoc[3]       ;
+    GLint   m_screenSizeLoc[3]      ;
+    GLint   m_eyeWorldPosLoc[3]     ;
+
+    GBuffer                     m_GBuffer   ;
+    CGEngine::CMesh             m_Sphere   ; //Spheres for Point Lights
+    CGEngine::CFullScreenQuad   m_Quad     ; //Fullscreenquad for Directional Light
+    CGEngine::CMesh             m_Cone     ; //Cones for Spot Lights
 
     void DSGeometryPass();
     void DSStencilPass(unsigned int _PointLightIndex);
     void DSPointLightPass(unsigned int _PointLightIndex);
+    void DSDirectionalLightPass();
+    void DSSpotStencilPass(unsigned int _SpotLightIndex);
+    void DSSpotLightPass(unsigned int _SpotLightIndex);
     void DSFinalPass();
     float CalcPointLightBSphere(const CGEngine::CPositionalLight& Light);
 };

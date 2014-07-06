@@ -83,7 +83,8 @@ void GBuffer::StartFrame()
 {
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);
 
-    glDrawBuffer(GL_COLOR_ATTACHMENT4);
+    GLenum DrawBuffers[] = { GL_COLOR_ATTACHMENT4 };
+    glDrawBuffers(ARRAY_SIZE_IN_ELEMENTS(DrawBuffers), DrawBuffers);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
 }
@@ -111,11 +112,8 @@ void GBuffer::BindForStencilPass()
 
 void GBuffer::BindForLightPass()
 {
-    /*
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);
     GLenum DrawBuffers[] = { GL_COLOR_ATTACHMENT4 };
     glDrawBuffers(ARRAY_SIZE_IN_ELEMENTS(DrawBuffers), DrawBuffers);
-    */
 
     for (unsigned int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_textures); i++) {
         glActiveTexture(GL_TEXTURE0 + i);

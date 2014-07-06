@@ -23,6 +23,7 @@ set(cgengine_headers	${CGE_HEADER_PATH}/mesh/CGEMesh.h
                         ${CGE_HEADER_PATH}/lights/CGELight.h
                         ${CGE_HEADER_PATH}/lights/CGEPointLight.h
                         ${CGE_HEADER_PATH}/lights/CGEDirectionalLight.h
+                        ${CGE_HEADER_PATH}/lights/CGESpotLight.h
                         ${CGE_HEADER_PATH}/lights/sh_adapt/shader_adapter.h
                         ${CGE_HEADER_PATH}/lights/CGE_multiple_lights.h
                         PARENT_SCOPE
@@ -36,6 +37,7 @@ set(cgengine_source     ${CGE_SOURCE_PATH}/object/CGEObject.cpp
                         ${CGE_SOURCE_PATH}/lights/CGELight.cpp
                         ${CGE_SOURCE_PATH}/lights/CGEPointLight.cpp
                         ${CGE_SOURCE_PATH}/lights/CGEDirectionalLight.cpp
+                        ${CGE_SOURCE_PATH}/lights/CGESpotLight.cpp
                         ${CGE_SOURCE_PATH}/lights/CGE_multiple_lights.cpp
                         PARENT_SCOPE
 )

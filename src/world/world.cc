@@ -21,24 +21,24 @@ World::World() : mDroids{Droid(droidPosition1), Droid(droidPosition2), Droid(dro
 
     mLevel.LoadMesh("geometry/L1/level.obj");
     mDice.LoadMesh("geometry/test/dice.obj");
-    mQuad.LoadMesh("");
-    mTex.VLoadTexture("geometry/L1/Textures/metalbridgetoprailbig.jpg");
+    m_Quad.LoadMesh("");
+
     mBunnyShader   = ShaderProgramFileManager::the()->get( ShaderProgramCreator("Bunny") );
 
-    CGEngine::LoadLightsFromFile("geometry/L1/level_lights.dae", mDirLights, mPointLights);
+    CGEngine::LoadLightsFromFile("geometry/L1/level_lights.dae", mDirLights, mPointLights, mSpotLights);
     glm::mat4 t = glm::translate(glm::mat4(1.0), glm::vec3(0.0, -1.0, 0.0));
     for (unsigned int i = 0 ; i < mPointLights.size() ; ++i)
         mPointLights[i].Transform(t);
+    for (unsigned int i = 0 ; i < mSpotLights.size() ; ++i)
+        mSpotLights[i].Transform(t);
+
+    CGEngine::CDirectionalLight dir_light ;
+    dir_light.Initialize( CGEngine::Vec4(0.1, 1.0, -0.1, 0.0), CGEngine::Vec4(0.1), CGEngine::Vec4(0.25), CGEngine::Vec4(1.0) );
+    mDirLights.push_back( dir_light );
 
     mpRotProcess = GameLogic::RotationProcessPtr( new GameLogic::RotationProcess() );
     mpProcessManager = GameLogic::CProcessManager::getInstance();
     mpProcessManager->attachProcess( mpRotProcess );
-    //GLint n = mBunnyShader->getAttributeLocation("aNormal");
-    //GLint v = mBunnyShader->getAttributeLocation("aPosition");
-    //GLint t = mBunnyShader->getAttributeLocation("aTexCoord");
-
-    //mBunnyGeometry->setAttributeLocations( mBunnyShader->getAttributeLocations() );
-    //mBunnyTexture  = loadTexture2D( "clownfishBunny.png" );
 
     //initialize bullet ==============================================================
 
@@ -78,7 +78,6 @@ World::World() : mDroids{Droid(droidPosition1), Droid(droidPosition2), Droid(dro
     // load audio assets:
     mBeep = new SimpleSound( "audio/musiccensor.wav" );
     mBeep->setLooping( true );
-    //mBeep->play();
 }
 
 World::~World() {
@@ -149,10 +148,7 @@ void World::render() {
         mBunnyShader->setUniform( "uTexture", 0 );
     }
 
-    mTex.Bind(GL_TEXTURE0);
     mDice.VOnDraw();
-
-=======
 
     mPlayer.mLightsaber.render(viewMatrix, projectionMatrix);
     mPlayer.mLightsaber.mPhysicObject.SetPosition(mPlayer.mLightsaber.getPosition());
@@ -303,25 +299,23 @@ void World::DSRender()
 
     glEnable(GL_STENCIL_TEST);
 
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-    glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     glDisable(GL_CULL_FACE);
 
     unsigned int num_lights1 = mPointLights.size();
 
     for (unsigned int i = 0 ; i < num_lights1; i++) {
-        //DSStencilPass(i);
+        DSStencilPass(i);
         DSPointLightPass(i);
     }
+
+    DSSpotStencilPass(0);
+    DSSpotLightPass(0);
 
     // The directional light does not need a stencil test because its volume
     // is unlimited and the final pass simply copies the texture.
     glDisable(GL_STENCIL_TEST);
 
-    //DSDirectionalLightPass();
+    DSDirectionalLightPass();
 
-    //DSFinalPass();
-
+    DSFinalPass();
 }

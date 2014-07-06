@@ -7,6 +7,9 @@
 #ifndef CGEDIRECTIONALLIGHT_H
     #include "CGEDirectionalLight.h"
 #endif
+#ifndef CGESPOTLIGHT_H
+    #include "CGESpotLight.h"
+#endif
 #ifndef CGEPOINTLIGHT_H
     #include "CGEPointLight.h"
 #endif
@@ -85,10 +88,11 @@ bool SendLightsToShaderConst(CShader& _shader,
  * All previous data in the arrays is lost.
  * returns true if all lights could be loaded correctly.
  */
-template <class DirLContainer, class PosLContainer>
+template <class DirLContainer, class PosLContainer, class SpotLContainer>
 bool LoadLightsFromFile(std::string _FileName,
                         DirLContainer& _directionalLights,
-                        PosLContainer& _positionalLights)
+                        PosLContainer& _positionalLights,
+                        SpotLContainer& _spotLights)
 {
     bool ret = true;
 
@@ -106,6 +110,7 @@ bool LoadLightsFromFile(std::string _FileName,
 
         _directionalLights.clear();
         _positionalLights.clear();
+        _spotLights.clear();
         unsigned int numLights = pScene->mNumLights;
         aiColor3D   ambient;
         aiColor3D   diffuse;
@@ -170,7 +175,32 @@ bool LoadLightsFromFile(std::string _FileName,
                 break;
             }
             case aiLightSource_SPOT:
+            {
+                CSpotLight sptlight;
+                aiVector3D  position    = m * paiLight->mPosition       ;
+                aiVector3D  direction   = m * paiLight->mDirection      ;
+                ambient     = paiLight->mColorAmbient   ;
+                diffuse     = paiLight->mColorDiffuse   ;
+                specular    = paiLight->mColorSpecular  ;
+                float       const_att   = paiLight->mAttenuationConstant    ;
+                float       lin_att     = paiLight->mAttenuationLinear      ;
+                float       exp_att     = paiLight->mAttenuationQuadratic   ;
+                float       cut_off1    = paiLight->mAngleInnerCone         ;
+                float       cut_off2    = paiLight->mAngleOuterCone         ;
+
+                sptlight.Initialize(
+                        Vec4(position[0], position[1], position[2], 1.0),
+                        Vec4(direction[0], direction[1], direction[2], 0.0),
+                        Vec4(ambient[0], ambient[1], ambient[2], 1.0),
+                        Vec4(diffuse[0], diffuse[1], diffuse[2], 1.0),
+                        Vec4(specular[0], specular[1], specular[2], 1.0),
+                        const_att, lin_att, exp_att, cut_off1, cut_off2);
+
+                _spotLights.push_back( sptlight );
+
+                ret = ret && true;
                 break;
+            }
             case aiLightSource_UNDEFINED:
             default:
             {
@@ -187,6 +217,9 @@ bool LoadLightsFromFile(std::string _FileName,
         std::cerr << "Light Importer: Error parsing " << _FileName.c_str() << " Assimp: " << Importer.GetErrorString() << std::endl ;
         ret = false;
     }
+
+    if ( !ret )
+        std::cerr << "Light Importer Error: Some lights were not imported correctly." << std::endl;
 
     return ret;
 }
