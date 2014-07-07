@@ -19,6 +19,18 @@ Droid::Droid(glm::vec3 startPosition)
     mDroidRenderFlag = true;
     setPosition(startPosition);
     mPhysicObject.Init(cShape, startPosition);
+    string droidfilie;
+    animationFlag = 0;
+    for (int i = 0; i < 40; i++) {
+        if (i < 10){
+           droidfilie  = "driodanim/droidanim_00000" + std::to_string(i) + ".obj";
+        } else {
+           droidfilie = "driodanim/droidanim_0000" + std::to_string(i) + ".obj";
+        }
+
+        mDroidanimatedGeometry.push_back(VertexArrayObjectCreator(droidfilie).create());
+    }
+
 }
 
 Droid::~Droid()
@@ -39,7 +51,9 @@ void Droid::render(glm::mat4 &viewMatrix, glm::mat4 &projectionMatrix)
                                                           getPosition().z) );
     modelMatrix = translateMatrix * modelMatrix;
 
-    mPhysicObject.SetPosition(getPosition());
+    if (mDroidRenderFlag){
+        mPhysicObject.SetPosition(getPosition());
+    }
     mPhysicObject.rigidBody->setUserPointer(this);
 
     mDroidShader->setUniform("uModelMatrix", modelMatrix);
@@ -47,6 +61,15 @@ void Droid::render(glm::mat4 &viewMatrix, glm::mat4 &projectionMatrix)
     mDroidShader->setUniform("uProjectionMatrix", projectionMatrix);
     mDroidShader->setUniform("uNormalMatrix", glm::inverseTranspose(glm::mat3(viewMatrix) * glm::mat3(modelMatrix)));
 
+    //animate();
     mDroidGeometry->bind();
     mDroidGeometry->draw();
+}
+
+void Droid::animate(){
+    if (animationFlag < mDroidanimatedGeometry.size()-1 )
+    {
+        animationFlag++;
+        mDroidGeometry = mDroidanimatedGeometry[animationFlag];
+    }
 }

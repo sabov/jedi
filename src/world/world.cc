@@ -13,8 +13,6 @@ using namespace ACGL::OpenGL;
 glm::vec3 droidPosition1 = glm::vec3(-3.0f, 1.0f, -5.0f);
 glm::vec3 droidPosition2 = glm::vec3(0.0f, 1.0f, -5.0f);
 glm::vec3 droidPosition3 = glm::vec3(3.0f, 1.0f, -5.0f);
-bool LocalContactProcessedCallback(btManifoldPoint& cp, void* body0, void* body1);
-
 
 World::World() : mDroids{Droid(droidPosition1), Droid(droidPosition2), Droid(droidPosition3)}{
     debug() << "loading game world..." << endl;
@@ -29,40 +27,8 @@ World::World() : mDroids{Droid(droidPosition1), Droid(droidPosition2), Droid(dro
     //mBunnyTexture  = loadTexture2D( "clownfishBunny.png" );
 
     //initialize bullet ==============================================================
+    initializeBullet();
 
-    btBroadphaseInterface* broadphase = new btDbvtBroadphase();
-    // Set up the collision configuration and dispatcher
-    btDefaultCollisionConfiguration* collisionConfiguration = new btDefaultCollisionConfiguration();
-    btCollisionDispatcher* dispatcher = new btCollisionDispatcher(collisionConfiguration);
-
-     // The actual physics solver
-    btSequentialImpulseConstraintSolver* solver = new btSequentialImpulseConstraintSolver;
-
-     // The world.
-    dynamicsWorld = new btDiscreteDynamicsWorld( dispatcher, broadphase, solver, collisionConfiguration);
-
-    //dynamicsWorld->setGravity(btVector3(0,-10,0));
-
-
-    btCollisionShape* groundShape = new btStaticPlaneShape(btVector3(0, 1, 0),0.0);
-
-    btScalar mass = 1.0;
-    btVector3 fallInertia(0,0,0);
-    //sphereShape->calculateLocalInertia(mass,fallInertia);
-
-
-    btDefaultMotionState* groundMotionState = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1),btVector3(0,-1,0)));
-    btRigidBody::btRigidBodyConstructionInfo groundRigidBodyCI(0,groundMotionState,groundShape,btVector3(0,0,0));
-    btRigidBody* groundRigidBody = new btRigidBody(groundRigidBodyCI);
-    //dynamicsWorld->addRigidBody(groundRigidBody);
-
-
-    dynamicsWorld->addRigidBody(mDroids[0].mPhysicObject.rigidBody);
-    dynamicsWorld->addRigidBody(mDroids[1].mPhysicObject.rigidBody);
-    dynamicsWorld->addRigidBody(mDroids[2].mPhysicObject.rigidBody);
-    dynamicsWorld->addRigidBody(mPlayer.mLightsaber.mPhysicObject.rigidBody);
-
-    //=====================================================================================
     // load audio assets:
     mBeep = new SimpleSound( "audio/musiccensor.wav" );
     mBeep->setLooping( true );
@@ -122,15 +88,17 @@ void World::render() {
     mPlayer.mLightsaber.render(viewMatrix, projectionMatrix);
     mPlayer.mLightsaber.mPhysicObject.SetPosition(mPlayer.mLightsaber.getPosition());
 
-    if (mDroids[0].mDroidRenderFlag){
-        mDroids[0].render(viewMatrix, projectionMatrix);
+
+    if (!mDroids[0].mDroidRenderFlag){
         //mDroids[0].setPosition(mDroids[0].mPhysicObject.GetPosition());
+        mDroids[0].animate();
     }
+    mDroids[0].render(viewMatrix, projectionMatrix);
 
     if (mDroids[1].mDroidRenderFlag){
         mDroids[1].render(viewMatrix, projectionMatrix);
         //mDroids[1].setPosition(mDroids[1].mPhysicObject.GetPosition());
-        mDroids[1].move(glm::vec3(0.0f, 0.0f, 0.001f));
+        mDroids[1].move(glm::vec3(0.0f, 0.0f, 0.01f));
     }
 
     if (mDroids[2].mDroidRenderFlag){
@@ -244,4 +212,35 @@ void World::toggleLightsaber() {
 
 void World::rotateLightsaber(float dYaw, float dRoll, float dPitch){
     mPlayer.mLightsaber.rotate(dYaw, dRoll, dPitch);
+}
+
+void World::initializeBullet()
+{
+    btBroadphaseInterface* broadphase = new btDbvtBroadphase();
+    // Set up the collision configuration and dispatcher
+    btDefaultCollisionConfiguration* collisionConfiguration = new btDefaultCollisionConfiguration();
+    btCollisionDispatcher* dispatcher = new btCollisionDispatcher(collisionConfiguration);
+
+     // The actual physics solver
+    btSequentialImpulseConstraintSolver* solver = new btSequentialImpulseConstraintSolver;
+
+     // The world.
+    dynamicsWorld = new btDiscreteDynamicsWorld( dispatcher, broadphase, solver, collisionConfiguration);
+    //dynamicsWorld->setGravity(btVector3(0,-10,0));
+
+    btCollisionShape* groundShape = new btStaticPlaneShape(btVector3(0, 1, 0),1.0);
+
+    btScalar mass = 1.0;
+    btVector3 fallInertia(0,0,0);
+
+    btDefaultMotionState* groundMotionState = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1),btVector3(0,-10,0)));
+    btRigidBody::btRigidBodyConstructionInfo groundRigidBodyCI(0,groundMotionState,groundShape,btVector3(0,0,0));
+    btRigidBody* groundRigidBody = new btRigidBody(groundRigidBodyCI);
+    dynamicsWorld->addRigidBody(groundRigidBody);
+
+    dynamicsWorld->addRigidBody(mDroids[0].mPhysicObject.rigidBody);
+    dynamicsWorld->addRigidBody(mDroids[1].mPhysicObject.rigidBody);
+    dynamicsWorld->addRigidBody(mDroids[2].mPhysicObject.rigidBody);
+    dynamicsWorld->addRigidBody(mPlayer.mLightsaber.mPhysicObject.rigidBody);
+
 }

@@ -54,6 +54,9 @@ public:
     //rotate the lightsaber, negative values rotate to the left, positive to the right
     void rotateLightsaber(float dYaw, float dRoll, float dPitch);
 
+    //initialize bullet physics engine
+    void initializeBullet();
+
 private:
     Player mPlayer;
     Droid mDroids[3];
