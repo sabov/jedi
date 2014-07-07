@@ -8,9 +8,6 @@
 #define NULL  0
 #endif
 
-#ifndef __GLEW_H__
-    #include <GL/glew.h>
-#endif
 #include <math.h>
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include "GLGProcess.h"
@@ -40,7 +37,7 @@ public:
     }
     //Geerbte Update-Funktion überladen (d.h. was soll bei update dieses Prozesses passiern?) ------|
     virtual void VOnUpdate(const int elapsedTime) {    //                                           |
-        rotAngle += static_cast<GLfloat>(elapsedTime) / 25.0f ; //neuer Winkel wird berechnet <-----|
+        rotAngle += static_cast<float>(elapsedTime) / 25.0f ; //neuer Winkel wird berechnet <-------|
 
         if (rotAngle > 360.0) { //überschreitet der Winkel 360° soll Prozess beendet werden
             this->VKill();

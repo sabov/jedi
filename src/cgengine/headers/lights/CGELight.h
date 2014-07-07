@@ -38,7 +38,7 @@ class CLight : public ICGEObject
 protected:
     bool    m_Enabled       ;
     bool    m_Initialized   ;
-    Vec4    m_Position      ;   //Position for Positional Light / Direction for Directional Light
+    Vec4    m_Position      ;   //Position for Positional & Spot Light / Direction for Directional Light
     Vec4    m_AmbientColor  ;
     Vec4    m_DiffuseColor  ;
     Vec4    m_SpecularColor ;
@@ -171,7 +171,7 @@ public:
     {
         return m_ShSpecName ;
     }
-    //Transform light position
+    //Transform light position/direction
     void Transform(const Matrix4x4& _mat);
 
 

@@ -9,11 +9,11 @@ layout (location = 1) out vec3 DiffuseOut;
 layout (location = 2) out vec3 NormalOut;
 
 										
-uniform sampler2D gColorMap;                
-											
+uniform sampler2D   gColorMap;
+
 void main()									
 {											
-	WorldPosOut     = WorldPos0;					
-	DiffuseOut      = texture(gColorMap, TexCoord0).xyz;	
+        WorldPosOut     = WorldPos0;
+        DiffuseOut      = texture(gColorMap, TexCoord0).xyz;
 	NormalOut       = normalize(Normal0);					
 }

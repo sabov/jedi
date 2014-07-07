@@ -223,9 +223,6 @@ void renderFrame() {
 
         glViewport(0, 0, gOutputWindowSize.x, gOutputWindowSize.y);
 
-        float x = gOutputWindowSize.x;
-        float y = gOutputWindowSize.y;
-
         //
         // Render the left eye onto the screen as the only eye:
         // (note: this mode is not complete ;-) it would be better to also deactivate
