@@ -11,7 +11,7 @@
  */
 
 #ifndef __GLEW_H__
-    #include <GL/glew.h>
+#include <GL/glew.h>
 #endif
 
 #include <btBulletDynamicsCommon.h>
@@ -161,11 +161,10 @@ int main(int argc, char *argv[]) {
     //GLEW Initialization
     glewExperimental = TRUE; // <--- Depends on your graphics card
     GLenum initStatus = glewInit();
-    if ( initStatus != GLEW_OK )
-    {
+    if (initStatus != GLEW_OK) {
         glfwTerminate();
         ACGL::Utils::error() << "Failed to initialize GLEW" << std::endl;
-        exit( -1 );
+        exit(-1);
     }
 
     //
@@ -190,8 +189,6 @@ int main(int argc, char *argv[]) {
     //Use mouse input
     gInput = new INPUT(myWindow, simpleRiftController, gWorld);
 
-    gInput->main();
-/*
     //
     // main loop
     //
@@ -225,7 +222,7 @@ int main(int argc, char *argv[]) {
         // until either the user pressed the X of the window (in case it has a windowbar (== not fullscreen)
         // or the program signaled to get closed by setting glfwSetWindowShouldClose( window, true ) somewhere!
     } while (!glfwWindowShouldClose(myWindow));
-*/
+
     // clean up:
     delete gWorld;
     delete gInput;
