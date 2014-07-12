@@ -20,7 +20,7 @@ World::World() {
     //GLint t = mBunnyShader->getAttributeLocation("aTexCoord");
     
     // load audio assets:
-    //mBeep = new SimpleSound( "audio/musiccensor.wav" );
+    mBeep = new SimpleSound( "audio/musiccensor.wav" );
     //mBeep->setLooping( true );
     //mBeep->play();
 }
