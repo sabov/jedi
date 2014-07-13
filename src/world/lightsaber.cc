@@ -17,7 +17,7 @@ Lightsaber::Lightsaber(const glm::vec3 &playerPosition) {
     mLightsaberTexture = loadTexture2D("lightsaber.png");
 
     setPlayerPosition(playerPosition);
-    setPosition(glm::vec3(mPlayerPosition.x, mPlayerPosition.y + 1.0f, mPlayerPosition.z - 0.5f));
+    setPosition(mPlayerPosition);
 }
 
 Lightsaber::~Lightsaber() {
@@ -75,6 +75,10 @@ void Lightsaber::move(const glm::vec3 &direction) {
     }
 }
 
+void Lightsaber::setPosition(const glm::vec3 &position) {
+    MoveableObject::setPosition(glm::vec3(position.x, position.y + 1.0f, position.z - 0.5f));
+}
+
 /*
  * Rotate lightsaber
  */
@@ -82,4 +86,9 @@ void Lightsaber::rotate(float yaw, float roll, float pitch) {
     glm::mat4 R = getRotationMatrix4();
     glm::mat4 newRot = glm::yawPitchRoll(yaw, roll, pitch);
     setRotationMatrix(R * newRot);
+}
+
+void Lightsaber::setRotation(float yaw, float roll, float pitch) {
+    glm::mat4 newRot = glm::yawPitchRoll(yaw, roll, pitch);
+    setRotationMatrix(newRot);
 }

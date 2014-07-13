@@ -18,13 +18,18 @@ private:
     void handleEvent(CWiimote &wm);
     void handleStatus(CWiimote &wm);
 
-    static glm::dvec2 movement; // movement of mouse cursor
-    static glm::dvec2 movementScale; // movement scaled depending on window size
+    // movement of wiimote
+    static glm::vec3 movement;
+    static glm::vec3 acceleration;
+    // rotation of wiimote
+    static float yaw;
+    static float roll;
+    static float pitch;
 
     //Wii
     static int LED_MAP[4];
     static bool reloadWiimotes;
-    static CWii wii; // Defaults to 4 remotes
+    static CWii wii; // Defaults to 4 wiimotes
     static CWiimote* wiimote;
 };
 #endif /* WII_H_ */

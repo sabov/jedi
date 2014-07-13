@@ -3,8 +3,11 @@
 using namespace std;
 
 //initialize static variables
-glm::dvec2 Wii::movement;
-glm::dvec2 Wii::movementScale;
+glm::vec3 Wii::movement = { 0, 0, 0 };
+glm::vec3 Wii::acceleration = {0, 0, 0};
+float Wii::yaw = 0;
+float Wii::roll = 0;
+float Wii::pitch = 0;
 int Wii::LED_MAP[4] = { CWiimote::LED_1, CWiimote::LED_2, CWiimote::LED_3, CWiimote::LED_4 };
 bool Wii::reloadWiimotes = false;
 CWii Wii::wii;
@@ -126,41 +129,17 @@ void Wii::handleInput() {
     //LIGHTSABER
     //----------
     // Move lightsaber in space
-    /*glm::vec3 lightsaberMovement;
-     lightsaberMovement.x = movementScale.x;
-     if (controlPressed) {
-     //Move on z-axis instead of y-axis
-     lightsaberMovement.z = movementScale.y;
-     } else {
-     lightsaberMovement.y = -movementScale.y;
-     }
-     Input::world->moveLightsaber(lightsaberMovement);
+    Input::world->moveLightsaber(movement);
+    movement = {0, 0, 0};
 
-     //rotate
-     float rotateRad = ACGL::Math::Functions::calcDegToRad(5.0f);
-     if (mouseWheelScrollUp) {
-     if (controlPressed) {
-     Input::world->rotateLightsaber(0.0f, -rotateRad, 0.0f);
-     } else {
-     Input::world->rotateLightsaber(0.0f, 0.0f, -rotateRad);
-     }
-     //Reset state
-     mouseWheelScrollUp = false;
-     } else if (mouseWheelScrollDown) {
-     if (controlPressed) {
-     Input::world->rotateLightsaber(0.0f, rotateRad, 0.0f);
-     } else {
-     Input::world->rotateLightsaber(0.0f, 0.0f, rotateRad);
-     }
-     //Reset state
-     mouseWheelScrollDown = false;
-     }
+    //rotate
+    //Input::world->setRotationLightsaber(yaw, roll, pitch);
 
-     //----
-     //VIEW
-     //----
-     // LookAround functionality
-     Input::gSimpleRiftControllerInput->getCamera()->FPSstyleLookAround(movementScale.x, movementScale.y);*/
+    //----
+    //VIEW
+    //----
+    // LookAround functionality
+    //Input::gSimpleRiftControllerInput->getCamera()->FPSstyleLookAround(movementScale.x, movementScale.y);
 }
 
 void Wii::handleEvent(CWiimote &wm) {
@@ -200,12 +179,33 @@ void Wii::handleEvent(CWiimote &wm) {
 
     // if the accelerometer is turned on then print angles
     if (wm.isUsingACC()) {
-        float pitch, roll, yaw, a_pitch, a_roll;
+        float a_pitch, a_roll;
+        float x, dx, y, dy, z, dz;
         wm.Accelerometer.GetOrientation(pitch, roll, yaw);
         wm.Accelerometer.GetRawOrientation(a_pitch, a_roll);
-        cout << "wiimote roll = " << roll << " [" << a_roll << "]" << endl;
-        cout << "wiimote pitch = " << pitch << " [" << a_pitch << "]" << endl;
-        cout << "wiimote yaw = " << yaw << endl;
+        //cout << "wiimote roll = " << roll << " [" << a_roll << "]" << endl;
+        //cout << "wiimote pitch = " << pitch << " [" << a_pitch << "]" << endl;
+        //cout << "wiimote yaw = " << yaw << endl;
+
+       wm.Accelerometer.GetGravityVector(x, y, z);
+        dx = acceleration.x - x;
+        if (glm::abs(dx) > 0.1) {
+            cout << "X: " << dx << endl;
+            movement.x += dx;
+        }
+        acceleration.x = x;
+        dy = acceleration.y - y;
+        if (glm::abs(dy) > 0.1) {
+            cout << "Y: " << dy << endl;
+            movement.y += dy;
+        }
+        acceleration.y = y;
+        dz = acceleration.z - z;
+        if (glm::abs(dz) > 0.1) {
+            cout << "Z: " << dz << endl;
+            movement.z += dz;
+        }
+        acceleration.z = z;
     }
 
     // if the Motion Plus is turned on then print angles
@@ -219,27 +219,27 @@ void Wii::handleEvent(CWiimote &wm) {
     }
 
     // if IR tracking is on then print the coordinates
-    if (wm.isUsingIR()) {
-        std::vector<CIRDot>::iterator i;
-        int x, y;
-        int index;
+    /*if (wm.isUsingIR()) {
+     std::vector<CIRDot>::iterator i;
+     int x, y;
+     int index;
 
-        printf("Num IR Dots: %i\n", wm.IR.GetNumDots());
-        printf("IR State: %u\n", wm.IR.GetState());
+     cout << "Num IR Dots: " << wm.IR.GetNumDots() << endl;
+     cout << "IR State: " << wm.IR.GetState() << endl;
 
-        std::vector<CIRDot>& dots = wm.IR.GetDots();
+     std::vector<CIRDot>& dots = wm.IR.GetDots();
 
-        for (index = 0, i = dots.begin(); i != dots.end(); ++index, ++i) {
-            if ((*i).isVisible()) {
-                (*i).GetCoordinate(x, y);
-                printf("IR source %i: (%i, %i)\n", index, x, y);
+     for (index = 0, i = dots.begin(); i != dots.end(); ++index, ++i) {
+     if ((*i).isVisible()) {
+     (*i).GetCoordinate(x, y);
+     cout << "IR source " << index << ": (" << x << ", " << y << ")" << endl;
 
-                wm.IR.GetCursorPosition(x, y);
-                printf("IR cursor: (%i, %i)\n", x, y);
-                printf("IR z distance: %f\n", wm.IR.GetDistance());
-            }
-        }
-    }
+     wm.IR.GetCursorPosition(x, y);
+     cout << "IR cursor: (" << x << ", " << y << ")" << endl;
+     cout << "IR z distance: " << wm.IR.GetDistance() << endl;
+     }
+     }
+     }*/
 
     if (wm.ExpansionDevice.GetType() == wm.ExpansionDevice.TYPE_NUNCHUK) {
         float pitch, roll, yaw, a_pitch, a_roll;

@@ -44,21 +44,27 @@ public:
     // move the lightsaber of the player
     void moveLightsaber(const glm::vec3 &direction);
 
+    // set the position of the lightsaber of the player
+    void setLightsaberPosition(const glm::vec3 &movement);
+
     //rotate the lightsaber, negative values rotate to the left, positive to the right
     void rotateLightsaber(float dYaw, float dRoll, float dPitch);
+
+    //set the rotaton of the lightsaber
+    void setRotationLightsaber(float dYaw, float dRoll, float dPitch);
 
 private:
     Player mPlayer;
 
     //Matrix Stack
-    CGEngine::CMatrixStack  mMatrixStack;
+    CGEngine::CMatrixStack mMatrixStack;
 
     // The "level":
-    CGEngine::CMesh mLevel ;
+    CGEngine::CMesh mLevel;
 
     //using this shader since it supports textures
     ACGL::OpenGL::SharedShaderProgram mBunnyShader;
-    
+
     // One repeating sound as an example of how to use OpenAL:
     SimpleSound *mBeep;
 };

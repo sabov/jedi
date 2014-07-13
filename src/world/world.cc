@@ -14,13 +14,13 @@ World::World() {
     debug() << "loading game world..." << endl;
 
     mLevel.LoadMesh("geometry/L1/level.obj", CGEngine::CGE_TRIANGULATE);
-    mBunnyShader   = ShaderProgramFileManager::the()->get( ShaderProgramCreator("Bunny") );
+    mBunnyShader = ShaderProgramFileManager::the()->get(ShaderProgramCreator("Bunny"));
     //GLint n = mBunnyShader->getAttributeLocation("aNormal");
     //GLint v = mBunnyShader->getAttributeLocation("aPosition");
     //GLint t = mBunnyShader->getAttributeLocation("aTexCoord");
-    
+
     // load audio assets:
-    mBeep = new SimpleSound( "audio/musiccensor.wav" );
+    mBeep = new SimpleSound("audio/musiccensor.wav");
     //mBeep->setLooping( true );
     //mBeep->play();
 }
@@ -66,12 +66,12 @@ void World::render() {
 
     // At least 16 texture units can be used, but multiple texture can also be placed in one
     // texture array and thus only occupy one texture unit!
-    mBunnyShader->setUniform( "uTexture", 0 );
+    mBunnyShader->setUniform("uTexture", 0);
     //
     // draw geometry
     //
     mLevel.VOnDraw();
-    
+
     mPlayer.mLightsaber.render(viewMatrix, projectionMatrix);
 }
 
@@ -144,6 +144,14 @@ void World::moveLightsaber(const glm::vec3 &direction) {
     mPlayer.mLightsaber.move(direction);
 }
 
-void World::rotateLightsaber(float dYaw, float dRoll, float dPitch){
+void World::setLightsaberPosition(const glm::vec3 &movement) {
+    mPlayer.mLightsaber.setPosition(movement);
+}
+
+void World::rotateLightsaber(float dYaw, float dRoll, float dPitch) {
     mPlayer.mLightsaber.rotate(dYaw, dRoll, dPitch);
+}
+
+void World::setRotationLightsaber(float dYaw, float dRoll, float dPitch) {
+    mPlayer.mLightsaber.setRotation(dYaw, dRoll, dPitch);
 }

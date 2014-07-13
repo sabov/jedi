@@ -21,7 +21,10 @@ public:
 
     void move(const glm::vec3 &direction); //Overwrite of parent method
 
+    void setPosition(const glm::vec3 &position);
+
     void rotate(float yaw, float roll, float pitch);
+    void setRotation(float yaw, float roll, float pitch);
 private:
     // Current position of player
     glm::vec3 mPlayerPosition;
