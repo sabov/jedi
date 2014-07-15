@@ -32,6 +32,9 @@ World::World() : mDroids{Droid(droidPosition1), Droid(droidPosition2), Droid(dro
     // load audio assets:
     mBeep = new SimpleSound( "audio/musiccensor.wav" );
     mBeep->setLooping( true );
+
+    mDroids[0].mPhysicObject.rigidBody->setAngularFactor(btVector3(0,0,0));
+    mDroids[0].mPhysicObject.rigidBody->setLinearFactor(btVector3(0,0,0));
     //mBeep->play();
 }
 
@@ -89,22 +92,21 @@ void World::render() {
     mPlayer.mLightsaber.mPhysicObject.SetPosition(mPlayer.mLightsaber.getPosition());
 
 
-    if (!mDroids[0].mDroidRenderFlag){
+    //if (!mDroids[0].mDroidRenderFlag){
+        mDroids[0].render(viewMatrix, projectionMatrix);
         //mDroids[0].setPosition(mDroids[0].mPhysicObject.GetPosition());
-        mDroids[0].animate();
-    }
-    mDroids[0].render(viewMatrix, projectionMatrix);
+    //}
 
-    if (mDroids[1].mDroidRenderFlag){
+
+
         mDroids[1].render(viewMatrix, projectionMatrix);
         //mDroids[1].setPosition(mDroids[1].mPhysicObject.GetPosition());
-        mDroids[1].move(glm::vec3(0.0f, 0.0f, 0.01f));
-    }
+        //mDroids[1].move(glm::vec3(0.0f, 0.0f, 0.01f));
 
-    if (mDroids[2].mDroidRenderFlag){
+    //if (mDroids[2].mDroidRenderFlag){
         mDroids[2].render(viewMatrix, projectionMatrix);
         //mDroids[2].setPosition(mDroids[2].mPhysicObject.GetPosition());
-    }
+    //}
 
 
 
@@ -121,14 +123,18 @@ void World::render() {
             if (obj1 == mPlayer.mLightsaber.mPhysicObject.rigidBody || obj2 == mPlayer.mLightsaber.mPhysicObject.rigidBody){
                 if (obj1 == mPlayer.mLightsaber.mPhysicObject.rigidBody){
                     if ( mDroids[i].mPhysicObject.rigidBody == obj2){
-                        //mDroids[i].;
+                        mDroids[i].mDroidRenderFlag = false;
+                        mDroids[i].animate();
                     }
 
                 }
                 else{
                     for (int i = 0; i < 3; i++){
                         if ( mDroids[i].mPhysicObject.rigidBody == obj1){
+                            cout << "collision with droid"<< i << endl;
                             mDroids[i].mDroidRenderFlag = false;
+                            mDroids[i].animate();
+
                         }
                     }
                 }
@@ -226,7 +232,7 @@ void World::initializeBullet()
 
      // The world.
     dynamicsWorld = new btDiscreteDynamicsWorld( dispatcher, broadphase, solver, collisionConfiguration);
-    //dynamicsWorld->setGravity(btVector3(0,-10,0));
+    dynamicsWorld->setGravity(btVector3(0,0,0));
 
     btCollisionShape* groundShape = new btStaticPlaneShape(btVector3(0, 1, 0),1.0);
 
@@ -236,7 +242,7 @@ void World::initializeBullet()
     btDefaultMotionState* groundMotionState = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1),btVector3(0,-10,0)));
     btRigidBody::btRigidBodyConstructionInfo groundRigidBodyCI(0,groundMotionState,groundShape,btVector3(0,0,0));
     btRigidBody* groundRigidBody = new btRigidBody(groundRigidBodyCI);
-    dynamicsWorld->addRigidBody(groundRigidBody);
+    //dynamicsWorld->addRigidBody(groundRigidBody);
 
     dynamicsWorld->addRigidBody(mDroids[0].mPhysicObject.rigidBody);
     dynamicsWorld->addRigidBody(mDroids[1].mPhysicObject.rigidBody);

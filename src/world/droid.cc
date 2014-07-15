@@ -51,10 +51,11 @@ void Droid::render(glm::mat4 &viewMatrix, glm::mat4 &projectionMatrix)
                                                           getPosition().z) );
     modelMatrix = translateMatrix * modelMatrix;
 
-    //if (mDroidRenderFlag){
-    //mPhysicObject.SetPosition(getPosition());
-    //}
-    setPosition(mPhysicObject.GetPosition());
+    if (mDroidRenderFlag){
+        mPhysicObject.SetPosition(getPosition());
+    }else{
+        setPosition(mPhysicObject.GetPosition());
+    }
     mPhysicObject.rigidBody->setUserPointer(this);
 
     mDroidShader->setUniform("uModelMatrix", modelMatrix);
@@ -74,4 +75,8 @@ void Droid::animate(){
         mDroidGeometry = mDroidanimatedGeometry[animationFlag];
         mDroidGeometry->setAttributeLocations( mDroidShader->getAttributeLocations() );
     }
+}
+
+void Droid::collide(){
+    animate();
 }
