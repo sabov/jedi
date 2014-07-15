@@ -94,17 +94,20 @@ void World::render() {
 
     //if (!mDroids[0].mDroidRenderFlag){
         mDroids[0].render(viewMatrix, projectionMatrix);
+        mDroids[0].animate();
         //mDroids[0].setPosition(mDroids[0].mPhysicObject.GetPosition());
     //}
 
 
 
         mDroids[1].render(viewMatrix, projectionMatrix);
+        mDroids[1].animate();
         //mDroids[1].setPosition(mDroids[1].mPhysicObject.GetPosition());
         //mDroids[1].move(glm::vec3(0.0f, 0.0f, 0.01f));
 
     //if (mDroids[2].mDroidRenderFlag){
         mDroids[2].render(viewMatrix, projectionMatrix);
+        mDroids[2].animate();
         //mDroids[2].setPosition(mDroids[2].mPhysicObject.GetPosition());
     //}
 
@@ -242,7 +245,7 @@ void World::initializeBullet()
     btDefaultMotionState* groundMotionState = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1),btVector3(0,-10,0)));
     btRigidBody::btRigidBodyConstructionInfo groundRigidBodyCI(0,groundMotionState,groundShape,btVector3(0,0,0));
     btRigidBody* groundRigidBody = new btRigidBody(groundRigidBodyCI);
-    //dynamicsWorld->addRigidBody(groundRigidBody);
+    dynamicsWorld->addRigidBody(groundRigidBody);
 
     dynamicsWorld->addRigidBody(mDroids[0].mPhysicObject.rigidBody);
     dynamicsWorld->addRigidBody(mDroids[1].mPhysicObject.rigidBody);

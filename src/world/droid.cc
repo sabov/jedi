@@ -20,12 +20,13 @@ Droid::Droid(glm::vec3 startPosition)
     setPosition(startPosition);
     mPhysicObject.Init(cShape, startPosition);
     string droidfilie;
+    int animVariant = rand() % 3;
     animationFlag = 0;
-    for (int i = 0; i < 40; i++) {
+    for (int i = 0; i < 50; i++) {
         if (i < 10){
-           droidfilie  = "driodanim/droidanim_00000" + std::to_string(i) + ".obj";
+           droidfilie  = "droidanim" +  std::to_string(animVariant) + "/Drone166_00000" + std::to_string(i) + ".obj";
         } else {
-           droidfilie = "driodanim/droidanim_0000" + std::to_string(i) + ".obj";
+           droidfilie = "droidanim" +  std::to_string(animVariant) + "/Drone166_0000" + std::to_string(i) + ".obj";
         }
 
         mDroidanimatedGeometry.push_back(VertexArrayObjectCreator(droidfilie).create());
