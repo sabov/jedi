@@ -47,5 +47,9 @@ private:
     bool turnedOn;
     float rayHeight;
 
-    btCollisionShape* cShape = new btCylinderShape(btVector3(0.2, 2, 0.2));
+    float yaw;
+    float pitch;
+    float roll;
+
+    btCollisionShape* cShape = new btCylinderShape(btVector3(0.1, 1, 0.1));
 };
