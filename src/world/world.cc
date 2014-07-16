@@ -65,6 +65,8 @@ bool World::initializeWorld()
         mpProcessManager->attachProcess( mDroids[i].getMoveProcess() );
     }
 
+    initializeBullet();
+
     // load audio assets:
     mBeep = new SimpleSound( "audio/musiccensor.wav" );
     mBeep->setLooping( true );
@@ -160,7 +162,9 @@ void World::render() {
                 if (obj1 == mPlayer.mLightsaber.mPhysicObject.rigidBody){
                     if ( mDroids[i].mPhysicObject.rigidBody == obj2){
                         mDroids[i].mDroidRenderFlag = false;
-                        mDroids[i].animate();
+                        //mDroids[i].animate();
+                        //use this instead:
+                        mpProcessManager->attachProcess( mDroids[i].getDestrucionProcess() );
                     }
 
                 }
@@ -204,7 +208,7 @@ void World::geometryRender()
         mDroids[i].baseRender();
     }
 
-    /*
+
     dynamicsWorld->stepSimulation(0.0166f,10);
 
     int numManifolds = dynamicsWorld->getDispatcher()->getNumManifolds();
@@ -235,7 +239,7 @@ void World::geometryRender()
             }
 
     }
-    */
+
 }
 
 void World::movePlayer(const glm::vec3 &direction) {

@@ -39,11 +39,13 @@ public:
 private:
     //The droid
     ACGL::OpenGL::SharedShaderProgram     mDroidShader;
-    CGEngine::CMesh     mDroid  ;
+    CGEngine::CMesh                 mDroid                  ;
+    std::vector<CGEngine::MeshPointer>    mDroidanimatedGeometry  ;
 
     glm::mat4 mModelMatrix   ;
 
     btCollisionShape* cShape = new btSphereShape(1);
+
     int animationFlag;
 
     //
@@ -73,8 +75,10 @@ private:
         DestructionProcess() : GameLogic::CProcess() {}
         ~DestructionProcess() {}
 
+        int animationIndex ;
+
         virtual void VOnInitialize();
-        virtual void VOnUpdate(const int elapsedTim);
+        virtual void VOnUpdate(const int elapsedTime);
         virtual void VKill();
     };
 
