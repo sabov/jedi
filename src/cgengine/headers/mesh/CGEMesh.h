@@ -8,6 +8,8 @@
 #ifndef MESH_H
 #define MESH_H
 
+#pragma once
+
 #ifndef __GLEW_H__
     #include <GL/glew.h>
 #endif
@@ -65,19 +67,21 @@ enum CGEMeshProcessingFlags
 class CMesh : public IDrawableObject
 {
 private:
-    GLuint m_VAO;
-    GLuint m_Buffers[4];
     //disallow copy constructor
     CMesh(const CMesh&) {}
+
+protected:
+    GLuint m_VAO;
+    GLuint m_Buffers[4];
 
     bool initFromScene(const aiScene* _pScene, const std::string& _filename);
     void initMesh(const aiMesh* _paiMesh,
                   Vec3DVec& _positions,
                   Vec3DVec& _normals,
                   Vec2DVec& _texCoords,
-                  std::vector<unsigned int>& _indices);
+                  std::vector<unsigned int>& _indices)                      ;
     bool initMaterials(const aiScene* _pScene, const std::string& _filename);
-    void setProperties(unsigned int _index, const aiMesh* _paiMesh);
+    void setProperties(unsigned int _index, const aiMesh* _paiMesh)         ;
     void clear();
 
 #define INDEX_BUFFER    0
