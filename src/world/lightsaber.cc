@@ -36,7 +36,7 @@ Lightsaber::~Lightsaber() {
     delete cShape;
 }
 
-void Lightsaber::render(glm::mat4 &viewMatrix, glm::mat4 &projectionMatrix) {
+void Lightsaber::render(const glm::mat4 &viewMatrix, const glm::mat4 &projectionMatrix) {
     mLightsaberShader->use();
 
     glm::mat4 modelMatrix = glm::scale(glm::vec3(0.01f));

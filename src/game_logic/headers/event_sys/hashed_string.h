@@ -23,7 +23,7 @@ public:
 
     unsigned long getHashValue() const
     {
-        return reinterpret_cast<unsigned long>(m_identString);
+        return reinterpret_cast<unsigned long>(m_ident);
     }
 
     char const * const getString() const {return m_identString;}

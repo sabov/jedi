@@ -54,7 +54,7 @@ private:
     //queue of pending- or processing-events
     typedef std::list<IEventDataPtr> EventQueue  ;
 
-    enum eConstants { eNumQueues = 2};
+    enum eConstants { eNumQueues = 2 };
 
     //list of registered event types
     EventTypeSet        m_TypeList              ;
@@ -89,7 +89,7 @@ public:
     bool VTrigger(const IEventData &_Event) const;
     bool VQueueEvent(const IEventDataPtr &_Event) ;
     bool VAbortEvent(const EventType &_Type, bool _allOfType);
-    bool VTick(unsigned long _maxMillisecs);
+    bool VTick(unsigned long _maxMillisecs = kINFINITE);
     bool VValidateEventType(const EventType &_Type) const;
 
     //  information lookup funcions

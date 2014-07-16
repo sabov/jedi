@@ -7,16 +7,18 @@ in vec3 vLightDirection;
 
 out vec4 oColor;
 
-//uniform sampler2D uTexture;
+uniform sampler2D uTexture;
 
 void main()
 {
-    //vec3 color = texture(uTexture, vTexCoord).rgb;
-    vec3 color = vec3(1.0f, 1.3f, 0.0f);
+    vec3 color = texture(uTexture, vTexCoord).rgb;
+    //vec3 color = vec3(1.0f, 1.3f, 0.0f);
 
-    float lightingTerm = dot( normalize(vNormal), vLightDirection );
-    lightingTerm = 0.5*lightingTerm + 0.5;
-    color *= lightingTerm;
+    float lightingTerm = dot( normalize(vNormal), normalize(vLightDirection) );
+    if (lightingTerm > 0.0)
+        color *= lightingTerm;
+    else
+        color *= 0.0;
 
     oColor = vec4( color, 1.0 );
 }
