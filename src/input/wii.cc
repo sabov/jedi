@@ -4,7 +4,7 @@ using namespace std;
 
 //initialize static variables
 glm::vec3 Wii::movement = { 0, 0, 0 };
-glm::vec3 Wii::acceleration = {0, 0, 0};
+glm::vec3 Wii::acceleration = { 0, 0, 0 };
 float Wii::yaw = 0;
 float Wii::roll = 0;
 float Wii::pitch = 0;
@@ -129,11 +129,12 @@ void Wii::handleInput() {
     //LIGHTSABER
     //----------
     // Move lightsaber in space
-    Input::world->moveLightsaber(movement);
-    movement = {0, 0, 0};
+    //Input::world->moveLightsaber(movement);
+    //movement = {0, 0, 0};
 
-    //rotate
-    //Input::world->setRotationLightsaber(yaw, roll, pitch);
+    //rotate lightsaber
+    Input::world->setRotationLightsaber(ACGL::Math::Functions::calcDegToRad(roll),
+            ACGL::Math::Functions::calcDegToRad(270 - pitch), ACGL::Math::Functions::calcDegToRad(yaw));
 
     //----
     //VIEW
@@ -179,15 +180,26 @@ void Wii::handleEvent(CWiimote &wm) {
 
     // if the accelerometer is turned on then print angles
     if (wm.isUsingACC()) {
-        float a_pitch, a_roll;
         float x, dx, y, dy, z, dz;
-        wm.Accelerometer.GetOrientation(pitch, roll, yaw);
-        wm.Accelerometer.GetRawOrientation(a_pitch, a_roll);
-        //cout << "wiimote roll = " << roll << " [" << a_roll << "]" << endl;
-        //cout << "wiimote pitch = " << pitch << " [" << a_pitch << "]" << endl;
-        //cout << "wiimote yaw = " << yaw << endl;
+        float pitchNew, rollNew, yawNew;
+        wm.Accelerometer.GetOrientation(pitchNew, rollNew, yawNew);
 
-       wm.Accelerometer.GetGravityVector(x, y, z);
+        if (glm::abs(pitchNew - pitch) > 5) {
+            pitch = pitchNew;
+            cout << "pitch " << pitch << endl;
+        }
+
+        if (glm::abs(rollNew - roll) > 5) {
+            roll = rollNew;
+            cout << "roll " << roll << endl;
+        }
+
+        if (glm::abs(yawNew - yaw) > 5) {
+            yaw = yawNew;
+            cout << "yaw " << yaw << endl;
+        }
+
+        wm.Accelerometer.GetGravityVector(x, y, z);
         dx = acceleration.x - x;
         if (glm::abs(dx) > 0.1) {
             cout << "X: " << dx << endl;
