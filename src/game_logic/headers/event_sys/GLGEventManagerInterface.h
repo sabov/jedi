@@ -23,7 +23,7 @@ class IEventManager
 {
 public:
     enum eConstants { kINFINITE = 0xffffffff };
-    explicit IEventManager () ;
+    explicit IEventManager () {}
     virtual ~IEventManager() {}
 
     /* Register a handler for a specific event type, implicitly the event
@@ -82,19 +82,22 @@ public:
     virtual bool VValidateEventType( EventType const & _Type ) const = 0;
 
 protected:
-/*
+
     /* Internal use only accessor for the static methods in the helper
      * to use to get the active global instance.
-     * /
+     */
 
+    /*
     static IEventManagerPtr Get();
+    */
 
     /* Following methods are declared friends in order to get access to the
      * Get() method. Since there is no other private entity declared in this
      * class, this does not break encapsulation, but allows us to do this without
      * requiring macros or old-style mechanisms.
-     * /
+     */
 
+    /*
     friend bool safeAddListener( EventListenerPtr const & _Listener, EventType const & _Type );
     friend bool safeDelListener( EventListenerPtr const & _Listener, EventType const & _Type );
     friend bool safeTriggerEvent( IEventData const & _Event );
@@ -144,7 +147,7 @@ protected:
         assert(IEventManager::Get());
         return IEventManager::Get()->VValidateEventType( _Type );
     }
-*/
+    */
 };
 
 } //Namespace

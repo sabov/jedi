@@ -11,7 +11,6 @@ bool World::InitDS()
 {
     if ( !m_GBuffer.Init( window_width, window_height ) )
         return false;
-    final_texture = m_GBuffer.getFinalTextureName();
 
     m_GeometryPassShader = ShaderProgramFileManager::the()->get( ShaderProgramCreator("geometry_pass") );
     m_GeometryPassShader->use();
@@ -58,6 +57,7 @@ bool World::InitDS()
 
     m_Sphere.LoadMesh("geometry/sphere.obj", CGEngine::CGE_TRIANGULATE);
     m_Cone.LoadMesh("geometry/spotlightcone.obj",  CGEngine::CGE_TRIANGULATE);
+    m_Quad.LoadMesh("");
 
     return true;
 }
@@ -75,37 +75,7 @@ void World::DSGeometryPass()
 
     glEnable(GL_DEPTH_TEST);
 
-    mMatrixStack.LoadIdentity();
-    mMatrixStack.Translate(CGEngine::Vec3(0.0, -1.0, 0.0));
-
-    glm::mat4 modelMatrix = mMatrixStack.getCompleteTransform();
-    glm::mat4 viewMatrix = mPlayer.getHMDViewMatrix();
-
-
-    m_GeometryPassShader->setUniform( "uModelMatrix", modelMatrix );
-    m_GeometryPassShader->setUniform( "uViewMatrix",  viewMatrix );
-    m_GeometryPassShader->setUniform( "uProjectionMatrix", mPlayer.getProjectionMatrix() );
-    m_GeometryPassShader->setUniform( "uNormalMatrix",     glm::inverseTranspose(glm::mat3(viewMatrix)*glm::mat3(modelMatrix)) );
-
-    //
-    // draw geometry
-    //
-    mLevel.VOnDraw();
-
-    mMatrixStack.LoadIdentity();
-    mMatrixStack.Translate(CGEngine::Vec3(0.0,1.0,-4.0));
-    mMatrixStack.Rotate( glm::radians( mpRotProcess->rotAngle ), CGEngine::Vec3(0.0,1.0,0.0) );
-
-    modelMatrix = mMatrixStack.getCompleteTransform();
-    viewMatrix = mPlayer.getHMDViewMatrix();
-
-    //m_GeometryPassShader->use();
-    m_GeometryPassShader->setUniform( "uModelMatrix", modelMatrix );
-    m_GeometryPassShader->setUniform( "uViewMatrix",  viewMatrix );
-    m_GeometryPassShader->setUniform( "uProjectionMatrix", mPlayer.getProjectionMatrix() );
-    m_GeometryPassShader->setUniform( "uNormalMatrix",     glm::inverseTranspose(glm::mat3(viewMatrix)*glm::mat3(modelMatrix)) );
-
-    mDice.VOnDraw();
+    geometryRender();
 
     // When we get here the depth buffer is already populated and the stencil pass
     // depends on it, but it does not write to it.

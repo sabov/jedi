@@ -10,10 +10,10 @@
 #ifndef __GLEW_H__
     #include <GL/glew.h>
 #endif
-#define GLM_FORCE_INLINE
+//#define GLM_FORCE_INLINE
 //#define GLM_SWIZZLE
 #define GLM_FORCE_RADIANS
-#include <glm/glm.hpp>
+//#include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/type_ptr.hpp>

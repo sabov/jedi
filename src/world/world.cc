@@ -10,16 +10,38 @@ using namespace std;
 using namespace ACGL;
 using namespace ACGL::Utils;
 using namespace ACGL::OpenGL;
-glm::vec3 droidPosition1 = glm::vec3(-3.0f, 1.0f, -5.0f);
-glm::vec3 droidPosition2 = glm::vec3(0.0f, 1.0f, -5.0f);
-glm::vec3 droidPosition3 = glm::vec3(3.0f, 1.0f, -5.0f);
+glm::vec3 droidPosition[3] = {glm::vec3(-3.0f, 1.0f, -5.0f), glm::vec3(0.0f, 1.0f, -5.0f), glm::vec3(3.0f, 1.0f, -5.0f)};
+bool LocalContactProcessedCallback(btManifoldPoint& cp, void* body0, void* body1);
 
-World::World() : mDroids{Droid(droidPosition1), Droid(droidPosition2), Droid(droidPosition3)}{
+
+World::World()
+{
+    window_width        = 1600  ;
+    window_height       = 900   ;
+    m_ColorTexUnitLoc   = 0     ;
+    for (int i = 0 ; i < 3 ; ++i)
+    {
+        m_posTexLoc[i]      = 0 ;
+        m_colorTexLoc[i]    = 0 ;
+        m_normalTexLoc[i]   = 0 ;
+        m_screenSizeLoc[i]  = 0 ;
+        m_eyeWorldPosLoc[i] = 0 ;
+    }
+
+}
+
+World::~World() {
+    cout << "deleting world..." << endl;
+    delete mBeep;
+    delete dynamicsWorld;
+    delete droidsPhysic;
+}
+
+bool World::initializeWorld()
+{
     debug() << "loading game world..." << endl;
 
     mLevel.LoadMesh("geometry/L1/level.obj");
-    mDice.LoadMesh("geometry/test/dice.obj");
-    m_Quad.LoadMesh("");
 
     mBunnyShader   = ShaderProgramFileManager::the()->get( ShaderProgramCreator("Bunny") );
 
@@ -34,12 +56,14 @@ World::World() : mDroids{Droid(droidPosition1), Droid(droidPosition2), Droid(dro
     dir_light.Initialize( CGEngine::Vec4(0.1, 1.0, -0.1, 0.0), CGEngine::Vec4(0.1), CGEngine::Vec4(0.25), CGEngine::Vec4(1.0) );
     mDirLights.push_back( dir_light );
 
-    mpRotProcess = GameLogic::RotationProcessPtr( new GameLogic::RotationProcess() );
-    mpProcessManager = GameLogic::CProcessManager::getInstance();
-    mpProcessManager->attachProcess( mpRotProcess );
-
     //initialize bullet ==============================================================
-    initializeBullet();
+    mpProcessManager = GameLogic::CProcessManager::getInstance();
+
+    for (int i = 0 ; i < 3 ; ++i)
+    {
+        mDroids[i].initialize("geometry/Droid/droid.obj", droidPosition[i]);
+        mpProcessManager->attachProcess( mDroids[i].getMoveProcess() );
+    }
 
     // load audio assets:
     mBeep = new SimpleSound( "audio/musiccensor.wav" );
@@ -47,13 +71,10 @@ World::World() : mDroids{Droid(droidPosition1), Droid(droidPosition2), Droid(dro
 
     mDroids[0].mPhysicObject.rigidBody->setAngularFactor(btVector3(0,0,0));
     mDroids[0].mPhysicObject.rigidBody->setLinearFactor(btVector3(0,0,0));
-}
 
-World::~World() {
-    cout << "deleting world..." << endl;
-    delete mBeep;
-    delete dynamicsWorld;
-    delete droidsPhysic;
+    //Throw event
+    GameLogic::CEventManager::getInstance()->VQueueEvent( GameLogic::EventDataPtr( new CEvtData_WorldInitialized( glfwGetTime() ) ) );
+    return true;
 }
 
 void World::setPlayerCamera(ACGL::HardwareSupport::SimpleRiftController *riftControl) {
@@ -99,25 +120,6 @@ void World::render() {
     // draw geometry
     //
     mLevel.VOnDraw();
-
-    mMatrixStack.LoadIdentity();
-    mMatrixStack.Translate(CGEngine::Vec3(0.0,1.0,-4.0));
-    mMatrixStack.Rotate( glm::radians( mpRotProcess->rotAngle ), CGEngine::Vec3(0.0,1.0,0.0) );
-
-    modelMatrix = mMatrixStack.getCompleteTransform();
-    viewMatrix = mPlayer.getHMDViewMatrix();
-
-    {
-        mBunnyShader->use();
-        mBunnyShader->setUniform( "uModelMatrix", modelMatrix );
-        mBunnyShader->setUniform( "uViewMatrix",  viewMatrix );
-        mBunnyShader->setUniform( "uProjectionMatrix", mPlayer.getProjectionMatrix() );
-        mBunnyShader->setUniform( "uNormalMatrix",     glm::inverseTranspose(glm::mat3(viewMatrix)*glm::mat3(modelMatrix)) );
-
-        mBunnyShader->setUniform( "uTexture", 0 );
-    }
-
-    mDice.VOnDraw();
 
     mPlayer.mLightsaber.render(viewMatrix, projectionMatrix);
     mPlayer.mLightsaber.mPhysicObject.SetPosition(mPlayer.mLightsaber.getPosition());
@@ -165,6 +167,64 @@ void World::render() {
                 else{
                     for (int i = 0; i < 3; i++){
                         if ( mDroids[i].mPhysicObject.rigidBody == obj1){
+                            mDroids[i].mDroidRenderFlag = false;
+                        }
+                    }
+                }
+            }
+
+    }
+}
+
+void World::geometryRender()
+{
+    mMatrixStack.LoadIdentity();
+    mMatrixStack.Translate(CGEngine::Vec3(0.0, -1.0, 0.0));
+
+    glm::mat4 modelMatrix = mMatrixStack.getCompleteTransform();
+    glm::mat4 viewMatrix = mPlayer.getHMDViewMatrix();
+    glm::mat4 projectionMatrix = mPlayer.getProjectionMatrix();
+
+    m_GeometryPassShader->setUniform( "uModelMatrix", modelMatrix );
+    m_GeometryPassShader->setUniform( "uViewMatrix",  viewMatrix );
+    m_GeometryPassShader->setUniform( "uProjectionMatrix", projectionMatrix);
+    m_GeometryPassShader->setUniform( "uNormalMatrix",     glm::inverseTranspose(glm::mat3(viewMatrix)*glm::mat3(modelMatrix)) );
+
+    //
+    // draw geometry
+    //
+    mLevel.VOnDraw();
+
+    for (int i = 0 ; i < 3 ; ++i)
+    {
+        m_GeometryPassShader->setUniform( "uModelMatrix", mDroids[i].getModelMatrix() );
+        m_GeometryPassShader->setUniform( "uViewMatrix",  viewMatrix );
+        m_GeometryPassShader->setUniform( "uProjectionMatrix", projectionMatrix );
+        m_GeometryPassShader->setUniform( "uNormalMatrix", glm::inverseTranspose( glm::mat3(viewMatrix) * glm::mat3(mDroids[i].getModelMatrix())) );
+        mDroids[i].baseRender();
+    }
+
+    /*
+    dynamicsWorld->stepSimulation(0.0166f,10);
+
+    int numManifolds = dynamicsWorld->getDispatcher()->getNumManifolds();
+    for (int i=0;i<numManifolds;i++)
+        {
+            btPersistentManifold* contactManifold =  dynamicsWorld->getDispatcher()->getManifoldByIndexInternal(i);
+            btRigidBody *obj1 = btRigidBody::upcast((btCollisionObject*)contactManifold->getBody0());
+            btRigidBody *obj2 = btRigidBody::upcast((btCollisionObject*)contactManifold->getBody1());
+
+            //checking for lightsaber collision
+            if (obj1 == mPlayer.mLightsaber.mPhysicObject.rigidBody || obj2 == mPlayer.mLightsaber.mPhysicObject.rigidBody){
+                if (obj1 == mPlayer.mLightsaber.mPhysicObject.rigidBody){
+                    if ( mDroids[i].mPhysicObject.rigidBody == obj2){
+                        //mDroids[i].;
+                    }
+
+                }
+                else{
+                    for (int i = 0; i < 3; i++){
+                        if ( mDroids[i].mPhysicObject.rigidBody == obj1){
                             cout << "collision with droid"<< i << endl;
                             mDroids[i].mDroidRenderFlag = false;
                             mDroids[i].animate();
@@ -174,7 +234,8 @@ void World::render() {
                 }
             }
 
-        }
+    }
+    */
 }
 
 void World::movePlayer(const glm::vec3 &direction) {
@@ -248,6 +309,7 @@ void World::moveLightsaber(const glm::vec3 &direction) {
 
 void World::toggleLightsaber() {
     mPlayer.mLightsaber.toggle();
+    GameLogic::CEventManager::getInstance()->VQueueEvent( GameLogic::EventDataPtr( new CEvtData_ToggleSword( glfwGetTime() ) ) );
 }
 
 void World::rotateLightsaber(float dYaw, float dRoll, float dPitch){
@@ -326,12 +388,13 @@ void World::DSRender()
 
     DSDirectionalLightPass();
 
+    glEnable(GL_BLEND);
+    glBlendEquation(GL_FUNC_ADD);
+    glBlendFunc(GL_ONE, GL_ONE);
+
+    mPlayer.mLightsaber.render( mPlayer.getHMDViewMatrix(), mPlayer.getProjectionMatrix() );
+
+    glDisable(GL_BLEND);
+
     DSFinalPass();
 }
-
- 
-
- 
-
-
-

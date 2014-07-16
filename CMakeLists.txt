@@ -30,7 +30,7 @@ SET(CMAKE_C_COMPILER "/usr/bin/g++")
 
 # overwrite for clang++
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-  UNSET(CMAKE_CXX_FLAGS)
+  SET(CMAKE_CXX_FLAGS "-std=c++11")
   SET(CMAKE_CXX_COMPILER "/usr/bin/clang++")
   SET(CMAKE_C_COMPILER "/usr/bin/clang++")
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")

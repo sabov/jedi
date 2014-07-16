@@ -39,6 +39,7 @@ namespace CGEngine {
   each struct in the shader only needs to be addressed by adding the index suffix "[index]". The function makes no
   changes to the fields of the light structs on the software side.
 */
+/*
 template <class DirLContainer, class PosLContainer>
 bool SendLightsToShaderConst(CShader& _shader,
                         DirLContainer& _directionalLights,
@@ -80,6 +81,7 @@ bool SendLightsToShaderConst(CShader& _shader,
 
     return true;
 }
+*/
 
 /*
  * Load lights from a given file, normally a scene file (*.dae, *.blend, etc).

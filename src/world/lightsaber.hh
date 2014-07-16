@@ -18,7 +18,7 @@ public:
         mPlayerPosition = playerPosition;
     }
 
-    void render(glm::mat4 &viewMatrix, glm::mat4 &projectionMatrix);
+    void render(const glm::mat4 &viewMatrix, const glm::mat4 &projectionMatrix);
 
     void move(const glm::vec3 &direction); //Overwrite of parent method
 

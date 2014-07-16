@@ -48,4 +48,8 @@ public:
 private:
     ACGL::Scene::SharedHMDCamera mHMDCamera;
     float mHeight;
+
+    //game related stuff
+    int     mPoints ;
+    float   mLifeBar;
 };

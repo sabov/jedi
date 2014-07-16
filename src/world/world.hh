@@ -29,11 +29,14 @@ public:
     World();
     ~World();
 
+    bool initializeWorld();
+
     // called once to connect the player with the Rift:
     void setPlayerCamera(ACGL::HardwareSupport::SimpleRiftController *riftControl);
 
     // render the world:
     void render();
+    void geometryRender();  //render geometry (geometry pass)
 
     // move the player relative to the players body orientation:
     void movePlayer(const glm::vec3 &direction);
@@ -71,7 +74,6 @@ public:
 
     void DSRender();
     bool InitDS()   ;
-    GLuint final_texture;
 
 private:
     unsigned int window_width;
@@ -90,8 +92,6 @@ private:
 
     // The "level":
     CGEngine::CMesh mLevel  ;
-    //test oject
-    CGEngine::CMesh mDice   ;
 
     //using this shader since it supports textures
     ACGL::OpenGL::SharedShaderProgram     mBunnyShader;

@@ -36,11 +36,6 @@ glm::uvec2 gOutputWindowSize;
 // 3D Rift rendering or 2D?
 bool gRenderForTheRift = false;
 
-//Render to texture etc ...
-CGEngine::FullScreenQuadPtr gFullScreenQuad;
-ACGL::OpenGL::SharedShaderProgram gPassThroughShader;
-CGEngine::CGLTexture2D gTex;
-
 //
 // A debug callback gets called for each OpenGL error and also for some warnings and even hints.
 // Here it just prints those messages.
@@ -84,10 +79,6 @@ void resizeCallback(GLFWwindow*, int newWidth, int newHeight) {
 //
 void initRenderer( GLFWwindow *window, ACGL::HardwareSupport::SimpleRiftController *simpleRiftController )
 {
-    gFullScreenQuad = CGEngine::FullScreenQuadPtr( new CGEngine::CFullScreenQuad );
-    gFullScreenQuad->LoadMesh("");
-    gPassThroughShader = ShaderProgramFileManager::the()->get( ShaderProgramCreator("pass_through") );
-    gTex.VLoadTexture("geometry/L1/Textures/metalbridgetoprailbig.jpg");
     //
     // Register our own OpenGL debug callback:
     //
@@ -231,19 +222,5 @@ void renderFrame() {
         gSimpleRiftControllerRenderer->getCamera()->setEye(GenericCamera::EYE_LEFT);
 
         renderScene();
-
-        /*
-        // the screen is framebuffer 0, bind that:
-        glBindFramebuffer( GL_FRAMEBUFFER, 0);
-
-        gPassThroughShader->use();
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, gWorld->final_texture);
-
-        gPassThroughShader->setUniform( "renderedTexture", 0 );
-
-        gFullScreenQuad->VOnDraw();
-        */
-
     }
 }

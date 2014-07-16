@@ -2,15 +2,17 @@
 
 namespace GameLogic {
 
+EventManagerPtr CEventManager::m_Instance ;
+
 bool CEventManager::VAddListener(const EventListenerPtr &_Listener, const EventType &_Type)
 {
-    if ( !VValidateEventType( _Type ) )
-        return false;
-
     //check / update the list
     EventTypeSet::iterator evIt = m_TypeList.find( _Type );
     if ( evIt == m_TypeList.end() )
         m_TypeList.insert( _Type );
+
+    if ( !VValidateEventType( _Type ) )
+        return false;
 
     //find listener map entry, create one if no table already exists for this entry..
     EventListenerMap::iterator elmIt = m_Registry.find( _Type.getHashValue() ) ;
@@ -267,7 +269,7 @@ bool CEventManager::VTick(unsigned long _maxMillisecs)
 
 bool CEventManager::VValidateEventType(const EventType &_Type) const
 {
-    if ( std::strlen( _Type.getString() ) )
+    if ( std::strlen( _Type.getString()) == 0 )
         return false;
 
     if ( ( _Type.getHashValue() == 0 ) &&

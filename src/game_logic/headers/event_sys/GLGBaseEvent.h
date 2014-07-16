@@ -43,10 +43,10 @@ public:
 class CBaseEventData : public IEventData
 {
 protected:
-    const float m_TimeStamp ;
+    const double m_TimeStamp ;
 
 public:
-    explicit CBaseEventData( const float _timeStamp = 0.0f )
+    explicit CBaseEventData( const double _timeStamp = 0.0 )
         : m_TimeStamp ( _timeStamp ){}
     virtual ~CBaseEventData() {}
     virtual const EventType & VGetEventType() const = 0 ;

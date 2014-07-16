@@ -29,6 +29,11 @@
 #include "audio/audio.hh"
 #include "world/world.hh"
 #include "input.hh"
+#ifndef GLGEVENTMANAGER_H
+#include "event_sys/GLGEventManager.h"
+#endif
+#include "world/eventlisteners.hh"
+#include "world/audiosystem.hh"
 
 //
 // Store the world in a global object. This is not pretty nor is it good software design,
@@ -162,6 +167,14 @@ int main(int argc, char *argv[]) {
     }
 
     //
+    // Get an instance of EventManager
+    //
+    GameLogic::EventManagerPtr eventManager = GameLogic::CEventManager::getInstance();
+    GameLogic::EventListenerPtr snoop( new EventDebugOuput() );
+    eventManager->VAddListener( snoop, GameLogic::EventType( GameLogic::kpWildCardEventType.c_str() ) );
+    eventManager->VAddListener( snoop, CEvtData_WorldInitialized::GetEventType() );
+
+    //
     // Create a SimpleRiftController
     //
     ACGL::HardwareSupport::SimpleRiftController *simpleRiftController = new ACGL::HardwareSupport::SimpleRiftController();
@@ -178,9 +191,18 @@ int main(int argc, char *argv[]) {
     initAudio();
 
     //
+    // Create Audiosystem
+    //
+    AudioSystemPtr audioSystem = AudioSystemPtr( new CAudioSystem() );
+    //Add sound and register at EventManager
+    audioSystem->AddSound( "audio/SaberOn.wav", CEvtData_ToggleSword::GetEventType() );
+    eventManager->VAddListener( audioSystem, CEvtData_ToggleSword::GetEventType() );
+
+    //
     // Create a world object
     //
     gWorld = new World();
+    gWorld->initializeWorld();
     gWorld->setPlayerCamera(simpleRiftController);
 
     /************************************************************************
@@ -192,6 +214,7 @@ int main(int argc, char *argv[]) {
     //
     // main loop
     //
+    eventManager->VTick();  //Handle events so far...
     double startTimeInSeconds = glfwGetTime();
     do {
         double now = glfwGetTime() - startTimeInSeconds;
@@ -211,6 +234,9 @@ int main(int argc, char *argv[]) {
             gWorld->update((int)(1000.0 * 0.1));
             nextUpdateTime = now + 0.1;
         }
+
+        //Handle events
+        eventManager->VTick();
 
         //
         // per frame tasks:
