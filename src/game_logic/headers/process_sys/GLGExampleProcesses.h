@@ -33,7 +33,7 @@ public:
         this->m_Active = true ;
         this->m_InitialUpdate = true ;
         this->m_Paused = false ;
-        this->m_pNext = NULL ;
+        //this->m_pNext = NULL ;
     }
     //Geerbte Update-Funktion überladen (d.h. was soll bei update dieses Prozesses passiern?) ------|
     virtual void VOnUpdate(const int elapsedTime) {    //                                           |
