@@ -87,8 +87,3 @@ void Lightsaber::rotate(float yaw, float pitch, float roll) {
     glm::mat4 newRot = glm::yawPitchRoll(yaw, pitch, roll);
     setRotationMatrix(R * newRot);
 }
-
-void Lightsaber::setRotation(float yaw, float roll, float pitch) {
-    glm::mat4 newRot = glm::yawPitchRoll(yaw, roll, pitch);
-    setRotationMatrix(newRot);
-}

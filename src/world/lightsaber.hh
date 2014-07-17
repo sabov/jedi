@@ -24,7 +24,6 @@ public:
     void setPosition(const glm::vec3 &position);
 
     void rotate(float yaw, float pitch, float roll);
-    void setRotation(float yaw, float pitch, float roll);
 
 private:
     // Current position of player

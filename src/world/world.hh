@@ -50,8 +50,8 @@ public:
     //rotate the lightsaber, negative values rotate to the left, positive to the right
     void rotateLightsaber(float yaw, float pitch, float roll);
 
-    //set the rotaton of the lightsaber
-    void setRotationLightsaber(float dYaw, float dRoll, float dPitch);
+    //set the rotation matrix of the lightsaber
+    void setRotationMatrixLightsaber(const glm::mat4 &rotation);
 
 private:
     Player mPlayer;

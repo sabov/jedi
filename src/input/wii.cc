@@ -133,8 +133,9 @@ void Wii::handleInput() {
     //movement = {0, 0, 0};
 
     //rotate lightsaber
-    Input::world->setRotationLightsaber(ACGL::Math::Functions::calcDegToRad(roll),
+    glm::mat4 rotation = glm::yawPitchRoll(ACGL::Math::Functions::calcDegToRad(roll),
             ACGL::Math::Functions::calcDegToRad(270 - pitch), ACGL::Math::Functions::calcDegToRad(yaw));
+    Input::world->setRotationMatrixLightsaber(rotation);
 
     //----
     //VIEW
@@ -184,20 +185,9 @@ void Wii::handleEvent(CWiimote &wm) {
         float pitchNew, rollNew, yawNew;
         wm.Accelerometer.GetOrientation(pitchNew, rollNew, yawNew);
 
-        if (glm::abs(pitchNew - pitch) > 5) {
-            pitch = pitchNew;
-            cout << "pitch " << pitch << endl;
-        }
-
-        if (glm::abs(rollNew - roll) > 5) {
-            roll = rollNew;
-            cout << "roll " << roll << endl;
-        }
-
-        if (glm::abs(yawNew - yaw) > 5) {
-            yaw = yawNew;
-            cout << "yaw " << yaw << endl;
-        }
+        pitch = fmod(0.9 * pitch + 0.1 * pitchNew, 360);
+        roll = fmod(0.9 * roll + 0.1 * rollNew, 360);
+        yaw = fmod(0.9 * yaw + 0.1 * yawNew, 360);
 
         wm.Accelerometer.GetGravityVector(x, y, z);
         dx = acceleration.x - x;
