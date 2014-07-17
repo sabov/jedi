@@ -161,7 +161,7 @@ void World::render() {
             if (obj1 == mPlayer.mLightsaber.mPhysicObject.rigidBody || obj2 == mPlayer.mLightsaber.mPhysicObject.rigidBody){
                 if (obj1 == mPlayer.mLightsaber.mPhysicObject.rigidBody){
                     if ( mDroids[i].mPhysicObject.rigidBody == obj2){
-                        mDroids[i].mDroidRenderFlag = false;
+                        mDroids[i].setRenderFlag(false);
                         //mDroids[i].animate();
                         //use this instead:
                         mpProcessManager->attachProcess( mDroids[i].getDestrucionProcess() );
@@ -171,7 +171,8 @@ void World::render() {
                 else{
                     for (int i = 0; i < 3; i++){
                         if ( mDroids[i].mPhysicObject.rigidBody == obj1){
-                            mDroids[i].mDroidRenderFlag = false;
+                            mDroids[i].setRenderFlag(false);
+                            mDroids[i].setAnimationFlag(true);
                             mpProcessManager->attachProcess( mDroids[i].getDestrucionProcess() );
                             cout << "collision with droid"<< i << endl;
                         }
@@ -211,12 +212,13 @@ void World::geometryRender()
     }
 
 
+
     dynamicsWorld->stepSimulation(0.0166f,10);
     //cout << "first Droid Position " <<mDroids[2].mPhysicObject.GetPosition().x << " " <<mDroids[2].mPhysicObject.GetPosition().y<< " " << mDroids[2].mPhysicObject.GetPosition().z <<endl;
     //cout << "lighsaber position   " <<mPlayer.mLightsaber.mPhysicObject.GetPosition().x << " " << mPlayer.mLightsaber.mPhysicObject.GetPosition().y << " " <<mPlayer.mLightsaber.mPhysicObject.GetPosition().z << endl;
 
     int numManifolds = dynamicsWorld->getDispatcher()->getNumManifolds();
-    for (int i=0;i<numManifolds;i++)
+    for ( int i = 0; i < numManifolds; i++ )
         {
             btPersistentManifold* contactManifold =  dynamicsWorld->getDispatcher()->getManifoldByIndexInternal(i);
             btRigidBody *obj1 = btRigidBody::upcast((btCollisionObject*)contactManifold->getBody0());
@@ -235,14 +237,14 @@ void World::geometryRender()
 
                 }
                 else{
-                    for (int i = 0; i < 3; i++){
-                        //cout << "collision with droid"<< i << endl;
-                        if ( mDroids[i].mPhysicObject.rigidBody == obj1){
-                            cout << "collision with droid"<< i << endl;
-                            mDroids[i].mDroidRenderFlag = false;
+                    for ( int j = 0; j < 3; j++ ){
+                        if ( mDroids[j].mPhysicObject.rigidBody == obj1 )
+                        {
+                            cout << "collision with droid"<< j << endl;
+                            mDroids[j].setRenderFlag(false);
+                            mDroids[j].setAnimationFlag(true);
                             //mDroids[i].animate();
-                            mpProcessManager->attachProcess( mDroids[i].getDestrucionProcess() );
-
+                            mpProcessManager->attachProcess( mDroids[j].getDestrucionProcess() );
                         }
                     }
                 }

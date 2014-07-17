@@ -92,6 +92,7 @@ private:
 
     // The "level":
     CGEngine::CMesh mLevel  ;
+    CGEngine::CMesh mDroidTest;
 
     //using this shader since it supports textures
     ACGL::OpenGL::SharedShaderProgram     mBunnyShader;

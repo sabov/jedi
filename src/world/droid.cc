@@ -12,6 +12,7 @@ using namespace ACGL::OpenGL;
 
 Droid::Droid()
 {
+    /*
     debug() << "loading droid..." << endl;
     mDroidGeometry = VertexArrayObjectCreator("droid.obj").create();
     mDroidShader   = ShaderProgramFileManager::the()->get( ShaderProgramCreator("droidShader") );
@@ -21,7 +22,7 @@ Droid::Droid()
     //mPhysicObject.Init(cShape, startPosition);
     string droidfilie;
     int animVariant = rand() % 3;
-    animationFlag = 0;
+    mAnimationFlag = 0;
     for (int i = 0; i < 50; i++) {
         if (i < 10){
            droidfilie  = "droidanim" +  std::to_string(animVariant) + "/Drone166_00000" + std::to_string(i) + ".obj";
@@ -31,7 +32,7 @@ Droid::Droid()
 
         //mDroidanimatedGeometry.push_back(VertexArrayObjectCreator(droidfilie).create());
     }
-
+    */
 }
 
 Droid::~Droid()
@@ -56,17 +57,19 @@ bool Droid::initialize(string _filename, glm::vec3 startPosition)
      * The destruction process is started as soon as a collision is registered,
      * i.e. see world.cc, line 167
      */
-    mDestructionProcess = GameLogic::ProcessPointer ( new Droid::DestructionProcess(this) );
+    mDestructionProcess = boost::shared_ptr<Droid::DestructionProcess> ( new Droid::DestructionProcess(this) );
 
     string droidfile;
     int animVariant = rand() % 3;
-    animationFlag = 0;
+    mAnimationFlag = false;
     int last_index = 0;
-    for (int i = 0; i < 50; i++) {
+    for (int i = 0; i < 50; i++) {//!
         if (i < 10){
-           droidfile  = "droidanim" +  std::to_string(animVariant) + "/Drone166_00000" + std::to_string(i) + ".obj";
+            droidfile  = "droidanim" +  std::to_string(animVariant) + "/Drone166_00000" + std::to_string(i) + ".obj";
+            //droidfile  = std::string("test_anim") + std::string("/droid_anim_00000") + std::to_string(i) + ".obj";
         } else {
-           droidfile = "droidanim" +  std::to_string(animVariant) + "/Drone166_0000" + std::to_string(i) + ".obj";
+            droidfile = "droidanim" +  std::to_string(animVariant) + "/Drone166_0000" + std::to_string(i) + ".obj";
+            //droidfile  = std::string("test_anim")  + std::string("/droid_anim_0000") + std::to_string(i) + ".obj";
         }
 
         mDroidanimatedGeometry.push_back( CGEngine::MeshPointer( new CGEngine::CMesh() ) );
@@ -104,12 +107,17 @@ void Droid::transformPosition()
 
 void Droid::baseRender()
 {
-    if (mDroidRenderFlag){
+    if (mDroidRenderFlag)
+    {
         mPhysicObject.SetPosition(getPosition());
-    }else{
-        setPosition(mPhysicObject.GetPosition());
+        mDroid.VOnDraw();
     }
-    mDroid.VOnDraw();
+    else if ( mAnimationFlag )
+    {
+        mDroidanimatedGeometry[mDestructionProcess->animationIndex]->VOnDraw();
+    }
+    else
+        return;
 }
 
 void Droid::MoveProcess::VOnInitialize()
@@ -155,29 +163,15 @@ void Droid::DestructionProcess::VKill()
 
 void Droid::DestructionProcess::VOnUpdate(const int elapsedTime)
 {
-    this->mDroid->animate();
+    animationIndex++;
+    if ( animationIndex >= (int)mDroid->mDroidanimatedGeometry.size() )
+    {
+        mDroid->mAnimationFlag = false;
+        VKill();
+    }
     /*
-     * render the different meshes for the animation: mDroidanimatedGeometry[animationIndex]->VOnDraw()
      * the variable animationIndex is the same as animationflag, it should be increased after each call of this function,
      * or after a certain time period.
      * If animationIndex is greater than 50, the process should be killed ( call VKill() ), or we will get errors.
      */
-}
-
-void Droid::animate(){
-    //cout<< "in anim" << endl;
-    if (animationFlag < mDroidanimatedGeometry.size()-1 )
-    {
-        animationFlag++;
-        cout<< animationFlag << endl;
-        mDroidanimatedGeometry[animationFlag]->VOnDraw();
-        //mDroidGeometry =  mDroidanimatedGeometry[animationFlag];
-        //mDroidGeometry->setAttributeLocations( mDroidShader->getAttributeLocations() );
-    }
-
-}
-
-void Droid::collide(){
-
-    animate();
 }
