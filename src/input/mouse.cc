@@ -111,17 +111,17 @@ void Mouse::handleInput() {
     float rotateRad = ACGL::Math::Functions::calcDegToRad(5.0f);
     if (mouseWheelScrollUp) {
         if (controlPressed) {
-            Input::world->rotateLightsaber(0.0f, -rotateRad, 0.0f);
-        } else {
             Input::world->rotateLightsaber(0.0f, 0.0f, -rotateRad);
+        } else {
+            Input::world->rotateLightsaber(0.0f, -rotateRad, 0.0f);
         }
         //Reset state
         mouseWheelScrollUp = false;
     } else if (mouseWheelScrollDown) {
         if (controlPressed) {
-            Input::world->rotateLightsaber(0.0f, rotateRad, 0.0f);
-        } else {
             Input::world->rotateLightsaber(0.0f, 0.0f, rotateRad);
+        } else {
+            Input::world->rotateLightsaber(0.0f, rotateRad, 0.0f);
         }
         //Reset state
         mouseWheelScrollDown = false;
