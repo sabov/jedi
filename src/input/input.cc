@@ -14,6 +14,8 @@ bool Input::rotateRightPressed = false;
 bool Input::forcePressed = false;
 bool Input::controlPressed = false;
 
+bool Input::previousForceState = false;
+
 float Input::analogLeftRightMovement = 0.0f;
 float Input::analogForwardBackMovement = 0.0f;
 float Input::analogLeftRightRotation = 0.0f;
@@ -153,7 +155,11 @@ void Input::handleInput() {
 
     //Use force
     if (forcePressed) {
+        if (previousForceState != forcePressed) {
+            world->toggleLightsaber();
+        }
         world->useForcePlayer();
+        previousForceState = forcePressed;
     }
 
     // Grabs the input from the Rift to update the cameras orientation:

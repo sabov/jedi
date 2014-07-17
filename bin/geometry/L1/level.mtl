@@ -9,6 +9,7 @@ Ks 0.500000 0.500000 0.500000
 Ni 1.000000
 d 1.000000
 illum 2
+map_Kd ..\Textures\lamp_tex.png
 
 newmtl MatCentralFloor
 Ns 135.294118
@@ -18,8 +19,8 @@ Ks 0.833333 0.833333 0.833333
 Ni 1.000000
 d 1.000000
 illum 2
-map_Kd Textures/miO0tZM.jpg
-map_Bump Textures/miO0tZM.jpg
+map_Kd ..\Textures\miO0tZM.jpg
+map_Bump ..\\Textures\\miO0tZM.jpg
 
 newmtl MatCentralFloor_NONE
 Ns 135.294118
@@ -29,8 +30,8 @@ Ks 0.833333 0.833333 0.833333
 Ni 1.000000
 d 1.000000
 illum 2
-map_Bump Textures/miO0tZM.jpg
-map_Kd Textures/miO0tZM.jpg
+map_Bump ..\\Textures\\miO0tZM.jpg
+map_Kd ..\\Textures\\miO0tZM.jpg
 
 newmtl MatFloor
 Ns 96.078431
@@ -40,8 +41,8 @@ Ks 0.500000 0.500000 0.500000
 Ni 1.000000
 d 1.000000
 illum 2
-map_Kd Textures/metal_floor.jpg
-map_Bump Textures/metal_floor.jpg
+map_Kd ..\Textures\metal_floor.jpg
+map_Bump ..\\Textures\\metal_floor.jpg
 
 newmtl MatPillar
 Ns 96.078431
@@ -51,8 +52,8 @@ Ks 0.500000 0.500000 0.500000
 Ni 1.000000
 d 1.000000
 illum 2
-map_Kd Textures/metalbridgebeam2.jpg
-map_Bump Textures/metalbridgebeam2.jpg
+map_Kd ..\Textures\metalbridgebeam2.jpg
+map_Bump ..\\Textures\\metalbridgebeam2.jpg
 
 newmtl MatPillar2
 Ns 96.078431
@@ -62,8 +63,8 @@ Ks 0.500000 0.500000 0.500000
 Ni 1.000000
 d 1.000000
 illum 2
-map_Kd Textures/metalbridgebeam2.jpg
-map_Bump Textures/metalbridgebeam2.jpg
+map_Kd ..\Textures\metalbridgebeam2.jpg
+map_Bump ..\\Textures\\metalbridgebeam2.jpg
 
 newmtl MatWhite
 Ns 186.274510
@@ -73,7 +74,7 @@ Ks 0.792929 0.792929 0.792929
 Ni 1.000000
 d 1.000000
 illum 2
-map_Kd Textures/metalbridgebeam2.jpg
+map_Kd ..\Textures\metalbridgebeam2.jpg
 
 newmtl Wall1
 Ns 96.078431
@@ -83,7 +84,7 @@ Ks 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
 illum 1
-map_Kd Textures/factoryiron1.jpg
+map_Kd ..\Textures\factoryiron1.jpg
 
 newmtl Wall2
 Ns 96.078431
@@ -93,8 +94,8 @@ Ks 0.060606 0.060606 0.060606
 Ni 1.000000
 d 1.000000
 illum 2
-map_Kd Textures/metalbridgetoprailbig.jpg
-map_Bump Textures/metalbridgetoprailbig.jpg
+map_Kd ..\Textures\metalbridgetoprailbig.jpg
+map_Bump ..\\Textures\\metalbridgetoprailbig.jpg
 
 newmtl WallTop
 Ns 96.078431
@@ -104,4 +105,4 @@ Ks 0.328283 0.328283 0.328283
 Ni 1.000000
 d 1.000000
 illum 2
-map_Kd Textures/vehl2panelsidefrnt.jpg
+map_Kd ..\Textures\vehl2panelsidefrnt.jpg

@@ -61,17 +61,17 @@ add_subdirectory(src)
 
 FILE(GLOB_RECURSE SOURCE_FILES_CC "${CMAKE_SOURCE_DIR}/*.cc")
 
-SET(SOURCE_FILES ${SOURCE_FILES} ${SOURCE_FILES_CC} ${cgengine_source})
+SET(SOURCE_FILES ${SOURCE_FILES} ${SOURCE_FILES_CC} ${cgengine_source} ${glg_source})
 
 FILE(GLOB_RECURSE HEADER_FILES_HH "${CMAKE_SOURCE_DIR}/*.hh")
 
-SET(HEADER_FILES ${HEADER_FILES} ${HEADER_FILES_HH} ${cgengine_headers})
+SET(HEADER_FILES ${HEADER_FILES} ${HEADER_FILES_HH} ${cgengine_headers} ${glg_headers})
 
 include_directories(${CGE_HEADERS})
+include_directories(${GLG_HEADERS})
 
 # shader files
 FILE(GLOB_RECURSE SHADER_FILES "${CMAKE_SOURCE_DIR}/bin/shader/*.*")
-
 
 #
 #
@@ -167,11 +167,6 @@ set(QT_USE_QTOPENGL TRUE)
 include(${QT_USE_FILE})
 add_definitions(${QT_DEFINITIONS})
 set(LIBRARIES ${LIBRARIES} ${QT_LIBRARIES})
-
-#Bullet Engine
-find_package(Bullet REQUIRED)
-include_directories(${BULLET_INCLUDE_DIRS})
-set(LIBRARIES ${LIBRARIES} ${BULLET_LIBRARIES})
 
 #Assimp Library
 find_package(Assimp REQUIRED)

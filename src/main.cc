@@ -14,8 +14,6 @@
 #include <GL/glew.h>
 #endif
 
-#include <btBulletDynamicsCommon.h>
-
 // OpenGL defines and function pointers. We use this instead of the system GL.h or glew.h.
 // This has to be included before glfw.h !
 #include <ACGL/OpenGL/GL.hh>
@@ -189,6 +187,12 @@ int main(int argc, char *argv[]) {
     //Use mouse input
     gInput = new INPUT(myWindow, simpleRiftController, gWorld);
 
+    /************************************************************************
+     * Deferred Shading - Setup
+     * *********************************************************************/
+    gWorld->setWidthHeight(1600, 900);
+    gWorld->InitDS();
+
     //
     // main loop
     //
@@ -204,6 +208,12 @@ int main(int argc, char *argv[]) {
         if (now > nextReloadTime) {
             ACGL::OpenGL::ShaderProgramFileManager::the()->updateAll();
             nextReloadTime = now + 1.0; // check again in one second
+        }
+
+        static double nextUpdateTime = 0.1;
+        if (now > nextUpdateTime) {
+            gWorld->update((int) (1000.0 * 0.1));
+            nextUpdateTime = now + 0.1;
         }
 
         //
