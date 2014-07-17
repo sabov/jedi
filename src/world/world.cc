@@ -245,6 +245,7 @@ void World::geometryRender()
                             mDroids[j].setAnimationFlag(true);
                             //mDroids[i].animate();
                             mpProcessManager->attachProcess( mDroids[j].getDestrucionProcess() );
+                            GameLogic::CEventManager::getInstance()->VQueueEvent( GameLogic::EventDataPtr( new CEvtData_CollisionLightSaber( glfwGetTime() ) ) );
                         }
                     }
                 }
