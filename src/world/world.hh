@@ -48,7 +48,7 @@ public:
     void setLightsaberPosition(const glm::vec3 &movement);
 
     //rotate the lightsaber, negative values rotate to the left, positive to the right
-    void rotateLightsaber(float dYaw, float dRoll, float dPitch);
+    void rotateLightsaber(float yaw, float pitch, float roll);
 
     //set the rotaton of the lightsaber
     void setRotationLightsaber(float dYaw, float dRoll, float dPitch);

@@ -144,14 +144,10 @@ void World::moveLightsaber(const glm::vec3 &direction) {
     mPlayer.mLightsaber.move(direction);
 }
 
-void World::setLightsaberPosition(const glm::vec3 &movement) {
-    mPlayer.mLightsaber.setPosition(movement);
+void World::rotateLightsaber(float yaw, float pitch, float roll){
+    mPlayer.mLightsaber.rotate(yaw, pitch, roll);
 }
 
-void World::rotateLightsaber(float dYaw, float dRoll, float dPitch) {
-    mPlayer.mLightsaber.rotate(dYaw, dRoll, dPitch);
-}
-
-void World::setRotationLightsaber(float dYaw, float dRoll, float dPitch) {
-    mPlayer.mLightsaber.setRotation(dYaw, dRoll, dPitch);
+void World::setRotationLightsaber(float yaw, float pitch, float roll) {
+    mPlayer.mLightsaber.setRotation(yaw, pitch, roll);
 }

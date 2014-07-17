@@ -82,9 +82,9 @@ void Lightsaber::setPosition(const glm::vec3 &position) {
 /*
  * Rotate lightsaber
  */
-void Lightsaber::rotate(float yaw, float roll, float pitch) {
+void Lightsaber::rotate(float yaw, float pitch, float roll) {
     glm::mat4 R = getRotationMatrix4();
-    glm::mat4 newRot = glm::yawPitchRoll(yaw, roll, pitch);
+    glm::mat4 newRot = glm::yawPitchRoll(yaw, pitch, roll);
     setRotationMatrix(R * newRot);
 }
 
