@@ -56,7 +56,7 @@ bool Droid::initialize(string _filename, glm::vec3 startPosition)
      * The destruction process is started as soon as a collision is registered,
      * i.e. see world.cc, line 167
      */
-    mDestructionProcess = GameLogic::ProcessPointer ( new Droid::DestructionProcess() );
+    mDestructionProcess = GameLogic::ProcessPointer ( new Droid::DestructionProcess(this) );
 
     string droidfile;
     int animVariant = rand() % 3;
@@ -73,7 +73,7 @@ bool Droid::initialize(string _filename, glm::vec3 startPosition)
         mDroidanimatedGeometry[last_index]->LoadMesh(droidfile);
         last_index++;
     }
-
+    mPhysicObject.rigidBody->setUserPointer(this);
     return ret;
 }
 
@@ -85,13 +85,6 @@ void Droid::render(glm::mat4 &viewMatrix, glm::mat4 &projectionMatrix)
 
     glm::mat4 translateMatrix = glm::translate( glm::mat4(), getPosition());
     modelMatrix = translateMatrix * modelMatrix;
-
-    if (mDroidRenderFlag){
-        mPhysicObject.SetPosition(getPosition());
-    }else{
-        setPosition(mPhysicObject.GetPosition());
-    }
-    mPhysicObject.rigidBody->setUserPointer(this);
 
     mDroidShader->setUniform("uModelMatrix", modelMatrix);
     mDroidShader->setUniform("uViewMatrix", viewMatrix);
@@ -107,7 +100,6 @@ void Droid::transformPosition()
     mModelMatrix = translateMatrix * mModelMatrix;
 
     mPhysicObject.SetPosition(getPosition());
-    mPhysicObject.rigidBody->setUserPointer(this);
 }
 
 void Droid::baseRender()
@@ -117,7 +109,6 @@ void Droid::baseRender()
     }else{
         setPosition(mPhysicObject.GetPosition());
     }
-    mPhysicObject.rigidBody->setUserPointer(this);
     mDroid.VOnDraw();
 }
 
@@ -164,6 +155,7 @@ void Droid::DestructionProcess::VKill()
 
 void Droid::DestructionProcess::VOnUpdate(const int elapsedTime)
 {
+    this->mDroid->animate();
     /*
      * render the different meshes for the animation: mDroidanimatedGeometry[animationIndex]->VOnDraw()
      * the variable animationIndex is the same as animationflag, it should be increased after each call of this function,
@@ -173,16 +165,19 @@ void Droid::DestructionProcess::VOnUpdate(const int elapsedTime)
 }
 
 void Droid::animate(){
-    /*
+    //cout<< "in anim" << endl;
     if (animationFlag < mDroidanimatedGeometry.size()-1 )
     {
         animationFlag++;
-        mDroidGeometry = mDroidanimatedGeometry[animationFlag];
-        mDroidGeometry->setAttributeLocations( mDroidShader->getAttributeLocations() );
+        cout<< animationFlag << endl;
+        mDroidanimatedGeometry[animationFlag]->VOnDraw();
+        //mDroidGeometry =  mDroidanimatedGeometry[animationFlag];
+        //mDroidGeometry->setAttributeLocations( mDroidShader->getAttributeLocations() );
     }
-    */
+
 }
 
 void Droid::collide(){
+
     animate();
 }

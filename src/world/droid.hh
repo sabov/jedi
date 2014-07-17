@@ -12,6 +12,8 @@
  * Class for the Droid
  */
 using namespace std;
+class Droid;
+typedef boost::shared_ptr<Droid> DroidPtr;
 
 class Droid : public ACGL::Scene::MoveableObject {
 public:
@@ -71,8 +73,11 @@ private:
 
     class DestructionProcess : public GameLogic::CProcess
     {
+    private:
+        Droid* mDroid;
     public:
         DestructionProcess() : GameLogic::CProcess() {}
+        DestructionProcess(Droid* droid) {mDroid = droid;}
         ~DestructionProcess() {}
 
         int animationIndex ;
