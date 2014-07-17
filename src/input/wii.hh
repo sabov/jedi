@@ -31,5 +31,11 @@ private:
     static bool reloadWiimotes;
     static CWii wii; // Defaults to 4 wiimotes
     static CWiimote* wiimote;
+
+    static double timeLast;
+    static double timePassed;
+
+    static const float SMOOTH_FACTOR_GYRO;
+    static const float SMOOTH_FACTOR_ACCEL;
 };
 #endif /* WII_H_ */

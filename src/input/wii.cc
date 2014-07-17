@@ -3,6 +3,9 @@
 using namespace std;
 
 //initialize static variables
+const float Wii::SMOOTH_FACTOR_GYRO = 0.90;
+const float Wii::SMOOTH_FACTOR_ACCEL = 0.20;
+
 glm::vec3 Wii::movement = { 0, 0, 0 };
 glm::vec3 Wii::acceleration = { 0, 0, 0 };
 float Wii::yaw = 0;
@@ -12,6 +15,9 @@ int Wii::LED_MAP[4] = { CWiimote::LED_1, CWiimote::LED_2, CWiimote::LED_3, CWiim
 bool Wii::reloadWiimotes = false;
 CWii Wii::wii;
 CWiimote* Wii::wiimote = NULL;
+
+double Wii::timeLast = 0;
+double Wii::timePassed = 0;
 
 Wii::Wii(GLFWwindow* window, ACGL::HardwareSupport::SimpleRiftController *simpleRiftController, World *world) :
         Input(window, simpleRiftController, world) {
@@ -56,6 +62,11 @@ Wii::~Wii() {
 }
 
 void Wii::handleInput() {
+    //Get passed time for movement over time
+    double timeNow = glfwGetTime();
+    timePassed = timeNow - timeLast;
+    timeLast = timeNow;
+
     // TODO Only get ontime result of polling when doing it twice in one iteration. I don't now why.
     for (int i = 0; i < 2; i++) {
         if (wii.Poll()) {
@@ -129,12 +140,12 @@ void Wii::handleInput() {
     //LIGHTSABER
     //----------
     // Move lightsaber in space
-    //Input::world->moveLightsaber(movement);
-    //movement = {0, 0, 0};
+    Input::world->moveLightsaber(movement);
+    movement = {0, 0, 0};
 
     //rotate lightsaber
-    glm::mat4 rotation = glm::yawPitchRoll(ACGL::Math::Functions::calcDegToRad(roll),
-            ACGL::Math::Functions::calcDegToRad(270 - pitch), ACGL::Math::Functions::calcDegToRad(yaw));
+    glm::mat4 rotation = glm::yawPitchRoll(ACGL::Math::Functions::calcDegToRad(yaw),
+            ACGL::Math::Functions::calcDegToRad(270 - pitch), ACGL::Math::Functions::calcDegToRad(roll));
     Input::world->setRotationMatrixLightsaber(rotation);
 
     //----
@@ -181,33 +192,29 @@ void Wii::handleEvent(CWiimote &wm) {
 
     // if the accelerometer is turned on then print angles
     if (wm.isUsingACC()) {
-        float x, dx, y, dy, z, dz;
+        float acc_x, dx, acc_y, dy, acc_z, dz;
         float pitchNew, rollNew, yawNew;
+        double timeFactor = timePassed * timePassed * 25;
+
+        // Get data from accelerator and gyroscope
         wm.Accelerometer.GetOrientation(pitchNew, rollNew, yawNew);
+        wm.Accelerometer.GetGravityVector(acc_x, acc_z, acc_y); //Wiimote switches y- and z-axis
+        acc_y = 1 - acc_y; //Gravity of 1g
 
-        pitch = fmod(0.9 * pitch + 0.1 * pitchNew, 360);
-        roll = fmod(0.9 * roll + 0.1 * rollNew, 360);
-        yaw = fmod(0.9 * yaw + 0.1 * yawNew, 360);
+        //Low pass for smoothing data
+        pitch = fmod(SMOOTH_FACTOR_GYRO * pitch + (1 - SMOOTH_FACTOR_GYRO) * pitchNew, 360);
+        roll = fmod(SMOOTH_FACTOR_GYRO * roll + (1 - SMOOTH_FACTOR_GYRO) * rollNew, 360);
+        yaw = fmod(SMOOTH_FACTOR_GYRO * yaw + (1 - SMOOTH_FACTOR_GYRO) * yawNew, 360);
+        acceleration.x = (SMOOTH_FACTOR_ACCEL * acceleration.x) + (1 - SMOOTH_FACTOR_ACCEL) * acc_x;
+        acceleration.y = (SMOOTH_FACTOR_ACCEL * acceleration.y) + (1 - SMOOTH_FACTOR_ACCEL) * acc_y;
+        acceleration.z = (SMOOTH_FACTOR_ACCEL * acceleration.z) + (1 - SMOOTH_FACTOR_ACCEL) * acc_z;
 
-        wm.Accelerometer.GetGravityVector(x, y, z);
-        dx = acceleration.x - x;
-        if (glm::abs(dx) > 0.1) {
-            cout << "X: " << dx << endl;
-            movement.x += dx;
-        }
-        acceleration.x = x;
-        dy = acceleration.y - y;
-        if (glm::abs(dy) > 0.1) {
-            cout << "Y: " << dy << endl;
-            movement.y += dy;
-        }
-        acceleration.y = y;
-        dz = acceleration.z - z;
-        if (glm::abs(dz) > 0.1) {
-            cout << "Z: " << dz << endl;
-            movement.z += dz;
-        }
-        acceleration.z = z;
+        dx = acceleration.x * timeFactor;
+        movement.x += dx;
+        dy = acceleration.y * timeFactor;
+        movement.y += dy;
+        dz = acceleration.z * timeFactor;
+        movement.z += dz;
     }
 
     // if the Motion Plus is turned on then print angles
