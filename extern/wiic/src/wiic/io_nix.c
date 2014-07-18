@@ -192,9 +192,9 @@ int wiic_load(struct wiimote_t** wm)
 	char* tmp = 0;
 	
 	// Retrieve the HOME environment variable
-	tmp = getenv("HOME");
-	strcpy(configPath,tmp);
-	strncat(configPath,"/.wiic/wiimotes.config",22);
+	//tmp = getenv("HOME");
+	//strcpy(configPath,tmp);
+	strncat(configPath,"wiimotes.config",15);
 
 	// Open the config file
 	FILE* fd = 0;
