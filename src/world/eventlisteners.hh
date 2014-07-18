@@ -7,6 +7,7 @@
 #ifndef EVENTLISTENERS_HH
 #define EVENTLISTENERS_HH
 
+#include <iostream>
 #include "event_sys/GLGEventListener.h"
 
 class EventDebugOuput : public GameLogic::IEventListener
