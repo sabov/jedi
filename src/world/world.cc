@@ -60,7 +60,7 @@ bool World::initializeWorld()
 
     for (int i = 0 ; i < 3 ; ++i)
     {
-        mDroids[i].initialize("geometry/Droid/droid.obj", droidPosition[i]);
+        mDroids[i].initialize("geometry/Droid/droid1.obj", droidPosition[i]);
         mpProcessManager->attachProcess( mDroids[i].getMoveProcess() );
     }
 
