@@ -96,7 +96,8 @@ private:
     CGEngine::CMatrixStack mMatrixStack;
 
     // The "level":
-    CGEngine::CMesh mLevel;
+    CGEngine::CMesh mLevel  ;
+    CGEngine::CMesh mDroidTest;
     //test oject
     CGEngine::CMesh mDice;
 

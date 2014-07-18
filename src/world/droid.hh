@@ -12,17 +12,20 @@
  * Class for the Droid
  */
 using namespace std;
+class Droid;
+typedef boost::shared_ptr<Droid> DroidPtr;
 
 class Droid : public ACGL::Scene::MoveableObject {
 public:
     Droid();
     ~Droid();
 
+    friend class MoveProcess;
+    friend class DestructionProcess;
+
     bool initialize(std::string _filename, glm::vec3 startPosition);
 
     void render(glm::mat4 &viewMatrix, glm::mat4 &projectionMatrix);
-    void animate();
-    void collide();
 
     glm::mat4 getModelMatrix() const { return mModelMatrix; }
 
@@ -32,21 +35,25 @@ public:
     void baseRender();          //render geometry and texture
 
     PhysicsObject mPhysicObject;
-    bool mDroidRenderFlag;
+
+    void setRenderFlag(bool _b) { mDroidRenderFlag = _b; }
+    void setAnimationFlag(bool _b) { mAnimationFlag = _b; }
+
 
     GameLogic::ProcessPointer getMoveProcess() const { return mMoveProcess; }
     GameLogic::ProcessPointer getDestrucionProcess() const { return mDestructionProcess; }
 private:
     //The droid
-    ACGL::OpenGL::SharedShaderProgram     mDroidShader;
-    CGEngine::CMesh                 mDroid                  ;
-    std::vector<CGEngine::MeshPointer>    mDroidanimatedGeometry  ;
+    ACGL::OpenGL::SharedShaderProgram       mDroidShader            ;
+    CGEngine::CMesh                         mDroid                  ;
+    std::vector<CGEngine::MeshPointer>      mDroidanimatedGeometry  ;
 
     glm::mat4 mModelMatrix   ;
 
     btCollisionShape* cShape = new btSphereShape(1);
 
-    int animationFlag;
+    bool mAnimationFlag;
+    bool mDroidRenderFlag;
 
     //
     //Movement and Destruction Processes
@@ -71,8 +78,11 @@ private:
 
     class DestructionProcess : public GameLogic::CProcess
     {
+    private:
+        Droid* mDroid;
     public:
         DestructionProcess() : GameLogic::CProcess() {}
+        DestructionProcess(Droid* droid) {mDroid = droid;}
         ~DestructionProcess() {}
 
         int animationIndex ;
@@ -82,5 +92,5 @@ private:
         virtual void VKill();
     };
 
-    GameLogic::ProcessPointer   mDestructionProcess ;
+    boost::shared_ptr<DestructionProcess>   mDestructionProcess ;
 };
