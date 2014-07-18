@@ -5,27 +5,23 @@
 #include <ACGL/OpenGL/Data/TextureLoadStore.hh>
 #include "../audio/loadWavFile.hh"
 
-
 using namespace std;
 using namespace ACGL;
 using namespace ACGL::Utils;
 using namespace ACGL::OpenGL;
-glm::vec3 droidPosition[3] = {glm::vec3(-3.0f, 1.0f, -5.0f), glm::vec3(0.0f, 1.0f, -5.0f), glm::vec3(3.0f, 1.0f, -5.0f)};
+glm::vec3 droidPosition[3] = { glm::vec3(-3.0f, 1.0f, -5.0f), glm::vec3(0.0f, 1.0f, -5.0f), glm::vec3(3.0f, 1.0f, -5.0f) };
 bool LocalContactProcessedCallback(btManifoldPoint& cp, void* body0, void* body1);
 
-
-World::World()
-{
-    window_width        = 1600  ;
-    window_height       = 900   ;
-    m_ColorTexUnitLoc   = 0     ;
-    for (int i = 0 ; i < 3 ; ++i)
-    {
-        m_posTexLoc[i]      = 0 ;
-        m_colorTexLoc[i]    = 0 ;
-        m_normalTexLoc[i]   = 0 ;
-        m_screenSizeLoc[i]  = 0 ;
-        m_eyeWorldPosLoc[i] = 0 ;
+World::World() {
+    window_width = 1600;
+    window_height = 900;
+    m_ColorTexUnitLoc = 0;
+    for (int i = 0; i < 3; ++i) {
+        m_posTexLoc[i] = 0;
+        m_colorTexLoc[i] = 0;
+        m_normalTexLoc[i] = 0;
+        m_screenSizeLoc[i] = 0;
+        m_eyeWorldPosLoc[i] = 0;
     }
 
 }
@@ -37,24 +33,23 @@ World::~World() {
     delete droidsPhysic;
 }
 
-bool World::initializeWorld()
-{
+bool World::initializeWorld() {
     debug() << "loading game world..." << endl;
 
     mLevel.LoadMesh("geometry/L1/level.obj");
 
-    mBunnyShader   = ShaderProgramFileManager::the()->get( ShaderProgramCreator("Bunny") );
+    mBunnyShader = ShaderProgramFileManager::the()->get(ShaderProgramCreator("Bunny"));
 
     CGEngine::LoadLightsFromFile("geometry/L1/level_lights.dae", mDirLights, mPointLights, mSpotLights);
     glm::mat4 t = glm::translate(glm::mat4(1.0), glm::vec3(0.0, -1.0, 0.0));
-    for (unsigned int i = 0 ; i < mPointLights.size() ; ++i)
+    for (unsigned int i = 0; i < mPointLights.size(); ++i)
         mPointLights[i].Transform(t);
-    for (unsigned int i = 0 ; i < mSpotLights.size() ; ++i)
+    for (unsigned int i = 0; i < mSpotLights.size(); ++i)
         mSpotLights[i].Transform(t);
 
-    CGEngine::CDirectionalLight dir_light ;
-    dir_light.Initialize( CGEngine::Vec4(0.1, 1.0, -0.1, 0.0), CGEngine::Vec4(0.1), CGEngine::Vec4(0.25), CGEngine::Vec4(1.0) );
-    mDirLights.push_back( dir_light );
+    CGEngine::CDirectionalLight dir_light;
+    dir_light.Initialize(CGEngine::Vec4(0.1, 1.0, -0.1, 0.0), CGEngine::Vec4(0.1), CGEngine::Vec4(0.25), CGEngine::Vec4(1.0));
+    mDirLights.push_back(dir_light);
 
     mpProcessManager = GameLogic::CProcessManager::getInstance();
 
@@ -67,11 +62,11 @@ bool World::initializeWorld()
     initializeBullet();
 
     // load audio assets:
-    mBeep = new SimpleSound( "audio/musiccensor.wav" );
-    mBeep->setLooping( true );
+    mBeep = new SimpleSound("audio/musiccensor.wav");
+    mBeep->setLooping(true);
 
     //Throw event
-    GameLogic::CEventManager::getInstance()->VQueueEvent( GameLogic::EventDataPtr( new CEvtData_WorldInitialized( glfwGetTime() ) ) );
+    GameLogic::CEventManager::getInstance()->VQueueEvent(GameLogic::EventDataPtr(new CEvtData_WorldInitialized(glfwGetTime())));
     return true;
 }
 
@@ -103,17 +98,16 @@ void World::render() {
     glm::mat4 viewMatrix = mPlayer.getHMDViewMatrix();
     glm::mat4 projectionMatrix = mPlayer.getProjectionMatrix();
 
-    {
-        mBunnyShader->use();
-        mBunnyShader->setUniform( "uModelMatrix", modelMatrix );
-        mBunnyShader->setUniform( "uViewMatrix",  viewMatrix );
-        mBunnyShader->setUniform( "uProjectionMatrix", mPlayer.getProjectionMatrix() );
-        mBunnyShader->setUniform( "uNormalMatrix",     glm::inverseTranspose(glm::mat3(viewMatrix)*glm::mat3(modelMatrix)) );
+    mBunnyShader->use();
+    mBunnyShader->setUniform("uModelMatrix", modelMatrix);
+    mBunnyShader->setUniform("uViewMatrix", viewMatrix);
+    mBunnyShader->setUniform("uProjectionMatrix", mPlayer.getProjectionMatrix());
+    mBunnyShader->setUniform("uNormalMatrix", glm::inverseTranspose(glm::mat3(viewMatrix) * glm::mat3(modelMatrix)));
 
-        // At least 16 texture units can be used, but multiple texture can also be placed in one
-        // texture array and thus only occupy one texture unit!
-        mBunnyShader->setUniform( "uTexture", 0 );
-    }
+    // At least 16 texture units can be used, but multiple texture can also be placed in one
+    // texture array and thus only occupy one texture unit!
+    mBunnyShader->setUniform("uTexture", 0);
+
     //
     // draw geometry
     //
@@ -121,7 +115,6 @@ void World::render() {
 
     mPlayer.mLightsaber.render(viewMatrix, projectionMatrix);
     mPlayer.mLightsaber.mPhysicObject.SetPosition(mPlayer.mLightsaber.getPosition());
-
 
     //if (!mDroids[0].mDroidRenderFlag){
         mDroids[0].render(viewMatrix, projectionMatrix);
@@ -179,12 +172,12 @@ void World::render() {
                     }
                 }
             }
+        }
 
     }
 }
 
-void World::geometryRender()
-{
+void World::geometryRender() {
     mMatrixStack.LoadIdentity();
     mMatrixStack.Translate(CGEngine::Vec3(0.0, -1.0, 0.0));
 
@@ -192,22 +185,22 @@ void World::geometryRender()
     glm::mat4 viewMatrix = mPlayer.getHMDViewMatrix();
     glm::mat4 projectionMatrix = mPlayer.getProjectionMatrix();
 
-    m_GeometryPassShader->setUniform( "uModelMatrix", modelMatrix );
-    m_GeometryPassShader->setUniform( "uViewMatrix",  viewMatrix );
-    m_GeometryPassShader->setUniform( "uProjectionMatrix", projectionMatrix);
-    m_GeometryPassShader->setUniform( "uNormalMatrix",     glm::inverseTranspose(glm::mat3(viewMatrix)*glm::mat3(modelMatrix)) );
+    m_GeometryPassShader->setUniform("uModelMatrix", modelMatrix);
+    m_GeometryPassShader->setUniform("uViewMatrix", viewMatrix);
+    m_GeometryPassShader->setUniform("uProjectionMatrix", projectionMatrix);
+    m_GeometryPassShader->setUniform("uNormalMatrix", glm::inverseTranspose(glm::mat3(viewMatrix) * glm::mat3(modelMatrix)));
 
     //
     // draw geometry
     //
     mLevel.VOnDraw();
 
-    for (int i = 0 ; i < 3 ; ++i)
-    {
-        m_GeometryPassShader->setUniform( "uModelMatrix", mDroids[i].getModelMatrix() );
-        m_GeometryPassShader->setUniform( "uViewMatrix",  viewMatrix );
-        m_GeometryPassShader->setUniform( "uProjectionMatrix", projectionMatrix );
-        m_GeometryPassShader->setUniform( "uNormalMatrix", glm::inverseTranspose( glm::mat3(viewMatrix) * glm::mat3(mDroids[i].getModelMatrix())) );
+    for (int i = 0; i < 3; ++i) {
+        m_GeometryPassShader->setUniform("uModelMatrix", mDroids[i].getModelMatrix());
+        m_GeometryPassShader->setUniform("uViewMatrix", viewMatrix);
+        m_GeometryPassShader->setUniform("uProjectionMatrix", projectionMatrix);
+        m_GeometryPassShader->setUniform("uNormalMatrix",
+                glm::inverseTranspose(glm::mat3(viewMatrix) * glm::mat3(mDroids[i].getModelMatrix())));
         mDroids[i].baseRender();
     }
 
@@ -250,6 +243,7 @@ void World::geometryRender()
                     }
                 }
             }
+        }
 
     }
 
@@ -326,34 +320,37 @@ void World::moveLightsaber(const glm::vec3 &direction) {
 
 void World::toggleLightsaber() {
     mPlayer.mLightsaber.toggle();
-    GameLogic::CEventManager::getInstance()->VQueueEvent( GameLogic::EventDataPtr( new CEvtData_ToggleSword( glfwGetTime() ) ) );
+    GameLogic::CEventManager::getInstance()->VQueueEvent(GameLogic::EventDataPtr(new CEvtData_ToggleSword(glfwGetTime())));
+}
+void World::rotateLightsaber(float yaw, float pitch, float roll) {
+    mPlayer.mLightsaber.rotate(yaw, pitch, roll);
 }
 
-void World::rotateLightsaber(float dYaw, float dRoll, float dPitch){
-    mPlayer.mLightsaber.rotate(dYaw, dRoll, dPitch);
+void World::setRotationMatrixLightsaber(const glm::mat4 &rotation) {
+    mPlayer.mLightsaber.setRotationMatrix(rotation);
 }
 
-void World::initializeBullet()
-{
+void World::initializeBullet() {
     btBroadphaseInterface* broadphase = new btDbvtBroadphase();
     // Set up the collision configuration and dispatcher
     btDefaultCollisionConfiguration* collisionConfiguration = new btDefaultCollisionConfiguration();
     btCollisionDispatcher* dispatcher = new btCollisionDispatcher(collisionConfiguration);
 
-     // The actual physics solver
+    // The actual physics solver
     btSequentialImpulseConstraintSolver* solver = new btSequentialImpulseConstraintSolver;
 
      // The world.
     dynamicsWorld = new btDiscreteDynamicsWorld( dispatcher, broadphase, solver, collisionConfiguration);
     //dynamicsWorld->setGravity(btVector3(0,-1,0));
 
-    btCollisionShape* groundShape = new btStaticPlaneShape(btVector3(0, 1, 0),1.0);
+    btCollisionShape* groundShape = new btStaticPlaneShape(btVector3(0, 1, 0), 1.0);
 
     btScalar mass = 1.0;
     btVector3 fallInertia(0,1,0);
 
-    btDefaultMotionState* groundMotionState = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1),btVector3(0,-10,0)));
-    btRigidBody::btRigidBodyConstructionInfo groundRigidBodyCI(0,groundMotionState,groundShape,btVector3(0,0,0));
+    btDefaultMotionState* groundMotionState = new btDefaultMotionState(
+            btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, -10, 0)));
+    btRigidBody::btRigidBodyConstructionInfo groundRigidBodyCI(0, groundMotionState, groundShape, btVector3(0, 0, 0));
     btRigidBody* groundRigidBody = new btRigidBody(groundRigidBodyCI);
     //dynamicsWorld->addRigidBody(groundRigidBody);
 
@@ -362,21 +359,18 @@ void World::initializeBullet()
     dynamicsWorld->addRigidBody(mDroids[2].mPhysicObject.rigidBody);
     dynamicsWorld->addRigidBody(mPlayer.mLightsaber.mPhysicObject.rigidBody);
 
-
 }
 
-void World::update(int time)
-{
+void World::update(int time) {
     mpProcessManager->updateProcesses(time);
 }
 
-void World::setWidthHeight(unsigned int _w, unsigned int _h)
-{
-    window_width = _w; window_height = _h;
+void World::setWidthHeight(unsigned int _w, unsigned int _h) {
+    window_width = _w;
+    window_height = _h;
 }
 
-void World::DSRender()
-{
+void World::DSRender() {
     m_GBuffer.StartFrame();
 
     DSGeometryPass();
@@ -391,7 +385,7 @@ void World::DSRender()
 
     unsigned int num_lights1 = mPointLights.size();
 
-    for (unsigned int i = 0 ; i < num_lights1; i++) {
+    for (unsigned int i = 0; i < num_lights1; i++) {
         DSStencilPass(i);
         DSPointLightPass(i);
     }
@@ -409,7 +403,7 @@ void World::DSRender()
     glBlendEquation(GL_FUNC_ADD);
     glBlendFunc(GL_ONE, GL_ONE);
 
-    mPlayer.mLightsaber.render( mPlayer.getHMDViewMatrix(), mPlayer.getProjectionMatrix() );
+    mPlayer.mLightsaber.render(mPlayer.getHMDViewMatrix(), mPlayer.getProjectionMatrix());
 
     glDisable(GL_BLEND);
 

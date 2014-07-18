@@ -11,7 +11,7 @@
  */
 
 #ifndef __GLEW_H__
-    #include <GL/glew.h>
+#include <GL/glew.h>
 #endif
 
 // OpenGL defines and function pointers. We use this instead of the system GL.h or glew.h.
@@ -28,7 +28,12 @@
 
 #include "audio/audio.hh"
 #include "world/world.hh"
-#include "input.hh"
+#include "input/mouse.hh"
+#include "input/wii.hh"
+
+//Set input device
+typedef Wii INPUT;
+
 #ifndef GLGEVENTMANAGER_H
 #include "event_sys/GLGEventManager.h"
 #endif
@@ -42,7 +47,7 @@
 World *gWorld = NULL;
 
 // Handles input
-Input *gInput = NULL;
+INPUT *gInput = NULL;
 
 extern void initRenderer(GLFWwindow *window, ACGL::HardwareSupport::SimpleRiftController *simpleRiftController); // see renderer.cc
 extern void renderFrame();
@@ -141,7 +146,7 @@ int main(int argc, char *argv[]) {
     // Create an OpenGL capable window:
     // parameter is whether the window should be fullscreen or not and which monitor to use if fullscreen
     //
-    GLFWwindow* myWindow = createWindow(!false, 1);
+    GLFWwindow* myWindow = createWindow(false, 1);
     if (!myWindow) {
         glfwTerminate();
         exit(-1);
@@ -159,20 +164,19 @@ int main(int argc, char *argv[]) {
     //GLEW Initialization
     glewExperimental = TRUE; // <--- Depends on your graphics card
     GLenum initStatus = glewInit();
-    if ( initStatus != GLEW_OK )
-    {
+    if (initStatus != GLEW_OK) {
         glfwTerminate();
         ACGL::Utils::error() << "Failed to initialize GLEW" << std::endl;
-        exit( -1 );
+        exit(-1);
     }
 
     //
     // Get an instance of EventManager
     //
     GameLogic::EventManagerPtr eventManager = GameLogic::CEventManager::getInstance();
-    GameLogic::EventListenerPtr snoop( new EventDebugOuput() );
-    eventManager->VAddListener( snoop, GameLogic::EventType( GameLogic::kpWildCardEventType.c_str() ) );
-    eventManager->VAddListener( snoop, CEvtData_WorldInitialized::GetEventType() );
+    GameLogic::EventListenerPtr snoop(new EventDebugOuput());
+    eventManager->VAddListener(snoop, GameLogic::EventType(GameLogic::kpWildCardEventType.c_str()));
+    eventManager->VAddListener(snoop, CEvtData_WorldInitialized::GetEventType());
 
     //
     // Create a SimpleRiftController
@@ -184,16 +188,13 @@ int main(int argc, char *argv[]) {
     //
     // init whatever you need:
     //
-
-    gInput = new Input(myWindow, simpleRiftController);
-
     initRenderer(myWindow, simpleRiftController);
     initAudio();
 
     //
     // Create Audiosystem
     //
-    AudioSystemPtr audioSystem = AudioSystemPtr( new CAudioSystem() );
+    AudioSystemPtr audioSystem = AudioSystemPtr(new CAudioSystem());
     //Add sound and register at EventManager
     audioSystem->AddSound( "audio/SaberOn.wav", CEvtData_ToggleSword::GetEventType() );
     audioSystem->AddSound( "audio/LSwall01.wav", CEvtData_CollisionLightSaber::GetEventType());
@@ -207,6 +208,9 @@ int main(int argc, char *argv[]) {
     gWorld->initializeWorld();
     gWorld->setPlayerCamera(simpleRiftController);
 
+    //Use mouse input
+    gInput = new INPUT(myWindow, simpleRiftController, gWorld);
+
     /************************************************************************
      * Deferred Shading - Setup
      * *********************************************************************/
@@ -216,7 +220,7 @@ int main(int argc, char *argv[]) {
     //
     // main loop
     //
-    eventManager->VTick();  //Handle events so far...
+    eventManager->VTick(); //Handle events so far...
     double startTimeInSeconds = glfwGetTime();
     do {
         double now = glfwGetTime() - startTimeInSeconds;
@@ -233,7 +237,7 @@ int main(int argc, char *argv[]) {
 
         static double nextUpdateTime = 0.1;
         if (now > nextUpdateTime) {
-            gWorld->update((int)(1000.0 * 0.1));
+            gWorld->update((int) (1000.0 * 0.1));
             nextUpdateTime = now + 0.1;
         }
 
