@@ -31,6 +31,7 @@ public:
     void BindForGeomPass();
     void BindForStencilPass();
     void BindForLightPass();
+    void BindForBlurPass();
     void BindForFinalPass();
 
     GLuint getFinalTextureName() const {

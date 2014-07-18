@@ -53,6 +53,9 @@ bool World::InitDS()
     m_SpotLightPassShader->setUniform(m_normalTexLoc[2],    GBuffer::GBUFFER_TEXTURE_TYPE_NORMAL);
     m_SpotLightPassShader->setUniform(m_screenSizeLoc[2],   glm::vec2( (float)window_width, (float)window_height) );
 
+    //mFboScene = new ACGL::OpenGL::FrameBufferObject();
+    m_BlurPassShader = ShaderProgramFileManager::the()->get( ShaderProgramCreator("blur_pass"));
+
     m_NullShader = ShaderProgramFileManager::the()->get( ShaderProgramCreator("null_technique") );
 
     m_Sphere.LoadMesh("geometry/sphere.obj", CGEngine::CGE_TRIANGULATE);
@@ -258,6 +261,25 @@ void World::DSSpotLightPass(unsigned int _SpotLightIndex)
     glCullFace(GL_BACK);
 
     glDisable(GL_BLEND);
+}
+
+void World::DSBlurPass()
+{
+    m_BlurPassShader->use();
+
+    m_GBuffer.BindForBlurPass();
+
+    glEnable(GL_DEPTH_TEST);
+
+    glDisable(GL_CULL_FACE);
+
+    //glClear(GL_STENCIL_BUFFER_BIT);
+    //m_BlurPassShader->setUniform( "uModelMatrix", modelMatrix );
+    //m_SpotLightPassShader->setUniform( "gLightTransform", viewMatrix );
+    //m_SpotLightPassShader->setUniform( "uViewMatrix",  viewMatrix );
+    m_Quad.VOnDraw();
+    glCullFace(GL_BACK);
+
 }
 
 void World::DSFinalPass()

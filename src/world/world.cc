@@ -375,18 +375,23 @@ void World::DSRender()
     unsigned int num_lights1 = mPointLights.size();
 
     for (unsigned int i = 0 ; i < num_lights1; i++) {
+        /*
         DSStencilPass(i);
         DSPointLightPass(i);
+        */
     }
 
+    /*
     DSSpotStencilPass(0);
     DSSpotLightPass(0);
+    */
 
     // The directional light does not need a stencil test because its volume
     // is unlimited and the final pass simply copies the texture.
     glDisable(GL_STENCIL_TEST);
 
     DSDirectionalLightPass();
+    DSBlurPass();
 
     glEnable(GL_BLEND);
     glBlendEquation(GL_FUNC_ADD);

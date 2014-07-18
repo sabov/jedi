@@ -7,6 +7,18 @@
 #include <ACGL/HardwareSupport/SimpleRiftController.hh>
 #include <ACGL/OpenGL/Objects/VertexArrayObject.hh>
 #include <ACGL/OpenGL/Objects/ShaderProgram.hh>
+#include <ACGL/OpenGL/Objects/FrameBufferObject.hh>
+
+#include "cinder/Vector.h"
+#include "cinder/Rand.h"
+
+//#include "cinder/app/AppBasic.h"
+
+//#include "cinder/gl/gl.h"
+//#include "cinder/gl/Fbo.h"
+//#include "cinder/gl/GlslProg.h"
+//#include "cinder/gl/Texture.h"
+
 #include <btBulletDynamicsCommon.h>
 #include "player.hh"
 #include "events.hh"
@@ -23,6 +35,9 @@
 #include "droid.hh"
 #include "PhysicsObject.hh"
 
+//using namespace ci;
+//using namespace ci::app;
+//using namespace ci::gl;
 
 class World {
 public:
@@ -114,6 +129,7 @@ private:
     ACGL::OpenGL::SharedShaderProgram   m_PointLightPassShader  ;
     ACGL::OpenGL::SharedShaderProgram   m_DirLightPassShader    ;
     ACGL::OpenGL::SharedShaderProgram   m_SpotLightPassShader   ;
+    ACGL::OpenGL::SharedShaderProgram   m_BlurPassShader   ;
     ACGL::OpenGL::SharedShaderProgram   m_NullShader            ;
     GLint   m_ColorTexUnitLoc       ;
     GLint   m_posTexLoc[3]          ;
@@ -127,12 +143,17 @@ private:
     CGEngine::CFullScreenQuad   m_Quad     ; //Fullscreenquad for Directional Light
     CGEngine::CMesh             m_Cone     ; //Cones for Spot Lights
 
+    ACGL::OpenGL::FrameBufferObject mFboScene;
+    ACGL::OpenGL::FrameBufferObject mFboBlur1;
+    ACGL::OpenGL::FrameBufferObject mFboBlur2;
+
     void DSGeometryPass();
     void DSStencilPass(unsigned int _PointLightIndex);
     void DSPointLightPass(unsigned int _PointLightIndex);
     void DSDirectionalLightPass();
     void DSSpotStencilPass(unsigned int _SpotLightIndex);
     void DSSpotLightPass(unsigned int _SpotLightIndex);
+    void DSBlurPass();
     void DSFinalPass();
     float CalcPointLightBSphere(const CGEngine::CPositionalLight& Light);
 };
