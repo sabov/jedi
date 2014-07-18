@@ -159,8 +159,8 @@ void Input::handleInput() {
             world->toggleLightsaber();
         }
         world->useForcePlayer();
-        previousForceState = forcePressed;
     }
+    previousForceState = forcePressed;
 
     // Grabs the input from the Rift to update the cameras orientation:
     // Note: If no Rift is connected, this will do nothing.
