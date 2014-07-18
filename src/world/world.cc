@@ -175,7 +175,7 @@ void World::render() {
         }
 
     }
-}
+
 
 void World::geometryRender() {
     mMatrixStack.LoadIdentity();
@@ -247,7 +247,7 @@ void World::geometryRender() {
 
     }
 
-}
+
 
 void World::movePlayer(const glm::vec3 &direction) {
     mPlayer.move(direction);
