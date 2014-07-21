@@ -45,7 +45,8 @@ bool Droid::initialize(string _filename, glm::vec3 startPosition)
 {
     debug() << "loading droid..." << endl;
     mDroidShader   = ShaderProgramFileManager::the()->get( ShaderProgramCreator("droidShader") );
-    bool ret = mDroid.LoadMesh(_filename);
+    mDroid = CGEngine::MeshPointer( new CGEngine::CMesh() );
+    bool ret = mDroid->LoadMesh(_filename);
     mDroidRenderFlag = true;
     setPosition(startPosition);
     mPhysicObject.Init(cShape, startPosition);
@@ -94,7 +95,7 @@ void Droid::render(glm::mat4 &viewMatrix, glm::mat4 &projectionMatrix)
     mDroidShader->setUniform("uProjectionMatrix", projectionMatrix);
     mDroidShader->setUniform("uNormalMatrix", glm::inverseTranspose(glm::mat3(viewMatrix) * glm::mat3(modelMatrix)));
 
-    mDroid.VOnDraw();
+    mDroid->VOnDraw();
 }
 
 void Droid::transformPosition()
@@ -110,7 +111,7 @@ void Droid::baseRender()
     if (mDroidRenderFlag)
     {
         mPhysicObject.SetPosition(getPosition());
-        mDroid.VOnDraw();
+        mDroid->VOnDraw();
     }
     else if ( mAnimationFlag )
     {
@@ -139,7 +140,6 @@ void Droid::MoveProcess::VOnUpdate(const int elapsedTime)
     glm::mat4 translateMatrix = glm::translate( glm::mat4(), moveDirection );
     mDroid->mModelMatrix = translateMatrix * mDroid->mModelMatrix;
     mDroid->move(moveDirection);
-
 }
 
 void Droid::MoveProcess::VKill()

@@ -45,7 +45,7 @@ public:
 private:
     //The droid
     ACGL::OpenGL::SharedShaderProgram       mDroidShader            ;
-    CGEngine::CMesh                         mDroid                  ;
+    CGEngine::MeshPointer                         mDroid                  ;
     std::vector<CGEngine::MeshPointer>      mDroidanimatedGeometry  ;
 
     glm::mat4 mModelMatrix   ;

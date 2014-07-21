@@ -53,6 +53,7 @@ bool World::initializeWorld() {
 
     mpProcessManager = GameLogic::CProcessManager::getInstance();
 
+    mDroids.resize(3);
     for (int i = 0 ; i < 3 ; ++i)
     {
         mDroids[i].initialize("geometry/Droid/droid1.obj", droidPosition[i]);
@@ -200,7 +201,7 @@ void World::geometryRender() {
         m_GeometryPassShader->setUniform("uViewMatrix", viewMatrix);
         m_GeometryPassShader->setUniform("uProjectionMatrix", projectionMatrix);
         m_GeometryPassShader->setUniform("uNormalMatrix",
-                glm::inverseTranspose(glm::mat3(viewMatrix) * glm::mat3(mDroids[i].getModelMatrix())));
+        glm::inverseTranspose(glm::mat3(viewMatrix) * glm::mat3(mDroids[i].getModelMatrix())));
         mDroids[i].baseRender();
     }
 
@@ -208,7 +209,7 @@ void World::geometryRender() {
 
     dynamicsWorld->stepSimulation(0.0166f,10);
     //cout << "first Droid Position " <<mDroids[2].mPhysicObject.GetPosition().x << " " <<mDroids[2].mPhysicObject.GetPosition().y<< " " << mDroids[2].mPhysicObject.GetPosition().z <<endl;
-    //cout << "lighsaber position   " <<mPlayer.mLightsaber.mPhysicObject.GetPosition().x << " " << mPlayer.mLightsaber.mPhysicObject.GetPosition().y << " " <<mPlayer.mLightsaber.mPhysicObject.GetPosition().z << endl;
+    //cout << "lighsabevec3r position   " <<mPlayer.mLightsaber.mPhysicObject.GetPosition().x << " " << mPlayer.mLightsaber.mPhysicObject.GetPosition().y << " " <<mPlayer.mLightsaber.mPhysicObject.GetPosition().z << endl;
 
     int numManifolds = dynamicsWorld->getDispatcher()->getNumManifolds();
     for ( int i = 0; i < numManifolds; i++ )

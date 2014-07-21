@@ -86,7 +86,7 @@ private:
     unsigned int window_height;
 
     Player mPlayer;
-    Droid mDroids[3];
+    std::vector<Droid> mDroids;
 
     //bullet
     btDiscreteDynamicsWorld* dynamicsWorld;
