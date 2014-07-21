@@ -23,26 +23,26 @@ Wii::Wii(GLFWwindow* window, ACGL::HardwareSupport::SimpleRiftController *simple
         Input(window, simpleRiftController, world) {
 
     //Find the wiimote. Search for up to five seconds.
-    cout << "Searching for wiimote... Turn it on!" << endl;
-    int numFound = wii.Find(5);
-    cout << "Found " << numFound << " wiimote(s)" << endl;
+    message() << "Searching for wiimote... Turn it on!" << endl;
+    int numFound = wii.LoadRegisteredWiimotes();
+    debug() << "Found " << numFound << " wiimote(s)" << endl;
 
     if (numFound == 0) {
         return;
     }
 
     // Connect to the wiimote
-    cout << "Connecting to wiimote..." << endl;
+    debug() << "Connecting to wiimote..." << endl;
 
     std::vector<CWiimote>& wiimotes = wii.Connect();
     if (wiimotes.size() == 0) {
-        cout << "No wiimote found!" << endl;
+        error() << "No wiimote found!" << endl;
         wiimote = NULL;
         return;
     }
 
     wiimote = &wiimotes[0];
-    cout << "Connected to wiimote" << endl;
+    message() << "Connected to wiimote" << endl;
     wiimote->SetLEDs(LED_MAP[0]);
 
     // Rumble for 0.2 seconds as a connection acknowledgment
@@ -68,7 +68,7 @@ void Wii::handleInput() {
     timeLast = timeNow;
 
     // TODO Only get ontime result of polling when doing it twice in one iteration. I don't now why.
-    for (int i = 0; i < 20; i++) {
+    for (int i = 0; i < 10; i++) {
         if (wii.Poll()) {
             if (reloadWiimotes) {
                 // Regenerate the list of wiimotes

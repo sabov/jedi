@@ -84,7 +84,9 @@ GLFWwindow* createWindow(bool fullscreen, int monitorNumber) {
     //
     // Try to get a native debug context, this will slow down GL a bit but be helpful for finding
     // errors.
+#ifdef DEBUGGING
     glfwWindowHint( GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+#endif
 
     // Define whether the window can get resized:
     glfwWindowHint( GLFW_RESIZABLE, true);
@@ -113,6 +115,7 @@ GLFWwindow* createWindow(bool fullscreen, int monitorNumber) {
         }
 
         const GLFWvidmode *currentVideoMode = glfwGetVideoMode(monitor);
+
         window = glfwCreateWindow(currentVideoMode->width, currentVideoMode->height, "Jedi-Game", monitor, NULL);
     }
     if (!window) {
@@ -157,7 +160,11 @@ int main(int argc, char *argv[]) {
     // The true parameter tells ACGL to simulate the debug functions of OpenGL 4.3 if they are not supported.
     // The final version should have a false here to increase the games speed a bit.
     //
+#ifdef DEBUGGING
     ACGL::init(true);
+#else
+    ACGL::init(false);
+#endif
     // tell ACGL in which subdirectory the shaders are:
     ACGL::Base::Settings::the()->setShaderPath("shader/");
 
@@ -199,10 +206,10 @@ int main(int argc, char *argv[]) {
     //
     AudioSystemPtr audioSystem = AudioSystemPtr(new CAudioSystem());
     //Add sound and register at EventManager
-    audioSystem->AddSound( "audio/SaberOn.wav", CEvtData_ToggleSword::GetEventType() );
-    audioSystem->AddSound( "audio/LSwall01.wav", CEvtData_CollisionLightSaber::GetEventType());
-    eventManager->VAddListener( audioSystem, CEvtData_ToggleSword::GetEventType() );
-    eventManager->VAddListener( audioSystem, CEvtData_CollisionLightSaber::GetEventType() );
+    audioSystem->AddSound("audio/SaberOn.wav", CEvtData_ToggleSword::GetEventType());
+    audioSystem->AddSound("audio/LSwall01.wav", CEvtData_CollisionLightSaber::GetEventType());
+    eventManager->VAddListener(audioSystem, CEvtData_ToggleSword::GetEventType());
+    eventManager->VAddListener(audioSystem, CEvtData_CollisionLightSaber::GetEventType());
 
     //
     // Create a world object
@@ -228,17 +235,16 @@ int main(int argc, char *argv[]) {
     do {
         double now = glfwGetTime() - startTimeInSeconds;
 
+#ifdef DEBUGGING
         //
         // shader file reloading once a second:
-        // good for development, should be removed for the final version
         //
-        /*
         static double nextReloadTime = 1.0;
         if (now > nextReloadTime) {
             ACGL::OpenGL::ShaderProgramFileManager::the()->updateAll();
             nextReloadTime = now + 1.0; // check again in one second
         }
-        */
+#endif
 
         static double nextUpdateTime = 0.005;
         if (now > nextUpdateTime) {
