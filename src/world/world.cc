@@ -28,7 +28,6 @@ World::World() {
 
 World::~World() {
     cout << "deleting world..." << endl;
-    delete mBeep;
     delete dynamicsWorld;
     delete droidsPhysic;
 }
@@ -37,8 +36,6 @@ bool World::initializeWorld() {
     debug() << "loading game world..." << endl;
 
     mLevel.LoadMesh("geometry/L1/level.obj");
-
-    mBunnyShader = ShaderProgramFileManager::the()->get(ShaderProgramCreator("Bunny"));
 
     CGEngine::LoadLightsFromFile("geometry/L1/level_lights.dae", mDirLights, mPointLights, mSpotLights);
     glm::mat4 t = glm::translate(glm::mat4(1.0), glm::vec3(0.0, -1.0, 0.0));
@@ -61,9 +58,8 @@ bool World::initializeWorld() {
 
     initializeBullet();
 
-    // load audio assets:
-    mBeep = new SimpleSound("audio/musiccensor.wav");
-    mBeep->setLooping(true);
+    m_BulletPhysicsProcess = PhysicsProcessPtr( new BulletPhysicsProcess( this ) );
+    mpProcessManager->attachProcess( m_BulletPhysicsProcess );
 
     //Throw event
     GameLogic::CEventManager::getInstance()->VQueueEvent(GameLogic::EventDataPtr(new CEvtData_WorldInitialized(glfwGetTime())));
@@ -90,94 +86,8 @@ void World::getPlayerOrientation(ALfloat *playerOrientation) {
     }
 }
 
-void World::render() {
-    mMatrixStack.LoadIdentity();
-    mMatrixStack.Translate(CGEngine::Vec3(0.0, -1.0, 0.0));
-
-    glm::mat4 modelMatrix = mMatrixStack.getCompleteTransform();
-    glm::mat4 viewMatrix = mPlayer.getHMDViewMatrix();
-    glm::mat4 projectionMatrix = mPlayer.getProjectionMatrix();
-
-    mBunnyShader->use();
-    mBunnyShader->setUniform("uModelMatrix", modelMatrix);
-    mBunnyShader->setUniform("uViewMatrix", viewMatrix);
-    mBunnyShader->setUniform("uProjectionMatrix", mPlayer.getProjectionMatrix());
-    mBunnyShader->setUniform("uNormalMatrix", glm::inverseTranspose(glm::mat3(viewMatrix) * glm::mat3(modelMatrix)));
-
-    // At least 16 texture units can be used, but multiple texture can also be placed in one
-    // texture array and thus only occupy one texture unit!
-    mBunnyShader->setUniform("uTexture", 0);
-
-    //
-    // draw geometry
-    //
-    mLevel.VOnDraw();
-
-    mPlayer.mLightsaber.render(viewMatrix, projectionMatrix);
-    mPlayer.mLightsaber.mPhysicObject.SetPosition(mPlayer.mLightsaber.getPosition());
-
-    //if (!mDroids[0].mDroidRenderFlag){
-        mDroids[0].render(viewMatrix, projectionMatrix);
-        //mDroids[0].animate();
-        //mDroids[0].setPosition(mDroids[0].mPhysicObject.GetPosition());
-    //}
-
-
-
-        mDroids[1].render(viewMatrix, projectionMatrix);
-        //mDroids[1].animate();
-        //mDroids[1].setPosition(mDroids[1].mPhysicObject.GetPosition());
-        //mDroids[1].move(glm::vec3(0.0f, 0.0f, 0.01f));
-
-    //if (mDroids[2].mDroidRenderFlag){
-        mDroids[2].render(viewMatrix, projectionMatrix);
-        //mDroids[2].animate();
-        //mDroids[2].setPosition(mDroids[2].mPhysicObject.GetPosition());
-    //}
-
-
-
-    dynamicsWorld->stepSimulation(0.0166f,10);
-    //cout << "first Droid Position " <<mDroids[2].mPhysicObject.GetPosition().x<< " " <<mDroids[2].mPhysicObject.GetPosition().y<< " " << mDroids[2].mPhysicObject.GetPosition().z <<endl;
-    //cout << "lighsaber position   " <<mPlayer.mLightsaber.mPhysicObject.GetPosition().x<< " " << mPlayer.mLightsaber.mPhysicObject.GetPosition().y << " " <<mPlayer.mLightsaber.mPhysicObject.GetPosition().z << endl;
-
-
-    int numManifolds = dynamicsWorld->getDispatcher()->getNumManifolds();
-    cout << "numManifolds"<< numManifolds<< endl;
-    for (int i=0;i<numManifolds;i++)
-        {
-            btPersistentManifold* contactManifold =  dynamicsWorld->getDispatcher()->getManifoldByIndexInternal(i);
-            btRigidBody *obj1 = btRigidBody::upcast((btCollisionObject*)contactManifold->getBody0());
-            btRigidBody *obj2 = btRigidBody::upcast((btCollisionObject*)contactManifold->getBody1());
-
-            //checking for lightsaber collision
-            if (obj1 == mPlayer.mLightsaber.mPhysicObject.rigidBody || obj2 == mPlayer.mLightsaber.mPhysicObject.rigidBody){
-                if (obj1 == mPlayer.mLightsaber.mPhysicObject.rigidBody){
-                    if ( mDroids[i].mPhysicObject.rigidBody == obj2){
-                        mDroids[i].setRenderFlag(false);
-                        //mDroids[i].animate();
-                        //use this instead:
-                        mpProcessManager->attachProcess( mDroids[i].getDestrucionProcess() );
-                    }
-
-                }
-                else{
-                    for (int i = 0; i < 3; i++){
-                        if ( mDroids[i].mPhysicObject.rigidBody == obj1){
-                            mDroids[i].setRenderFlag(false);
-                            mDroids[i].setAnimationFlag(true);
-                            mpProcessManager->attachProcess( mDroids[i].getDestrucionProcess() );
-                            cout << "collision with droid"<< i << endl;
-                        }
-                    }
-                }
-            }
-        }
-
-    }
-
-
-void World::geometryRender() {
+void World::geometryRender()
+{
     mMatrixStack.LoadIdentity();
     mMatrixStack.Translate(CGEngine::Vec3(0.0, -1.0, 0.0));
 
@@ -203,49 +113,7 @@ void World::geometryRender() {
                 glm::inverseTranspose(glm::mat3(viewMatrix) * glm::mat3(mDroids[i].getModelMatrix())));
         mDroids[i].baseRender();
     }
-
-
-
-    dynamicsWorld->stepSimulation(0.0166f,10);
-    //cout << "first Droid Position " <<mDroids[2].mPhysicObject.GetPosition().x << " " <<mDroids[2].mPhysicObject.GetPosition().y<< " " << mDroids[2].mPhysicObject.GetPosition().z <<endl;
-    //cout << "lighsaber position   " <<mPlayer.mLightsaber.mPhysicObject.GetPosition().x << " " << mPlayer.mLightsaber.mPhysicObject.GetPosition().y << " " <<mPlayer.mLightsaber.mPhysicObject.GetPosition().z << endl;
-
-    int numManifolds = dynamicsWorld->getDispatcher()->getNumManifolds();
-    for ( int i = 0; i < numManifolds; i++ )
-        {
-            btPersistentManifold* contactManifold =  dynamicsWorld->getDispatcher()->getManifoldByIndexInternal(i);
-            btRigidBody *obj1 = btRigidBody::upcast((btCollisionObject*)contactManifold->getBody0());
-            btRigidBody *obj2 = btRigidBody::upcast((btCollisionObject*)contactManifold->getBody1());
-
-            //cout << mPlayer.mLightsaber.mPhysicObject.rigidBody->getCompanionId() << endl;
-            //checking for lightsaber collision
-            if (obj1 == mPlayer.mLightsaber.mPhysicObject.rigidBody || obj2 == mPlayer.mLightsaber.mPhysicObject.rigidBody)
-            {
-                if (obj1 == mPlayer.mLightsaber.mPhysicObject.rigidBody){
-                    if ( mDroids[i].mPhysicObject.rigidBody == obj2){
-                        //cout << "collision ooooooooo droid"<< i << endl;
-                        //mDroids[i].mDroidRenderFlag = false;
-                        mpProcessManager->attachProcess( mDroids[i].getDestrucionProcess() );
-                    }
-
-                }
-                else{
-                    for ( int j = 0; j < 3; j++ ){
-                        if ( mDroids[j].mPhysicObject.rigidBody == obj1 )
-                        {
-                            cout << "collision with droid"<< j << endl;
-                            mDroids[j].setRenderFlag(false);
-                            mDroids[j].setAnimationFlag(true);
-                            //mDroids[i].animate();
-                            mpProcessManager->attachProcess( mDroids[j].getDestrucionProcess() );
-                            GameLogic::CEventManager::getInstance()->VQueueEvent( GameLogic::EventDataPtr( new CEvtData_CollisionLightSaber( glfwGetTime() ) ) );
-                        }
-                    }
-                }
-            }
-        }
-
-    }
+}
 
 
 
@@ -309,9 +177,6 @@ void World::duckPlayer(float duckingValue) {
 
 void World::useForcePlayer() {
     mPlayer.useForce();
-    if (!mBeep->isPlaying()) {
-        //mBeep->play();
-    }
 }
 
 void World::moveLightsaber(const glm::vec3 &direction) {
@@ -328,37 +193,6 @@ void World::rotateLightsaber(float yaw, float pitch, float roll) {
 
 void World::setRotationMatrixLightsaber(const glm::mat4 &rotation) {
     mPlayer.mLightsaber.setRotationMatrix(rotation);
-}
-
-void World::initializeBullet() {
-    btBroadphaseInterface* broadphase = new btDbvtBroadphase();
-    // Set up the collision configuration and dispatcher
-    btDefaultCollisionConfiguration* collisionConfiguration = new btDefaultCollisionConfiguration();
-    btCollisionDispatcher* dispatcher = new btCollisionDispatcher(collisionConfiguration);
-
-    // The actual physics solver
-    btSequentialImpulseConstraintSolver* solver = new btSequentialImpulseConstraintSolver;
-
-     // The world.
-    dynamicsWorld = new btDiscreteDynamicsWorld( dispatcher, broadphase, solver, collisionConfiguration);
-    //dynamicsWorld->setGravity(btVector3(0,-1,0));
-
-    btCollisionShape* groundShape = new btStaticPlaneShape(btVector3(0, 1, 0), 1.0);
-
-    btScalar mass = 1.0;
-    btVector3 fallInertia(0,1,0);
-
-    btDefaultMotionState* groundMotionState = new btDefaultMotionState(
-            btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, -10, 0)));
-    btRigidBody::btRigidBodyConstructionInfo groundRigidBodyCI(0, groundMotionState, groundShape, btVector3(0, 0, 0));
-    btRigidBody* groundRigidBody = new btRigidBody(groundRigidBodyCI);
-    //dynamicsWorld->addRigidBody(groundRigidBody);
-
-    dynamicsWorld->addRigidBody(mDroids[0].mPhysicObject.rigidBody);
-    dynamicsWorld->addRigidBody(mDroids[1].mPhysicObject.rigidBody);
-    dynamicsWorld->addRigidBody(mDroids[2].mPhysicObject.rigidBody);
-    dynamicsWorld->addRigidBody(mPlayer.mLightsaber.mPhysicObject.rigidBody);
-
 }
 
 void World::update(int time) {
@@ -399,9 +233,9 @@ void World::DSRender() {
 
     DSDirectionalLightPass();
 
-    glEnable(GL_BLEND);
-    glBlendEquation(GL_FUNC_ADD);
-    glBlendFunc(GL_ONE, GL_ONE);
+    //glEnable(GL_BLEND);
+    //glBlendEquation(GL_FUNC_ADD);
+    //glBlendFunc(GL_ONE, GL_ONE);
 
     mPlayer.mLightsaber.render(mPlayer.getHMDViewMatrix(), mPlayer.getProjectionMatrix());
 

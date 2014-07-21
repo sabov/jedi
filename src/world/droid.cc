@@ -12,33 +12,14 @@ using namespace ACGL::OpenGL;
 
 Droid::Droid()
 {
-    /*
-    debug() << "loading droid..." << endl;
-    mDroidGeometry = VertexArrayObjectCreator("droid.obj").create();
-    mDroidShader   = ShaderProgramFileManager::the()->get( ShaderProgramCreator("droidShader") );
-    mDroidGeometry->setAttributeLocations( mDroidShader->getAttributeLocations() );
-    mDroidRenderFlag = true;
-    //setPosition(startPosition);
-    //mPhysicObject.Init(cShape, startPosition);
-    string droidfilie;
-    int animVariant = rand() % 3;
-    mAnimationFlag = 0;
-    for (int i = 0; i < 50; i++) {
-        if (i < 10){
-           droidfilie  = "droidanim" +  std::to_string(animVariant) + "/Drone166_00000" + std::to_string(i) + ".obj";
-        } else {
-           droidfilie = "droidanim" +  std::to_string(animVariant) + "/Drone166_0000" + std::to_string(i) + ".obj";
-        }
-
-        //mDroidanimatedGeometry.push_back(VertexArrayObjectCreator(droidfilie).create());
-    }
-    */
 }
 
 Droid::~Droid()
 {
     cout << "deleting droid..." << endl;
     delete cShape;
+    if (mPhysicObject.rigidBody)
+        delete mPhysicObject.rigidBody;
 }
 
 bool Droid::initialize(string _filename, glm::vec3 startPosition)
@@ -49,13 +30,12 @@ bool Droid::initialize(string _filename, glm::vec3 startPosition)
     mDroidRenderFlag = true;
     setPosition(startPosition);
     mPhysicObject.Init(cShape, startPosition);
-    mModelMatrix = glm::scale( glm::vec3( 0.8f ) );
+    mModelMatrix = glm::scale( glm::vec3( 0.4f ) );
     mModelMatrix = glm::translate(glm::mat4(1.0), startPosition) * mModelMatrix;
 
     mMoveProcess = GameLogic::ProcessPointer( new Droid::MoveProcess() );
     /*
-     * The destruction process is started as soon as a collision is registered,
-     * i.e. see world.cc, line 167
+     * The destruction process is started as soon as a collision is registered
      */
     mDestructionProcess = boost::shared_ptr<Droid::DestructionProcess> ( new Droid::DestructionProcess(this) );
 

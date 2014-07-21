@@ -28,7 +28,7 @@ public:
     }
 
     //Add new sound for certain event type
-    bool AddSound( std::string _filename, const GameLogic::EventType& _eventType );
+    bool AddSound( std::string _filename, const GameLogic::EventType& _eventType, bool _setLooping = false );
 
     //Play sound according to received event type
     virtual bool VHandleEvent(const GameLogic::IEventData &_event);

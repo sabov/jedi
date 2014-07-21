@@ -68,7 +68,7 @@ void Wii::handleInput() {
     timeLast = timeNow;
 
     // TODO Only get ontime result of polling when doing it twice in one iteration. I don't now why.
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < 20; i++) {
         if (wii.Poll()) {
             if (reloadWiimotes) {
                 // Regenerate the list of wiimotes

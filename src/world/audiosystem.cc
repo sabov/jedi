@@ -7,7 +7,7 @@ void CAudioSystem::clear()
         delete mSoundMap[i];
 }
 
-bool CAudioSystem::AddSound(std::string _filename, const GameLogic::EventType &_eventType)
+bool CAudioSystem::AddSound(std::string _filename, const GameLogic::EventType &_eventType, bool _setLooping)
 {
     bool success = false;
 
@@ -21,7 +21,7 @@ bool CAudioSystem::AddSound(std::string _filename, const GameLogic::EventType &_
         return success;
     }
 
-    mSoundMap[ hash ]->setLooping(false);
+    mSoundMap[ hash ]->setLooping( _setLooping );
 
     success = true;
     return success;

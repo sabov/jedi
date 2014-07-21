@@ -29,8 +29,6 @@ public:
 
     glm::mat4 getModelMatrix() const { return mModelMatrix; }
 
-    ACGL::OpenGL::SharedVertexArrayObject mDroidGeometry;
-
     void transformPosition() ;  //move droid, update position
     void baseRender();          //render geometry and texture
 

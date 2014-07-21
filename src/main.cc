@@ -99,7 +99,7 @@ GLFWwindow* createWindow(bool fullscreen, int monitorNumber) {
     GLFWwindow* window = NULL;
     if (!fullscreen) {
         // windowed:
-        window = glfwCreateWindow(1280, 800, "SimpleVRGame", NULL, NULL);
+        window = glfwCreateWindow(1280, 800, "Jedi-Game", NULL, NULL);
     } else {
         // fullscreen:
         int numberOfMonitors = 1;
@@ -113,7 +113,7 @@ GLFWwindow* createWindow(bool fullscreen, int monitorNumber) {
         }
 
         const GLFWvidmode *currentVideoMode = glfwGetVideoMode(monitor);
-        window = glfwCreateWindow(currentVideoMode->width, currentVideoMode->height, "SimpleVRGame", monitor, NULL);
+        window = glfwCreateWindow(currentVideoMode->width, currentVideoMode->height, "Jedi-Game", monitor, NULL);
     }
     if (!window) {
         ACGL::Utils::error() << "Failed to open a GLFW window - requested OpenGL version: " << ACGL_OPENGL_VERSION << std::endl;
@@ -175,6 +175,9 @@ int main(int argc, char *argv[]) {
     //
     GameLogic::EventManagerPtr eventManager = GameLogic::CEventManager::getInstance();
     GameLogic::EventListenerPtr snoop(new EventDebugOuput());
+    //
+    // Add listener and events
+    //
     eventManager->VAddListener(snoop, GameLogic::EventType(GameLogic::kpWildCardEventType.c_str()));
     eventManager->VAddListener(snoop, CEvtData_WorldInitialized::GetEventType());
 
@@ -229,20 +232,19 @@ int main(int argc, char *argv[]) {
         // shader file reloading once a second:
         // good for development, should be removed for the final version
         //
+        /*
         static double nextReloadTime = 1.0;
         if (now > nextReloadTime) {
             ACGL::OpenGL::ShaderProgramFileManager::the()->updateAll();
             nextReloadTime = now + 1.0; // check again in one second
         }
+        */
 
-        static double nextUpdateTime = 0.1;
+        static double nextUpdateTime = 0.005;
         if (now > nextUpdateTime) {
-            gWorld->update((int) (1000.0 * 0.1));
-            nextUpdateTime = now + 0.1;
+            gWorld->update((int) (1000.0 * 0.005));
+            nextUpdateTime = now + 0.005;
         }
-
-        //Handle events
-        eventManager->VTick();
 
         //
         // per frame tasks:
@@ -256,6 +258,9 @@ int main(int argc, char *argv[]) {
         // If VSync is active, this will block until the next frame can get displayed (up to 16.6msec)
         // Note that in VR you want VSync as tearing lines are very distractive!
         glfwSwapBuffers(myWindow);
+
+        //Handle events
+        eventManager->VTick();
 
         // until either the user pressed the X of the window (in case it has a windowbar (== not fullscreen)
         // or the program signaled to get closed by setting glfwSetWindowShouldClose( window, true ) somewhere!
