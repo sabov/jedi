@@ -52,7 +52,7 @@ bool Droid::initialize(string _filename, glm::vec3 startPosition)
     mModelMatrix = glm::scale( glm::vec3( 0.8f ) );
     mModelMatrix = glm::translate(glm::mat4(1.0), startPosition) * mModelMatrix;
 
-    mMoveProcess = GameLogic::ProcessPointer( new Droid::MoveProcess() );
+    mMoveProcess = GameLogic::ProcessPointer( new Droid::MoveProcess(this) );
     /*
      * The destruction process is started as soon as a collision is registered,
      * i.e. see world.cc, line 167
@@ -135,6 +135,10 @@ void Droid::MoveProcess::VOnUpdate(const int elapsedTime)
      * update "mModelMatrix" here, for example mModelMatrix = translateMatrix * mModelMatrix
      * for some translateMatrix or whatever
      */
+    glm::vec3 moveDirection = glm::vec3(0.0f, 0.0f, 0.01f);
+    glm::mat4 translateMatrix = glm::translate( glm::mat4(), moveDirection );
+    mDroid->mModelMatrix = translateMatrix * mDroid->mModelMatrix;
+    mDroid->move(moveDirection);
 
 }
 

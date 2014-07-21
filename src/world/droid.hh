@@ -60,9 +60,12 @@ private:
     //
     class MoveProcess : public GameLogic::CProcess
     {
+    private:
+        Droid* mDroid;
     public:
-        MoveProcess() : GameLogic::CProcess()
+        MoveProcess(Droid* droid) : GameLogic::CProcess()
         {
+            mDroid = droid;
             mTransform = glm::mat4(1.0f);
         }
         ~MoveProcess() {}
