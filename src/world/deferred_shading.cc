@@ -53,8 +53,34 @@ bool World::InitDS()
     m_SpotLightPassShader->setUniform(m_normalTexLoc[2],    GBuffer::GBUFFER_TEXTURE_TYPE_NORMAL);
     m_SpotLightPassShader->setUniform(m_screenSizeLoc[2],   glm::vec2( (float)window_width, (float)window_height) );
 
-    //mFboScene = new ACGL::OpenGL::FrameBufferObject();
+    //blur init
     m_BlurPassShader = ShaderProgramFileManager::the()->get( ShaderProgramCreator("blur_pass"));
+    glGenFramebuffers(1, &mFboScene);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mFboScene);
+
+    glGenTextures(1, &mFboBlur1);
+
+    glGenTextures(1, &mFboBlur2);
+
+    glBindTexture(GL_TEXTURE_2D, mFboBlur1);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA , window_width, window_height, 0, GL_RGB, GL_FLOAT, NULL);
+    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mFboBlur1, 0);
+
+    glBindTexture(GL_TEXTURE_2D, mFboBlur2);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA , window_width, window_height, 0, GL_RGB, GL_FLOAT, NULL);
+    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, mFboBlur2, 0);
+
+    GLenum Status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+
+    if (Status != GL_FRAMEBUFFER_COMPLETE) {
+        std::cout << "FB error, status: 0x" << Status << "x" << std::endl;
+        return false;
+    }
+
+    // restore default FBO
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+
+    //====================
 
     m_NullShader = ShaderProgramFileManager::the()->get( ShaderProgramCreator("null_technique") );
 
@@ -265,20 +291,39 @@ void World::DSSpotLightPass(unsigned int _SpotLightIndex)
 
 void World::DSBlurPass()
 {
+
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mFboScene);
+
+    GLenum DrawBuffers[] = { GL_COLOR_ATTACHMENT0 };
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+    glDrawBuffers(1, DrawBuffers);
+
+    mPlayer.mLightsaber.render( mPlayer.getHMDViewMatrix(), mPlayer.getProjectionMatrix() );
+
+
+    // Path 2
+
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mFboScene);
+    GLenum DrawBuffersA[] = { GL_COLOR_ATTACHMENT1 };
+    glDrawBuffers(1, DrawBuffersA);
+
     m_BlurPassShader->use();
+    m_BlurPassShader->setUniform( "pixelSize", glm::vec2(1/window_height, 1/window_width));
+    m_BlurPassShader->setUniform( "isVertical", 0);
+    m_BlurPassShader->setUniform( "tex", 0);
+    glBindTexture(GL_TEXTURE_2D, mFboBlur1);
 
-    m_GBuffer.BindForBlurPass();
 
-    glEnable(GL_DEPTH_TEST);
 
-    glDisable(GL_CULL_FACE);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-    //glClear(GL_STENCIL_BUFFER_BIT);
-    //m_BlurPassShader->setUniform( "uModelMatrix", modelMatrix );
-    //m_SpotLightPassShader->setUniform( "gLightTransform", viewMatrix );
-    //m_SpotLightPassShader->setUniform( "uViewMatrix",  viewMatrix );
+
     m_Quad.VOnDraw();
-    glCullFace(GL_BACK);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 
 }
 

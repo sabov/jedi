@@ -9,16 +9,6 @@
 #include <ACGL/OpenGL/Objects/ShaderProgram.hh>
 #include <ACGL/OpenGL/Objects/FrameBufferObject.hh>
 
-#include "cinder/Vector.h"
-#include "cinder/Rand.h"
-
-//#include "cinder/app/AppBasic.h"
-
-//#include "cinder/gl/gl.h"
-//#include "cinder/gl/Fbo.h"
-//#include "cinder/gl/GlslProg.h"
-//#include "cinder/gl/Texture.h"
-
 #include <btBulletDynamicsCommon.h>
 #include "player.hh"
 #include "events.hh"
@@ -55,6 +45,7 @@ public:
 
     // move the player relative to the players body orientation:
     void movePlayer(const glm::vec3 &direction);
+    void DSBlurPass();
 
     // get the current position in world space
     glm::vec3 getPlayerPosition();
@@ -89,6 +80,10 @@ public:
 
     void DSRender();
     bool InitDS()   ;
+
+    GLuint mFboScene;
+    GLuint mFboBlur1;
+    GLuint mFboBlur2;
 
 private:
     unsigned int window_width;
@@ -143,9 +138,9 @@ private:
     CGEngine::CFullScreenQuad   m_Quad     ; //Fullscreenquad for Directional Light
     CGEngine::CMesh             m_Cone     ; //Cones for Spot Lights
 
-    ACGL::OpenGL::FrameBufferObject mFboScene;
-    ACGL::OpenGL::FrameBufferObject mFboBlur1;
-    ACGL::OpenGL::FrameBufferObject mFboBlur2;
+    //ACGL::OpenGL::FrameBufferObject mFboScene;
+    //ACGL::OpenGL::FrameBufferObject mFboBlur1;
+    //ACGL::OpenGL::FrameBufferObject mFboBlur2;
 
     void DSGeometryPass();
     void DSStencilPass(unsigned int _PointLightIndex);
@@ -153,7 +148,6 @@ private:
     void DSDirectionalLightPass();
     void DSSpotStencilPass(unsigned int _SpotLightIndex);
     void DSSpotLightPass(unsigned int _SpotLightIndex);
-    void DSBlurPass();
     void DSFinalPass();
     float CalcPointLightBSphere(const CGEngine::CPositionalLight& Light);
 };

@@ -391,15 +391,16 @@ void World::DSRender()
     glDisable(GL_STENCIL_TEST);
 
     DSDirectionalLightPass();
+
     DSBlurPass();
 
-    glEnable(GL_BLEND);
-    glBlendEquation(GL_FUNC_ADD);
-    glBlendFunc(GL_ONE, GL_ONE);
+    //glEnable(GL_BLEND);
+    //glBlendEquation(GL_FUNC_ADD);
+    //glBlendFunc(GL_ONE, GL_ONE);
 
-    mPlayer.mLightsaber.render( mPlayer.getHMDViewMatrix(), mPlayer.getProjectionMatrix() );
+    //mPlayer.mLightsaber.render( mPlayer.getHMDViewMatrix(), mPlayer.getProjectionMatrix() );
 
-    glDisable(GL_BLEND);
+    //glDisable(GL_BLEND);
 
     DSFinalPass();
 }
