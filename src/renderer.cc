@@ -219,15 +219,22 @@ void renderFrame() {
         // (note: this mode is not complete ;-) it would be better to also deactivate
         // the stereo option of the camera)
         //
+        //
+
         gSimpleRiftControllerRenderer->getCamera()->setEye(GenericCamera::EYE_LEFT);
 
+        renderScene();
+        //CGEngine::CFullScreenQuad quad;
+        //quad.LoadMesh("");
+        gWorld->DSBlurPass();
+        //quad.VOnDraw();
+        /*
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         CGEngine::CFullScreenQuad quad;
         quad.LoadMesh("");
         ACGL::OpenGL::SharedShaderProgram pass_through = ShaderProgramFileManager::the()->get(ShaderProgramCreator("pass_through"));
 
-        gWorld->DSBlurPass();
 
         pass_through->use();
         glBindTexture(GL_TEXTURE_2D, gWorld->mFboBlur1);
@@ -235,7 +242,7 @@ void renderFrame() {
 
 
         quad.VOnDraw();
+        */
 
-        //renderScene();
     }
 }

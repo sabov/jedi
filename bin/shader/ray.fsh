@@ -5,7 +5,8 @@ in vec2 vTexCoord;
 in vec3 vWorldPos;
 in vec3 vLightDirection;
 
-layout (location = 0) out vec4 oColor;
+out vec4 oColor;
+out vec4 oNormal;
 
 uniform vec4 uColor;
 

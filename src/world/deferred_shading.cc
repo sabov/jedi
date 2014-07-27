@@ -1,11 +1,15 @@
 #include "world.hh"
 #include <ACGL/OpenGL/Managers.hh>
 #include <ACGL/OpenGL/Creator/ShaderProgramCreator.hh>
+#include <ACGL/OpenGL/Creator/VertexArrayObjectCreator.hh>
 #include <cmath>
 
 using namespace ACGL;
 using namespace ACGL::Utils;
 using namespace ACGL::OpenGL;
+std::vector<SharedTexture2D> offScreenTextures;
+SharedFrameBufferObject fbo;
+SharedShaderProgram combine;
 
 bool World::InitDS()
 {
@@ -54,6 +58,30 @@ bool World::InitDS()
     m_SpotLightPassShader->setUniform(m_screenSizeLoc[2],   glm::vec2( (float)window_width, (float)window_height) );
 
     //blur init
+
+    glm::uvec2 bunnyRes = glm::uvec2(window_width, window_height);
+
+    // store the offscreen textures so they can be resized if the window resizes:
+    offScreenTextures.push_back( SharedTexture2D( new Texture2D(bunnyRes) ) ); // RGBA per default
+    offScreenTextures.push_back( SharedTexture2D( new Texture2D(bunnyRes) ) ); // RGBA per default
+    offScreenTextures.push_back( SharedTexture2D( new Texture2D(bunnyRes, GL_DEPTH24_STENCIL8) ) );
+
+    offScreenTextures[0]->setMinFilter( GL_NEAREST );
+    offScreenTextures[1]->setMinFilter( GL_NEAREST );
+    offScreenTextures[0]->setMagFilter( GL_NEAREST );
+    offScreenTextures[1]->setMagFilter( GL_NEAREST );
+
+    // set up the FBO:
+    fbo = SharedFrameBufferObject(new FrameBufferObject());
+    fbo->attachColorTexture( "oNormal", offScreenTextures[1] );
+    fbo->attachColorTexture( "oColor",  offScreenTextures[0] );
+    fbo->setDepthTexture(               offScreenTextures[2] );
+    fbo->validate(); // always a good idea
+
+
+    combine = ShaderProgramCreator("Combine").create();
+
+    /*
     m_BlurPassShader = ShaderProgramFileManager::the()->get( ShaderProgramCreator("blur_pass"));
     glGenFramebuffers(1, &mFboScene);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mFboScene);
@@ -79,6 +107,7 @@ bool World::InitDS()
 
     // restore default FBO
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    */
 
     //====================
 
@@ -292,6 +321,36 @@ void World::DSSpotLightPass(unsigned int _SpotLightIndex)
 void World::DSBlurPass()
 {
 
+
+    fbo->bind();
+    glEnable(GL_DEPTH_TEST);
+    glViewport( 0, 0, window_width, window_height );
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    mPlayer.mLightsaber.render( mPlayer.getHMDViewMatrix(), mPlayer.getProjectionMatrix() );
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glDisable(GL_DEPTH_TEST);
+    glViewport( 0, 0, window_width, window_height );
+
+    combine->use();
+
+    //debug() << "==============" << std::endl;
+
+    combine->setUniform("pixelSize" , glm::vec2(1.0/window_width, 1.0/window_height) );
+    combine->setTexture("uSamplerColor",  offScreenTextures[0], 0 );
+    combine->setTexture("uSamplerNormal" ,offScreenTextures[1], 1 );
+
+    // attribute-less rendering:
+    VertexArrayObject vao;
+    vao.bind(); // 'empty' VAO -> no attributes are defined
+    glDrawArrays( GL_TRIANGLE_STRIP, 0, 50 ); // create 2 triangles with no attributes
+
+    /*
+    //glm::uvec2 bunnyRes = g_windowSize / (unsigned int) 4;
+    SharedFrameBufferObject fbo;
+    fbo = SharedFrameBufferObject(new FrameBufferObject());
+
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mFboScene);
 
     GLenum DrawBuffers[] = { GL_COLOR_ATTACHMENT0 };
@@ -312,17 +371,17 @@ void World::DSBlurPass()
     m_BlurPassShader->use();
     m_BlurPassShader->setUniform( "pixelSize", glm::vec2(1/window_height, 1/window_width));
     m_BlurPassShader->setUniform( "isVertical", 0);
-    m_BlurPassShader->setUniform( "tex", 0);
-    glBindTexture(GL_TEXTURE_2D, mFboBlur1);
+    m_BlurPassShader->setUniform( "tex", DrawBuffersA[0]);
+    //m_BlurPassShader->setTexture("tex", )
 
-
+    //glBindTexture(GL_TEXTURE_2D, mFboBlur1);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
 
     m_Quad.VOnDraw();
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    */
 
 
 }
