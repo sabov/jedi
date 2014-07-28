@@ -28,6 +28,7 @@ public:
     void attachProcess(const ProcessPointer& pProcess) ;    // append process to list
 
     void attachProcess(const ProcessPointer& pProcess, const ProcessPointer& dependingProcess) ; // append process to list, with dependency
+    void detachProcess(const ProcessPointer& pProcess) ;     // remove process from list
 
     bool hasProcesses() const ;
 
@@ -62,7 +63,7 @@ private:
     CProcessManager() {}
     CProcessManager(const CProcessManager&) {}
 
-    void detachProcess(const ProcessPointer& pProcess) ;     // remove process from list
+
 
 };
 

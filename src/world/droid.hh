@@ -24,6 +24,7 @@ public:
     friend class DestructionProcess;
 
     bool initialize(std::string _filename, glm::vec3 startPosition);
+    void reInit();
 
     void render(glm::mat4 &viewMatrix, glm::mat4 &projectionMatrix);
 
@@ -42,6 +43,10 @@ public:
 
     GameLogic::ProcessPointer getMoveProcess() const { return mMoveProcess; }
     GameLogic::ProcessPointer getDestrucionProcess() const { return mDestructionProcess; }
+
+    glm::vec3 moveDirection;
+    glm::vec3 droidStartPosition;
+    bool rigidflag;
 private:
     //The droid
     ACGL::OpenGL::SharedShaderProgram       mDroidShader            ;
@@ -50,7 +55,7 @@ private:
 
     glm::mat4 mModelMatrix   ;
 
-    btCollisionShape* cShape = new btSphereShape(1);
+    btCollisionShape* cShape = new btSphereShape(0.5);
 
     bool mAnimationFlag;
     bool mDroidRenderFlag;

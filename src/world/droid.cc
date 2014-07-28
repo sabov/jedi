@@ -43,14 +43,16 @@ Droid::~Droid()
 
 bool Droid::initialize(string _filename, glm::vec3 startPosition)
 {
+    droidStartPosition = startPosition;
     debug() << "loading droid..." << endl;
     mDroidShader   = ShaderProgramFileManager::the()->get( ShaderProgramCreator("droidShader") );
     mDroid = CGEngine::MeshPointer( new CGEngine::CMesh() );
     bool ret = mDroid->LoadMesh(_filename);
     mDroidRenderFlag = true;
+    rigidflag = true;
     setPosition(startPosition);
     mPhysicObject.Init(cShape, startPosition);
-    mModelMatrix = glm::scale( glm::vec3( 0.8f ) );
+    mModelMatrix = glm::scale( glm::vec3( 0.5f ) );
     mModelMatrix = glm::translate(glm::mat4(1.0), startPosition) * mModelMatrix;
 
     mMoveProcess = GameLogic::ProcessPointer( new Droid::MoveProcess(this) );
@@ -79,6 +81,13 @@ bool Droid::initialize(string _filename, glm::vec3 startPosition)
     }
     mPhysicObject.rigidBody->setUserPointer(this);
     return ret;
+}
+
+void Droid::reInit(){
+    mAnimationFlag = false;
+    mDroidRenderFlag = true;
+    setPosition(droidStartPosition);
+    mPhysicObject.SetPosition(droidStartPosition);
 }
 
 void Droid::render(glm::mat4 &viewMatrix, glm::mat4 &projectionMatrix)
@@ -136,7 +145,7 @@ void Droid::MoveProcess::VOnUpdate(const int elapsedTime)
      * update "mModelMatrix" here, for example mModelMatrix = translateMatrix * mModelMatrix
      * for some translateMatrix or whatever
      */
-    glm::vec3 moveDirection = glm::vec3(0.0f, 0.0f, 0.01f);
+    glm::vec3 moveDirection =glm::vec3(0.03f, 0.0f, 0.05f);
     glm::mat4 translateMatrix = glm::translate( glm::mat4(), moveDirection );
     mDroid->mModelMatrix = translateMatrix * mDroid->mModelMatrix;
     mDroid->move(moveDirection);
@@ -173,9 +182,4 @@ void Droid::DestructionProcess::VOnUpdate(const int elapsedTime)
         mDroid->mAnimationFlag = false;
         VKill();
     }
-    /*
-     * the variable animationIndex is the same as animationflag, it should be increased after each call of this function,
-     * or after a certain time period.
-     * If animationIndex is greater than 50, the process should be killed ( call VKill() ), or we will get errors.
-     */
 }

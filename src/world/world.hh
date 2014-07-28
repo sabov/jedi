@@ -73,6 +73,8 @@ public:
     //initialize bullet physics engine
     void initializeBullet();
 
+    void createDroid(glm::vec3 position);
+
     void update(int time);
 
     void setWidthHeight(unsigned int _w, unsigned int _h);
