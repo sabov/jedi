@@ -33,7 +33,8 @@ public:
     ACGL::OpenGL::SharedVertexArrayObject mDroidGeometry;
 
     void transformPosition() ;  //move droid, update position
-    void baseRender();          //render geometry and texture
+    void baseRender(glm::vec3 moveDirection);          //render geometry and texture
+    void moveDroid(glm::vec3 movedirection);
 
     PhysicsObject mPhysicObject;
 

@@ -86,6 +86,8 @@ bool Droid::initialize(string _filename, glm::vec3 startPosition)
 void Droid::reInit(){
     mAnimationFlag = false;
     mDroidRenderFlag = true;
+    mModelMatrix = glm::scale( glm::vec3( 0.5f ) );
+    mModelMatrix = glm::translate(glm::mat4(1.0), droidStartPosition) * mModelMatrix;
     setPosition(droidStartPosition);
     mPhysicObject.SetPosition(droidStartPosition);
 }
@@ -115,12 +117,13 @@ void Droid::transformPosition()
     mPhysicObject.SetPosition(getPosition());
 }
 
-void Droid::baseRender()
+void Droid::baseRender(glm::vec3 moveDirection)
 {
     if (mDroidRenderFlag)
     {
         mPhysicObject.SetPosition(getPosition());
         mDroid->VOnDraw();
+        moveDroid(moveDirection);
     }
     else if ( mAnimationFlag )
     {
@@ -128,6 +131,12 @@ void Droid::baseRender()
     }
     else
         return;
+}
+
+void Droid::moveDroid(glm::vec3 moveDirection){
+    glm::mat4 translateMatrix = glm::translate( glm::mat4(), moveDirection );
+    mModelMatrix = translateMatrix * mModelMatrix;
+    move(moveDirection);
 }
 
 void Droid::MoveProcess::VOnInitialize()
@@ -183,3 +192,5 @@ void Droid::DestructionProcess::VOnUpdate(const int elapsedTime)
         VKill();
     }
 }
+
+

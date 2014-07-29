@@ -10,6 +10,7 @@ using namespace ACGL;
 using namespace ACGL::Utils;
 using namespace ACGL::OpenGL;
 glm::vec3 droidPosition[4] = { glm::vec3(-3.0f, 1.3f, -5.0f), glm::vec3(0.0f, 1.0f, -5.0f), glm::vec3(3.0f, 1.0f, -5.0f), glm::vec3(-5.0f, 1.0f, -5.0f) };
+glm::vec3 droidMoveDirection[4] = { glm::vec3(0.01f, 0.0f, 0.0166f), glm::vec3(0.00f, 0.0f, 0.5f), glm::vec3(-0.01f, 0.0f, 0.0166f), glm::vec3(-5.0f, 1.0f, -5.0f) };
 bool LocalContactProcessedCallback(btManifoldPoint& cp, void* body0, void* body1);
 
 World::World() {
@@ -55,7 +56,7 @@ bool World::initializeWorld() {
 
     initializeBullet();
 
-    mDroids.resize(2);
+    mDroids.resize(3);
     for (int i = 0 ; i < mDroids.size() ; ++i)
     {
         mDroids[i].initialize("geometry/Droid/droid1.obj", droidPosition[i]);
@@ -212,7 +213,8 @@ void World::geometryRender() {
         m_GeometryPassShader->setUniform("uProjectionMatrix", projectionMatrix);
         m_GeometryPassShader->setUniform("uNormalMatrix",
         glm::inverseTranspose(glm::mat3(viewMatrix) * glm::mat3(mDroids[i].getModelMatrix())));
-        mDroids[i].baseRender();
+        mDroids[i].baseRender(droidMoveDirection[i]);
+        //mDroids[i].moveDroid(droidMoveDirection[i]);
     }
 
 
