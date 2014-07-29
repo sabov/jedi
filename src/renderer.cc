@@ -226,7 +226,7 @@ void renderFrame() {
         renderScene();
         //CGEngine::CFullScreenQuad quad;
         //quad.LoadMesh("");
-        gWorld->DSBlurPass();
+        //gWorld->DSBlurPass();
         //quad.VOnDraw();
         /*
 

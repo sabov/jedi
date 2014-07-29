@@ -138,10 +138,6 @@ private:
     CGEngine::CFullScreenQuad   m_Quad     ; //Fullscreenquad for Directional Light
     CGEngine::CMesh             m_Cone     ; //Cones for Spot Lights
 
-    //ACGL::OpenGL::FrameBufferObject mFboScene;
-    //ACGL::OpenGL::FrameBufferObject mFboBlur1;
-    //ACGL::OpenGL::FrameBufferObject mFboBlur2;
-
     void DSGeometryPass();
     void DSStencilPass(unsigned int _PointLightIndex);
     void DSPointLightPass(unsigned int _PointLightIndex);

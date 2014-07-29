@@ -321,7 +321,6 @@ void World::DSSpotLightPass(unsigned int _SpotLightIndex)
 void World::DSBlurPass()
 {
 
-
     fbo->bind();
     glEnable(GL_DEPTH_TEST);
     glViewport( 0, 0, window_width, window_height );
@@ -340,49 +339,12 @@ void World::DSBlurPass()
     combine->setUniform("pixelSize" , glm::vec2(1.0/window_width, 1.0/window_height) );
     combine->setTexture("uSamplerColor",  offScreenTextures[0], 0 );
     combine->setTexture("uSamplerNormal" ,offScreenTextures[1], 1 );
+    combine->setUniform(combine->getUniformLocation("tex0"), m_GBuffer.getFinalTextureName());
 
     // attribute-less rendering:
     VertexArrayObject vao;
     vao.bind(); // 'empty' VAO -> no attributes are defined
-    glDrawArrays( GL_TRIANGLE_STRIP, 0, 50 ); // create 2 triangles with no attributes
-
-    /*
-    //glm::uvec2 bunnyRes = g_windowSize / (unsigned int) 4;
-    SharedFrameBufferObject fbo;
-    fbo = SharedFrameBufferObject(new FrameBufferObject());
-
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mFboScene);
-
-    GLenum DrawBuffers[] = { GL_COLOR_ATTACHMENT0 };
-
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-    glDrawBuffers(1, DrawBuffers);
-
-    mPlayer.mLightsaber.render( mPlayer.getHMDViewMatrix(), mPlayer.getProjectionMatrix() );
-
-
-    // Path 2
-
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mFboScene);
-    GLenum DrawBuffersA[] = { GL_COLOR_ATTACHMENT1 };
-    glDrawBuffers(1, DrawBuffersA);
-
-    m_BlurPassShader->use();
-    m_BlurPassShader->setUniform( "pixelSize", glm::vec2(1/window_height, 1/window_width));
-    m_BlurPassShader->setUniform( "isVertical", 0);
-    m_BlurPassShader->setUniform( "tex", DrawBuffersA[0]);
-    //m_BlurPassShader->setTexture("tex", )
-
-    //glBindTexture(GL_TEXTURE_2D, mFboBlur1);
-
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-    m_Quad.VOnDraw();
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    */
-
+    glDrawArrays( GL_TRIANGLE_STRIP, 0, 4); // create 2 triangles with no attributes
 
 }
 

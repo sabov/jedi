@@ -38,6 +38,9 @@ public:
         //return m_textures[GBUFFER_TEXTURE_TYPE_NORMAL];
         return m_finalTexture;
     }
+    GLuint getTexture() const {
+        return m_textures[GBUFFER_TEXTURE_TYPE_POSITION];
+    }
 
 private:
 

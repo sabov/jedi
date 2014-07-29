@@ -2,6 +2,7 @@
 
 uniform sampler2D uSamplerColor;
 uniform sampler2D uSamplerNormal;
+uniform sampler2D tex0;
 uniform vec2 pixelSize;
 
 in vec2 vTexCoord;
@@ -39,22 +40,12 @@ void main()
 
     vec4 color = texture(uSamplerNormal, vTexCoord);
     vec4 color2 = texture(uSamplerNormal, curSamplePos) * 0.8;
+    vec4 color3 = texture(tex0, vTexCoord);
     //oColor = color;
-    oColor = result;
+    oColor = mix(color3, result, 0.5);
 
     /*
     vec4 color  = texture(uSamplerColor, vTexCoord);
     vec4 normal = texture(uSamplerNormal, vTexCoord);
-
-    vec2 pos = vTexCoord;
-
-    if (pos.x < 0.5)
-    {
-        oColor = color;
-    }
-    else
-    {
-        oColor = normal;
-    }
     */
 }
