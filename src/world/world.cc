@@ -9,8 +9,8 @@ using namespace std;
 using namespace ACGL;
 using namespace ACGL::Utils;
 using namespace ACGL::OpenGL;
-glm::vec3 droidPosition[4] = { glm::vec3(-3.0f, 1.3f, -5.0f), glm::vec3(0.0f, 1.0f, -5.0f), glm::vec3(3.0f, 1.0f, -5.0f), glm::vec3(-5.0f, 1.0f, -5.0f) };
-glm::vec3 droidMoveDirection[4] = { glm::vec3(0.01f, 0.0f, 0.0166f), glm::vec3(0.00f, 0.0f, 0.5f), glm::vec3(-0.01f, 0.0f, 0.0166f), glm::vec3(-5.0f, 1.0f, -5.0f) };
+glm::vec3 droidPosition[4] = { glm::vec3(-3.0f, 1.5f, -5.0f), glm::vec3(0.0f, 1.5f, -5.0f), glm::vec3(3.0f, 1.5f, -5.0f), glm::vec3(-5.0f, 1.0f, -5.0f) };
+glm::vec3 droidMoveDirection[4] = { glm::vec3(0.01f, 0.0f, 0.0166f), glm::vec3(0.00f, 0.0f, 0.015f), glm::vec3(-0.01f, 0.0f, 0.0166f), glm::vec3(-5.0f, 1.0f, -5.0f) };
 bool LocalContactProcessedCallback(btManifoldPoint& cp, void* body0, void* body1);
 
 World::World() {
@@ -65,7 +65,7 @@ bool World::initializeWorld() {
     }
 
       mDroids[1].setRenderFlag(false);
-//    mDroids[2].setRenderFlag(false);
+      mDroids[2].setRenderFlag(false);
 //    mDroids.resize(2);
 //    mDroids.end()->initialize("geometry/Droid/droid1.obj", glm::vec3(-5.0f, 1.0f, -5.0f));
 //    mpProcessManager->attachProcess( mDroids.end()->getMoveProcess() );
@@ -206,7 +206,8 @@ void World::geometryRender() {
     //
     mLevel.VOnDraw();
 
-
+    mPlayer.mPhysicObject.SetPosition(mPlayer.getPosition());
+//    cout <<  "x:   " << mPlayer.mPhysicObject.GetPosition().x <<"y:   " << mPlayer.mPhysicObject.GetPosition().y<< "z:   " << mPlayer.mPhysicObject.GetPosition().z<<endl;
     for (int i = 0; i < mDroids.size() ; ++i) {
         m_GeometryPassShader->setUniform("uModelMatrix", mDroids[i].getModelMatrix());
         m_GeometryPassShader->setUniform("uViewMatrix", viewMatrix);
@@ -214,14 +215,11 @@ void World::geometryRender() {
         m_GeometryPassShader->setUniform("uNormalMatrix",
         glm::inverseTranspose(glm::mat3(viewMatrix) * glm::mat3(mDroids[i].getModelMatrix())));
         mDroids[i].baseRender(droidMoveDirection[i]);
-        //mDroids[i].moveDroid(droidMoveDirection[i]);
     }
 
 
 
     dynamicsWorld->stepSimulation(0.0166f,10);
-    //cout << "first Droid Position " <<mDroids[2].mPhysicObject.GetPosition().x << " " <<mDroids[2].mPhysicObject.GetPosition().y<< " " << mDroids[2].mPhysicObject.GetPosition().z <<endl;
-    //cout << "lighsabevec3r position   " <<mPlayer.mLightsaber.mPhysicObject.GetPosition().x << " " << mPlayer.mLightsaber.mPhysicObject.GetPosition().y << " " <<mPlayer.mLightsaber.mPhysicObject.GetPosition().z << endl;
 
     int numManifolds = dynamicsWorld->getDispatcher()->getNumManifolds();
     for ( int i = 0; i < numManifolds; i++ )
@@ -230,7 +228,6 @@ void World::geometryRender() {
             btRigidBody *obj1 = btRigidBody::upcast((btCollisionObject*)contactManifold->getBody0());
             btRigidBody *obj2 = btRigidBody::upcast((btCollisionObject*)contactManifold->getBody1());
 
-            //cout << mPlayer.mLightsaber.mPhysicObject.rigidBody->getCompanionId() << endl;
             //checking for lightsaber collision
             if (obj1 == mPlayer.mLightsaber.mPhysicObject.rigidBody || obj2 == mPlayer.mLightsaber.mPhysicObject.rigidBody)
             {
@@ -244,19 +241,16 @@ void World::geometryRender() {
                             mDroids[j].setRenderFlag(false);
                             mDroids[j].setAnimationFlag(true);
                             mpProcessManager->attachProcess( mDroids[j].getDestrucionProcess() );
-//                            mpProcessManager->detachProcess( mDroids[j].getMoveProcess());
                             GameLogic::CEventManager::getInstance()->VQueueEvent( GameLogic::EventDataPtr( new CEvtData_CollisionLightSaber( glfwGetTime() ) ) );
 
                             if (j == (mDroids.size() -1) ){
                                 mDroids[0].reInit();
-//                                mpProcessManager->attachProcess( mDroids[0].getMoveProcess() );
                                 if (!mDroids[0].rigidflag){
                                     dynamicsWorld->addRigidBody(mDroids[0].mPhysicObject.rigidBody);
                                     mDroids[0].rigidflag = true;
                                 }
                             } else{
                                 mDroids[j+1].reInit();
-//                                mpProcessManager->attachProcess( mDroids[j].getMoveProcess() );
                                 if (!mDroids[j+1].rigidflag){
                                     dynamicsWorld->addRigidBody(mDroids[j+1].mPhysicObject.rigidBody);
                                     mDroids[j+1].rigidflag = true;
@@ -275,19 +269,78 @@ void World::geometryRender() {
                             mDroids[j].setRenderFlag(false);
                             mDroids[j].setAnimationFlag(true);
                             mpProcessManager->attachProcess( mDroids[j].getDestrucionProcess() );
-//                            mpProcessManager->detachProcess( mDroids[j].getMoveProcess());
                             GameLogic::CEventManager::getInstance()->VQueueEvent( GameLogic::EventDataPtr( new CEvtData_CollisionLightSaber( glfwGetTime() ) ) );
 
                             if (j == (mDroids.size() -1) ){
                                 mDroids[0].reInit();
-//                                mpProcessManager->attachProcess( mDroids[0].getMoveProcess() );
                                 if (!mDroids[0].rigidflag){
                                     dynamicsWorld->addRigidBody(mDroids[0].mPhysicObject.rigidBody);
                                     mDroids[0].rigidflag = true;
                                 }
                             } else{
                                 mDroids[j+1].reInit();
-//                                mpProcessManager->attachProcess( mDroids[j].getMoveProcess() );
+                                if (!mDroids[j+1].rigidflag){
+                                    dynamicsWorld->addRigidBody(mDroids[j+1].mPhysicObject.rigidBody);
+                                    mDroids[j+1].rigidflag = true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            //==================User collisions======================
+            //+++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+            if (obj1 == mPlayer.mPhysicObject.rigidBody || obj2 == mPlayer.mPhysicObject.rigidBody){
+                if (obj1 == mPlayer.mPhysicObject.rigidBody){
+                    for ( int j = 0; j < mDroids.size(); j++ ){
+                        if ( mDroids[j].mPhysicObject.rigidBody == obj2 )
+                        {
+                            dynamicsWorld->removeCollisionObject(mDroids[j].mPhysicObject.rigidBody);
+                            mDroids[j].rigidflag = false;
+                            cout << "player collision with droid"<< j << endl;
+                            mDroids[j].setRenderFlag(false);
+                            // mDroids[j].setAnimationFlag(true);
+                            mpProcessManager->attachProcess( mDroids[j].getDestrucionProcess() );
+                            GameLogic::CEventManager::getInstance()->VQueueEvent( GameLogic::EventDataPtr( new CEvtData_CollisionLightSaber( glfwGetTime() ) ) );
+
+                            if (j == (mDroids.size() -1) ){
+                               mDroids[0].reInit();
+                                  if (!mDroids[0].rigidflag){
+                                    dynamicsWorld->addRigidBody(mDroids[0].mPhysicObject.rigidBody);
+                                    mDroids[0].rigidflag = true;
+                                }
+                            } else{
+                                mDroids[j+1].reInit();
+                                if (!mDroids[j+1].rigidflag){
+                                    dynamicsWorld->addRigidBody(mDroids[j+1].mPhysicObject.rigidBody);
+                                    mDroids[j+1].rigidflag = true;
+                                }
+                            }
+                        }
+                    }
+                }
+                else{
+                    for ( int j = 0; j < mDroids.size(); j++ ){
+                        if ( mDroids[j].mPhysicObject.rigidBody == obj1 )
+                        {
+                            dynamicsWorld->removeCollisionObject(mDroids[j].mPhysicObject.rigidBody);
+                            mDroids[j].rigidflag = false;
+                            cout << "player collision with droid"<< j << endl;
+                            mDroids[j].setRenderFlag(false);
+                            //mDroids[j].setAnimationFlag(true);
+                            mpProcessManager->attachProcess( mDroids[j].getDestrucionProcess() );
+                            GameLogic::CEventManager::getInstance()->VQueueEvent( GameLogic::EventDataPtr( new CEvtData_CollisionLightSaber( glfwGetTime() ) ) );
+
+                            if (j == (mDroids.size() -1) ){
+                                mDroids[0].reInit();
+                                if (!mDroids[0].rigidflag){
+                                    dynamicsWorld->addRigidBody(mDroids[0].mPhysicObject.rigidBody);
+                                    mDroids[0].rigidflag = true;
+                                }
+                            } else{
+                                mDroids[j+1].reInit();
                                 if (!mDroids[j+1].rigidflag){
                                     dynamicsWorld->addRigidBody(mDroids[j+1].mPhysicObject.rigidBody);
                                     mDroids[j+1].rigidflag = true;
@@ -412,6 +465,7 @@ void World::initializeBullet() {
     //dynamicsWorld->addRigidBody(mDroids[1].mPhysicObject.rigidBody);
     //dynamicsWorld->addRigidBody(mDroids[2].mPhysicObject.rigidBody);
     dynamicsWorld->addRigidBody(mPlayer.mLightsaber.mPhysicObject.rigidBody);
+    dynamicsWorld->addRigidBody(mPlayer.mPhysicObject.rigidBody);
 
 }
 

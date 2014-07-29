@@ -52,7 +52,7 @@ bool Droid::initialize(string _filename, glm::vec3 startPosition)
     rigidflag = true;
     setPosition(startPosition);
     mPhysicObject.Init(cShape, startPosition);
-    mModelMatrix = glm::scale( glm::vec3( 0.5f ) );
+    mModelMatrix = glm::scale( glm::vec3( 0.2f ) );
     mModelMatrix = glm::translate(glm::mat4(1.0), startPosition) * mModelMatrix;
 
     mMoveProcess = GameLogic::ProcessPointer( new Droid::MoveProcess(this) );
@@ -86,7 +86,7 @@ bool Droid::initialize(string _filename, glm::vec3 startPosition)
 void Droid::reInit(){
     mAnimationFlag = false;
     mDroidRenderFlag = true;
-    mModelMatrix = glm::scale( glm::vec3( 0.5f ) );
+    mModelMatrix = glm::scale( glm::vec3( 0.2f ) );
     mModelMatrix = glm::translate(glm::mat4(1.0), droidStartPosition) * mModelMatrix;
     setPosition(droidStartPosition);
     mPhysicObject.SetPosition(droidStartPosition);

@@ -5,9 +5,12 @@ using namespace ACGL::Scene;
 
 Player::Player() :
         mLightsaber(getPosition()) {
+    mPhysicObject.Init(cShape, getPosition());
+    mPhysicObject.rigidBody->setUserPointer(this);
 }
 
 Player::~Player() {
+    delete cShape;
 }
 
 void Player::setCamera(ACGL::Scene::SharedHMDCamera sHMDCamera) {
