@@ -24,7 +24,7 @@ Wii::Wii(GLFWwindow* window, ACGL::HardwareSupport::SimpleRiftController *simple
 
     //Find the wiimote. Search for up to five seconds.
     message() << "Searching for wiimote... Turn it on!" << endl;
-    int numFound = wii.LoadRegisteredWiimotes();
+    int numFound = wii.Find(5);//LoadRegisteredWiimotes();
     debug() << "Found " << numFound << " wiimote(s)" << endl;
 
     if (numFound == 0) {
