@@ -414,15 +414,11 @@ void World::DSRender() {
 
     DSDirectionalLightPass();
 
-    //glEnable(GL_BLEND);
-    //glBlendEquation(GL_FUNC_ADD);
-    //glBlendFunc(GL_ONE, GL_ONE);
-
-    mPlayer.mLightsaber.render(mPlayer.getHMDViewMatrix(), mPlayer.getProjectionMatrix());
-
-    glDisable(GL_BLEND);
+    mPlayer.mLightsaber.render( mPlayer.getHMDViewMatrix(), mPlayer.getProjectionMatrix() );
 
     DSFinalPass();
+
+    //DSBlurPass();
 }
 
 void World::createDroid(glm::vec3 position){

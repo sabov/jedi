@@ -7,6 +7,8 @@
 #include <ACGL/HardwareSupport/SimpleRiftController.hh>
 #include <ACGL/OpenGL/Objects/VertexArrayObject.hh>
 #include <ACGL/OpenGL/Objects/ShaderProgram.hh>
+#include <ACGL/OpenGL/Objects/FrameBufferObject.hh>
+
 #include <btBulletDynamicsCommon.h>
 #include "player.hh"
 #include "events.hh"
@@ -23,6 +25,10 @@
 #include "droid.hh"
 #include "PhysicsObject.hh"
 
+//using namespace ci;
+//using namespace ci::app;
+//using namespace ci::gl;
+
 class World {
 public:
     World();
@@ -38,6 +44,7 @@ public:
 
     // move the player relative to the players body orientation:
     void movePlayer(const glm::vec3 &direction);
+    void DSBlurPass();
 
     // get the current position in world space
     glm::vec3 getPlayerPosition();
@@ -81,6 +88,10 @@ public:
     //Deferred Shading
     void DSRender();
     bool InitDS();
+
+    GLuint mFboScene;
+    GLuint mFboBlur1;
+    GLuint mFboBlur2;
 
 private:
     unsigned int window_width;

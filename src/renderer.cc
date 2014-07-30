@@ -219,8 +219,11 @@ void renderFrame() {
         // (note: this mode is not complete ;-) it would be better to also deactivate
         // the stereo option of the camera)
         //
+        //
+
         gSimpleRiftControllerRenderer->getCamera()->setEye(GenericCamera::EYE_LEFT);
 
         renderScene();
+
     }
 }

@@ -1,11 +1,15 @@
 #include "world.hh"
 #include <ACGL/OpenGL/Managers.hh>
 #include <ACGL/OpenGL/Creator/ShaderProgramCreator.hh>
+#include <ACGL/OpenGL/Creator/VertexArrayObjectCreator.hh>
 #include <cmath>
 
 using namespace ACGL;
 using namespace ACGL::Utils;
 using namespace ACGL::OpenGL;
+std::vector<SharedTexture2D> offScreenTextures;
+SharedFrameBufferObject fbo;
+SharedShaderProgram combine;
 
 bool World::InitDS()
 {
@@ -52,6 +56,60 @@ bool World::InitDS()
     m_SpotLightPassShader->setUniform(m_colorTexLoc[2],     GBuffer::GBUFFER_TEXTURE_TYPE_DIFFUSE);
     m_SpotLightPassShader->setUniform(m_normalTexLoc[2],    GBuffer::GBUFFER_TEXTURE_TYPE_NORMAL);
     m_SpotLightPassShader->setUniform(m_screenSizeLoc[2],   glm::vec2( (float)window_width, (float)window_height) );
+
+    //blur init
+
+    glm::uvec2 bunnyRes = glm::uvec2(window_width, window_height);
+
+    // store the offscreen textures so they can be resized if the window resizes:
+    offScreenTextures.push_back( SharedTexture2D( new Texture2D(bunnyRes) ) ); // RGBA per default
+    offScreenTextures.push_back( SharedTexture2D( new Texture2D(bunnyRes) ) ); // RGBA per default
+    offScreenTextures.push_back( SharedTexture2D( new Texture2D(bunnyRes, GL_DEPTH24_STENCIL8) ) );
+
+    offScreenTextures[0]->setMinFilter( GL_NEAREST );
+    offScreenTextures[1]->setMinFilter( GL_NEAREST );
+    offScreenTextures[0]->setMagFilter( GL_NEAREST );
+    offScreenTextures[1]->setMagFilter( GL_NEAREST );
+
+    // set up the FBO:
+    fbo = SharedFrameBufferObject(new FrameBufferObject());
+    fbo->attachColorTexture( "oNormal", offScreenTextures[1] );
+    fbo->attachColorTexture( "oColor",  offScreenTextures[0] );
+    fbo->setDepthTexture(               offScreenTextures[2] );
+    fbo->validate(); // always a good idea
+
+
+    combine = ShaderProgramCreator("Combine").create();
+
+    /*
+    m_BlurPassShader = ShaderProgramFileManager::the()->get( ShaderProgramCreator("blur_pass"));
+    glGenFramebuffers(1, &mFboScene);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mFboScene);
+
+    glGenTextures(1, &mFboBlur1);
+
+    glGenTextures(1, &mFboBlur2);
+
+    glBindTexture(GL_TEXTURE_2D, mFboBlur1);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA , window_width, window_height, 0, GL_RGB, GL_FLOAT, NULL);
+    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mFboBlur1, 0);
+
+    glBindTexture(GL_TEXTURE_2D, mFboBlur2);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA , window_width, window_height, 0, GL_RGB, GL_FLOAT, NULL);
+    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, mFboBlur2, 0);
+
+    GLenum Status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+
+    if (Status != GL_FRAMEBUFFER_COMPLETE) {
+        std::cout << "FB error, status: 0x" << Status << "x" << std::endl;
+        return false;
+    }
+
+    // restore default FBO
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    */
+
+    //====================
 
     m_NullShader = ShaderProgramFileManager::the()->get( ShaderProgramCreator("null_technique") );
 
@@ -258,6 +316,36 @@ void World::DSSpotLightPass(unsigned int _SpotLightIndex)
     glCullFace(GL_BACK);
 
     glDisable(GL_BLEND);
+}
+
+void World::DSBlurPass()
+{
+
+    fbo->bind();
+    glEnable(GL_DEPTH_TEST);
+    glViewport( 0, 0, window_width, window_height );
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    mPlayer.mLightsaber.render( mPlayer.getHMDViewMatrix(), mPlayer.getProjectionMatrix() );
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glDisable(GL_DEPTH_TEST);
+    glViewport( 0, 0, window_width, window_height );
+
+    combine->use();
+
+    //debug() << "==============" << std::endl;
+
+    combine->setUniform("pixelSize" , glm::vec2(1.0/window_width, 1.0/window_height) );
+    //combine->setTexture("uSamplerColor",  offScreenTextures[0], 0 );
+    combine->setTexture("uSamplerNormal" ,offScreenTextures[1], 1 );
+    combine->setUniform(combine->getUniformLocation("tex0"), GBuffer::GBUFFER_TEXTURE_TYPE_NORMAL);
+
+    // attribute-less rendering:
+    VertexArrayObject vao;
+    vao.bind(); // 'empty' VAO -> no attributes are defined
+    glDrawArrays( GL_TRIANGLE_STRIP, 0, 4); // create 2 triangles with no attributes
+
 }
 
 void World::DSFinalPass()

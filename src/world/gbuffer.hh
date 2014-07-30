@@ -31,11 +31,15 @@ public:
     void BindForGeomPass();
     void BindForStencilPass();
     void BindForLightPass();
+    void BindForBlurPass();
     void BindForFinalPass();
 
     GLuint getFinalTextureName() const {
         //return m_textures[GBUFFER_TEXTURE_TYPE_NORMAL];
         return m_finalTexture;
+    }
+    GLuint getTexture() const {
+        return GBuffer::GBUFFER_TEXTURE_TYPE_NORMAL;
     }
 
 private:

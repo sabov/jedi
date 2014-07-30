@@ -121,6 +121,16 @@ void GBuffer::BindForLightPass()
     }
 }
 
+void GBuffer::BindForBlurPass()
+{
+    GLenum DrawBuffers[] = { GL_COLOR_ATTACHMENT4 };
+    glDrawBuffers(ARRAY_SIZE_IN_ELEMENTS(DrawBuffers), DrawBuffers);
+    for (unsigned int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_textures); i++) {
+        glActiveTexture(GL_TEXTURE0 + i);
+        glBindTexture(GL_TEXTURE_2D, m_textures[GBUFFER_TEXTURE_TYPE_POSITION + i]);
+    }
+}
+
 
 void GBuffer::BindForFinalPass()
 {

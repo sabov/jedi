@@ -95,7 +95,7 @@ void Lightsaber::render(const glm::mat4 &viewMatrix, const glm::mat4 &projection
     if (turnedOn) {
         modelMatrix = glm::scale(glm::vec3(0.012f, 0.0101f * rayHeight, 0.012f));
         glm::vec3 pos = getPosition();
-        translateMatrix = glm::translate(glm::mat4(), pos);
+        glm::mat4 translateMatrix = glm::translate(glm::mat4(), pos);
         modelMatrix = translateMatrix * getRotationMatrix4() * modelMatrix;
 
         mRayShader->setUniform("uModelMatrix", modelMatrix);
