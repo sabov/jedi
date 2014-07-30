@@ -11,7 +11,7 @@
  */
 
 #ifndef __GLEW_H__
-    #include <GL/glew.h>
+#include <GL/glew.h>
 #endif
 
 // OpenGL defines and function pointers. We use this instead of the system GL.h or glew.h.
@@ -28,7 +28,12 @@
 
 #include "audio/audio.hh"
 #include "world/world.hh"
-#include "input.hh"
+#include "input/mouse.hh"
+#include "input/wii.hh"
+
+//Set input device
+typedef Wii INPUT;
+
 #ifndef GLGEVENTMANAGER_H
 #include "event_sys/GLGEventManager.h"
 #endif
@@ -42,7 +47,7 @@
 World *gWorld = NULL;
 
 // Handles input
-Input *gInput = NULL;
+INPUT *gInput = NULL;
 
 extern void initRenderer(GLFWwindow *window, ACGL::HardwareSupport::SimpleRiftController *simpleRiftController); // see renderer.cc
 extern void renderFrame();
@@ -79,7 +84,9 @@ GLFWwindow* createWindow(bool fullscreen, int monitorNumber) {
     //
     // Try to get a native debug context, this will slow down GL a bit but be helpful for finding
     // errors.
+#ifdef DEBUGGING
     glfwWindowHint( GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+#endif
 
     // Define whether the window can get resized:
     glfwWindowHint( GLFW_RESIZABLE, true);
@@ -94,7 +101,7 @@ GLFWwindow* createWindow(bool fullscreen, int monitorNumber) {
     GLFWwindow* window = NULL;
     if (!fullscreen) {
         // windowed:
-        window = glfwCreateWindow(1280, 800, "SimpleVRGame", NULL, NULL);
+        window = glfwCreateWindow(1280, 800, "Jedi-Game", NULL, NULL);
     } else {
         // fullscreen:
         int numberOfMonitors = 1;
@@ -108,7 +115,8 @@ GLFWwindow* createWindow(bool fullscreen, int monitorNumber) {
         }
 
         const GLFWvidmode *currentVideoMode = glfwGetVideoMode(monitor);
-        window = glfwCreateWindow(currentVideoMode->width, currentVideoMode->height, "SimpleVRGame", monitor, NULL);
+
+        window = glfwCreateWindow(currentVideoMode->width, currentVideoMode->height, "Jedi-Game", monitor, NULL);
     }
     if (!window) {
         ACGL::Utils::error() << "Failed to open a GLFW window - requested OpenGL version: " << ACGL_OPENGL_VERSION << std::endl;
@@ -141,7 +149,7 @@ int main(int argc, char *argv[]) {
     // Create an OpenGL capable window:
     // parameter is whether the window should be fullscreen or not and which monitor to use if fullscreen
     //
-    GLFWwindow* myWindow = createWindow(!false, 1);
+    GLFWwindow* myWindow = createWindow(false, 1);
     if (!myWindow) {
         glfwTerminate();
         exit(-1);
@@ -152,27 +160,33 @@ int main(int argc, char *argv[]) {
     // The true parameter tells ACGL to simulate the debug functions of OpenGL 4.3 if they are not supported.
     // The final version should have a false here to increase the games speed a bit.
     //
+#ifdef DEBUGGING
     ACGL::init(true);
+#else
+    ACGL::init(false);
+#endif
     // tell ACGL in which subdirectory the shaders are:
     ACGL::Base::Settings::the()->setShaderPath("shader/");
 
     //GLEW Initialization
     glewExperimental = TRUE; // <--- Depends on your graphics card
     GLenum initStatus = glewInit();
-    if ( initStatus != GLEW_OK )
-    {
+    if (initStatus != GLEW_OK) {
         glfwTerminate();
         ACGL::Utils::error() << "Failed to initialize GLEW" << std::endl;
-        exit( -1 );
+        exit(-1);
     }
 
     //
     // Get an instance of EventManager
     //
     GameLogic::EventManagerPtr eventManager = GameLogic::CEventManager::getInstance();
-    GameLogic::EventListenerPtr snoop( new EventDebugOuput() );
-    eventManager->VAddListener( snoop, GameLogic::EventType( GameLogic::kpWildCardEventType.c_str() ) );
-    eventManager->VAddListener( snoop, CEvtData_WorldInitialized::GetEventType() );
+    GameLogic::EventListenerPtr snoop(new EventDebugOuput());
+    //
+    // Add listener and events
+    //
+    eventManager->VAddListener(snoop, GameLogic::EventType(GameLogic::kpWildCardEventType.c_str()));
+    eventManager->VAddListener(snoop, CEvtData_WorldInitialized::GetEventType());
 
     //
     // Create a SimpleRiftController
@@ -184,19 +198,18 @@ int main(int argc, char *argv[]) {
     //
     // init whatever you need:
     //
-
-    gInput = new Input(myWindow, simpleRiftController);
-
     initRenderer(myWindow, simpleRiftController);
     initAudio();
 
     //
     // Create Audiosystem
     //
-    AudioSystemPtr audioSystem = AudioSystemPtr( new CAudioSystem() );
+    AudioSystemPtr audioSystem = AudioSystemPtr(new CAudioSystem());
     //Add sound and register at EventManager
-    audioSystem->AddSound( "audio/SaberOn.wav", CEvtData_ToggleSword::GetEventType() );
-    eventManager->VAddListener( audioSystem, CEvtData_ToggleSword::GetEventType() );
+    audioSystem->AddSound("audio/SaberOn.wav", CEvtData_ToggleSword::GetEventType());
+    audioSystem->AddSound("audio/LSwall01.wav", CEvtData_CollisionLightSaber::GetEventType());
+    eventManager->VAddListener(audioSystem, CEvtData_ToggleSword::GetEventType());
+    eventManager->VAddListener(audioSystem, CEvtData_CollisionLightSaber::GetEventType());
 
     //
     // Create a world object
@@ -204,6 +217,9 @@ int main(int argc, char *argv[]) {
     gWorld = new World();
     gWorld->initializeWorld();
     gWorld->setPlayerCamera(simpleRiftController);
+
+    //Use mouse input
+    gInput = new INPUT(myWindow, simpleRiftController, gWorld);
 
     /************************************************************************
      * Deferred Shading - Setup
@@ -214,29 +230,27 @@ int main(int argc, char *argv[]) {
     //
     // main loop
     //
-    eventManager->VTick();  //Handle events so far...
+    eventManager->VTick(); //Handle events so far...
     double startTimeInSeconds = glfwGetTime();
     do {
         double now = glfwGetTime() - startTimeInSeconds;
 
+#ifdef DEBUGGING
         //
         // shader file reloading once a second:
-        // good for development, should be removed for the final version
         //
         static double nextReloadTime = 1.0;
         if (now > nextReloadTime) {
             ACGL::OpenGL::ShaderProgramFileManager::the()->updateAll();
             nextReloadTime = now + 1.0; // check again in one second
         }
+#endif
 
-        static double nextUpdateTime = 0.1;
+        static double nextUpdateTime = 0.005;
         if (now > nextUpdateTime) {
-            gWorld->update((int)(1000.0 * 0.1));
-            nextUpdateTime = now + 0.1;
+            gWorld->update((int) (1000.0 * 0.005));
+            nextUpdateTime = now + 0.005;
         }
-
-        //Handle events
-        eventManager->VTick();
 
         //
         // per frame tasks:
@@ -250,6 +264,9 @@ int main(int argc, char *argv[]) {
         // If VSync is active, this will block until the next frame can get displayed (up to 16.6msec)
         // Note that in VR you want VSync as tearing lines are very distractive!
         glfwSwapBuffers(myWindow);
+
+        //Handle events
+        eventManager->VTick();
 
         // until either the user pressed the X of the window (in case it has a windowbar (== not fullscreen)
         // or the program signaled to get closed by setting glfwSetWindowShouldClose( window, true ) somewhere!

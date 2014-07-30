@@ -20,7 +20,7 @@
 #include "lights/CGEDirectionalLight.h"
 #include "lights/CGE_multiple_lights.h"
 #include "process_sys/GLGProcessManager.h"
-#include "process_sys/GLGExampleProcesses.h"
+#include "process_sys/GLGProcess.h"
 #include "gbuffer.hh"
 #include "droid.hh"
 #include "PhysicsObject.hh"
@@ -40,8 +40,7 @@ public:
     void setPlayerCamera(ACGL::HardwareSupport::SimpleRiftController *riftControl);
 
     // render the world:
-    void render();
-    void geometryRender();  //render geometry (geometry pass)
+    void geometryRender(); //render geometry (geometry pass)
 
     // move the player relative to the players body orientation:
     void movePlayer(const glm::vec3 &direction);
@@ -65,21 +64,30 @@ public:
     // move the lightsaber of the player
     void moveLightsaber(const glm::vec3 &direction);
 
+    // set the position of the lightsaber of the player
+    void setLightsaberPosition(const glm::vec3 &movement);
+
     //turn on/off lightsaber
     void toggleLightsaber();
 
     //rotate the lightsaber, negative values rotate to the left, positive to the right
-    void rotateLightsaber(float dYaw, float dRoll, float dPitch);
+    void rotateLightsaber(float yaw, float pitch, float roll);
+
+    //set the rotation matrix of the lightsaber
+    void setRotationMatrixLightsaber(const glm::mat4 &rotation);
 
     //initialize bullet physics engine
     void initializeBullet();
+
+    void createDroid(glm::vec3 position);
 
     void update(int time);
 
     void setWidthHeight(unsigned int _w, unsigned int _h);
 
+    //Deferred Shading
     void DSRender();
-    bool InitDS()   ;
+    bool InitDS();
 
     GLuint mFboScene;
     GLuint mFboBlur1;
@@ -90,60 +98,76 @@ private:
     unsigned int window_height;
 
     Player mPlayer;
-    Droid mDroids[3];
+    std::vector<Droid> mDroids;
 
-    //bullet
+    //Bullet
     btDiscreteDynamicsWorld* dynamicsWorld;
     PhysicsObject *droidsPhysic;
-
+    void updatePhysics() ;
 
     //Matrix Stack
-    CGEngine::CMatrixStack  mMatrixStack;
+    CGEngine::CMatrixStack mMatrixStack;
 
     // The "level":
     CGEngine::CMesh mLevel  ;
 
-    //using this shader since it supports textures
-    ACGL::OpenGL::SharedShaderProgram     mBunnyShader;
-
     //Lights
-    std::vector<CGEngine::CPositionalLight>     mPointLights   ;
-    std::vector<CGEngine::CDirectionalLight>    mDirLights     ;
-    std::vector<CGEngine::CSpotLight>           mSpotLights    ;
+    std::vector<CGEngine::CPositionalLight>     mPointLights    ;
+    std::vector<CGEngine::CDirectionalLight>    mDirLights      ;
+    std::vector<CGEngine::CSpotLight>           mSpotLights     ;
 
-    //
-    // One repeating sound as an example of how to use OpenAL:
-    SimpleSound *mBeep;
-
-    //process manager per level
-    GameLogic::ProcessManagerPtr    mpProcessManager;
-    GameLogic::RotationProcessPtr   mpRotProcess;
+    //One process manager per level
+    GameLogic::ProcessManagerPtr mpProcessManager;
 
     //Deferred Shading
-    ACGL::OpenGL::SharedShaderProgram   m_GeometryPassShader    ;
-    ACGL::OpenGL::SharedShaderProgram   m_PointLightPassShader  ;
-    ACGL::OpenGL::SharedShaderProgram   m_DirLightPassShader    ;
-    ACGL::OpenGL::SharedShaderProgram   m_SpotLightPassShader   ;
-    ACGL::OpenGL::SharedShaderProgram   m_BlurPassShader   ;
-    ACGL::OpenGL::SharedShaderProgram   m_NullShader            ;
-    GLint   m_ColorTexUnitLoc       ;
-    GLint   m_posTexLoc[3]          ;
-    GLint   m_colorTexLoc[3]        ;
-    GLint   m_normalTexLoc[3]       ;
-    GLint   m_screenSizeLoc[3]      ;
-    GLint   m_eyeWorldPosLoc[3]     ;
+    ACGL::OpenGL::SharedShaderProgram m_GeometryPassShader  ;
+    ACGL::OpenGL::SharedShaderProgram m_PointLightPassShader;
+    ACGL::OpenGL::SharedShaderProgram m_DirLightPassShader  ;
+    ACGL::OpenGL::SharedShaderProgram m_SpotLightPassShader ;
+    ACGL::OpenGL::SharedShaderProgram m_NullShader          ;
+    GLint m_ColorTexUnitLoc     ;
+    GLint m_posTexLoc[3]        ;
+    GLint m_colorTexLoc[3]      ;
+    GLint m_normalTexLoc[3]     ;
+    GLint m_screenSizeLoc[3]    ;
+    GLint m_eyeWorldPosLoc[3]   ;
 
-    GBuffer                     m_GBuffer   ;
-    CGEngine::CMesh             m_Sphere   ; //Spheres for Point Lights
-    CGEngine::CFullScreenQuad   m_Quad     ; //Fullscreenquad for Directional Light
-    CGEngine::CMesh             m_Cone     ; //Cones for Spot Lights
+    GBuffer                     m_GBuffer   ; //Geometry buffer (manages geometry, diffuse and normal maps for DS)
+    CGEngine::CMesh             m_Sphere    ; //rendering Spheres for Point Lights
+    CGEngine::CFullScreenQuad   m_Quad      ; //rendering Fullscreenquad for Directional Light
+    CGEngine::CMesh             m_Cone      ; //rendering Cones for Spot Lights
 
-    void DSGeometryPass();
-    void DSStencilPass(unsigned int _PointLightIndex);
-    void DSPointLightPass(unsigned int _PointLightIndex);
-    void DSDirectionalLightPass();
-    void DSSpotStencilPass(unsigned int _SpotLightIndex);
-    void DSSpotLightPass(unsigned int _SpotLightIndex);
-    void DSFinalPass();
+    void DSGeometryPass()                                               ;
+    void DSStencilPass(unsigned int _PointLightIndex)                   ;
+    void DSPointLightPass(unsigned int _PointLightIndex)                ;
+    void DSDirectionalLightPass()                                       ;
+    void DSSpotStencilPass(unsigned int _SpotLightIndex)                ;
+    void DSSpotLightPass(unsigned int _SpotLightIndex)                  ;
+    void DSFinalPass()                                                  ;
     float CalcPointLightBSphere(const CGEngine::CPositionalLight& Light);
+
+    //Physics process (updates physic processes like collisions in our scene)
+    friend class BulletPhysicsProcess;
+
+    class BulletPhysicsProcess : public GameLogic::CProcess
+    {
+    private:
+        World*  m_World ;
+    public:
+        BulletPhysicsProcess(World* _World) : GameLogic::CProcess()
+        {
+            m_World = _World;
+        }
+        ~BulletPhysicsProcess()
+        {
+            m_World = NULL;
+        }
+
+        virtual void VOnInitialize();
+        virtual void VKill();
+        virtual void VOnUpdate(const int elapsedTime);
+    };
+
+    typedef boost::shared_ptr<BulletPhysicsProcess> PhysicsProcessPtr   ;
+    PhysicsProcessPtr m_BulletPhysicsProcess   ;
 };

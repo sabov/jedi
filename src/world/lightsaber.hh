@@ -22,11 +22,14 @@ public:
 
     void move(const glm::vec3 &direction); //Overwrite of parent method
 
-    void rotate(float yaw, float roll, float pitch);
+    void setPosition(const glm::vec3 &position);
+
+    void rotate(float yaw, float pitch, float roll);
 
     void toggle();
 
     PhysicsObject mPhysicObject;
+
 private:
     // Current position of player
     glm::vec3 mPlayerPosition;
@@ -47,5 +50,9 @@ private:
     bool turnedOn;
     float rayHeight;
 
-    btCollisionShape* cShape = new btCylinderShape(btVector3(0.2, 2, 0.2));
+    float yaw;
+    float pitch;
+    float roll;
+
+    btCollisionShape* cShape = new btCylinderShape(btVector3(0.01, 0.5, 0.01));
 };

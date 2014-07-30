@@ -18,7 +18,7 @@ class   CAnimatedMesh   ;
 typedef boost::shared_ptr<CAnimatedMesh>    AnimatedMeshPtr ;
 
 /*
- * Class for animations
+ * Class for bone-animations
  */
 class CAnimatedMesh : public CMesh
 {

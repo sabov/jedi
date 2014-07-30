@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED (VERSION 2.6) 
+CMAKE_MINIMUM_REQUIRED (VERSION 2.6)
 
 # project/binary name:
 PROJECT(Jedi)
@@ -8,11 +8,19 @@ message("Jedi - Occulus Rift - Starting Project Build")
 #include "findASSIMP.cmake"...
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/extern/acgl/cmake/")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/extern/wiic/src/cmake_modules/")
 
 # ACGL setup:
 ADD_DEFINITIONS(-DACGL_OPENGL_VERSION_32)
 ADD_DEFINITIONS(-DACGL_OPENGL_PROFILE_CORE)
 INCLUDE(${CMAKE_SOURCE_DIR}/extern/acgl/CMakeListsStaticInclude.txt)
+
+# Wiiuse setup
+INCLUDE(${CMAKE_SOURCE_DIR}/extern/wiic/CMakeListsStaticInclude.txt)
+include_directories(extern/wiic/src/wiicpp)
+include_directories(extern/wiic/src/wiic)
+include_directories(extern/wiic/src/log)
+SET(LIBRARIES ${LIBRARIES} "-lbluetooth")
 
 ###############################################################################
 #
@@ -213,13 +221,7 @@ find_package(Bullet REQUIRED)
 include_directories(${BULLET_INCLUDE_DIRS})
 set(LIBRARIES ${LIBRARIES} ${BULLET_LIBRARIES})
 
-###############################################################################
-#
-# Cider
-#
-#include_directories("extern/cinder/include/")
-#set(LIBRARIES ${LIBRARIES} "/extern/cinder/lib")
-
+set(CMAKE_C_FLAGS_DEBUG "-DDEBUGGING")
 
 ADD_EXECUTABLE(${CMAKE_PROJECT_NAME} ${SOURCE_FILES} ${HEADER_FILES} ${SHADER_FILES} ${README_FILES})
 TARGET_LINK_LIBRARIES(${CMAKE_PROJECT_NAME} ${LIBRARIES})

@@ -9,11 +9,14 @@ using namespace ACGL;
 using namespace ACGL::Utils;
 using namespace ACGL::OpenGL;
 
-Lightsaber::Lightsaber(const glm::vec3 &playerPosition){
+Lightsaber::Lightsaber(const glm::vec3 &playerPosition) {
     debug() << "loading lightsaber..." << endl;
 
     turnedOn = false;
     rayHeight = 0;
+    yaw = 0;
+    pitch = 0;
+    roll = 0;
 
     mLightsaberGeometry = VertexArrayObjectCreator("lightsaber.obj").create();
     mRayGeometry = VertexArrayObjectCreator("ray.obj").create();
@@ -27,8 +30,28 @@ Lightsaber::Lightsaber(const glm::vec3 &playerPosition){
     mLightsaberTexture = loadTexture2D("lightsaber.png");
 
     setPlayerPosition(playerPosition);
-    setPosition(glm::vec3(mPlayerPosition.x, mPlayerPosition.y + 1.0f, mPlayerPosition.z - 0.5f));
+    setPosition(mPlayerPosition);
     mPhysicObject.Init(cShape, getPosition());
+
+    /*
+    mPhysicObject.rigidBody->applyTorque(btVector3(0.9, 0, 0));
+    */
+
+    /*
+    btTransform tr = mPhysicObject.rigidBody->getCenterOfMassTransform();
+    //tr.setIdentity();
+    btQuaternion quat;
+    quat.setEuler(0, 0.8, 0); //or quat.setEulerZYX depending on the ordering you want
+    tr.setRotation(quat);
+    mPhysicObject.rigidBody->setCenterOfMassTransform(tr);
+    */
+
+    /*
+    tr.setIdentity();
+    quat.setEuler(0, 0.78, 0); //or quat.setEulerZYX depending on the ordering you want
+    tr.setRotation(quat);
+    mPhysicObject.rigidBody->setCenterOfMassTransform(tr);
+    */
 }
 
 Lightsaber::~Lightsaber() {
@@ -48,10 +71,18 @@ void Lightsaber::render(const glm::mat4 &viewMatrix, const glm::mat4 &projection
     mLightsaberShader->setUniform("uProjectionMatrix", projectionMatrix);
     mLightsaberShader->setUniform("uNormalMatrix", glm::inverseTranspose(glm::mat3(viewMatrix) * glm::mat3(modelMatrix)));
 
+    btTransform tr;
+    tr.setIdentity();
+    btQuaternion quat;
+    quat.setEuler(0, roll, pitch); //or quat.setEulerZYX depending on the ordering you want
+    tr.setRotation(quat);
+    mPhysicObject.rigidBody->setCenterOfMassTransform(tr);
+
     mPhysicObject.SetPosition(getPosition());
     mPhysicObject.rigidBody->setUserPointer(this);
 
     GLint textureUnit = 0;
+
     mLightsaberTexture->bind(textureUnit);
     mLightsaberShader->setUniform("uTexture", textureUnit);
 
@@ -61,8 +92,8 @@ void Lightsaber::render(const glm::mat4 &viewMatrix, const glm::mat4 &projection
     mRayShader->use();
 
     //Ray
-    if(turnedOn) {
-        glm::mat4 modelMatrix = glm::scale(glm::vec3(0.012f, 0.0101f * rayHeight, 0.012f));
+    if (turnedOn) {
+        modelMatrix = glm::scale(glm::vec3(0.012f, 0.0101f * rayHeight, 0.012f));
         glm::vec3 pos = getPosition();
         glm::mat4 translateMatrix = glm::translate(glm::mat4(), pos);
         modelMatrix = translateMatrix * getRotationMatrix4() * modelMatrix;
@@ -74,7 +105,7 @@ void Lightsaber::render(const glm::mat4 &viewMatrix, const glm::mat4 &projection
         mRayShader->setUniform("uColor", glm::vec4(1.0, 1.0, 1.0, 1.0));
 
         glEnable(GL_BLEND);
-        glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         mRayGeometry->bind();
         mRayGeometry->draw();
 
@@ -127,6 +158,10 @@ void Lightsaber::move(const glm::vec3 &direction) {
     }
 }
 
+void Lightsaber::setPosition(const glm::vec3 &position) {
+    MoveableObject::setPosition(glm::vec3(position.x, position.y + 1.0f, position.z - 0.5f));
+}
+
 /*
  * Turn on/off lightsaber
  */
@@ -142,8 +177,28 @@ void Lightsaber::toggle() {
 /*
  * Rotate lightsaber
  */
-void Lightsaber::rotate(float yaw, float roll, float pitch) {
+void Lightsaber::rotate(float _yaw, float _roll, float _pitch) {
+
+    yaw += _yaw;
+    pitch += _pitch;
+    roll += _roll;
+    cout << "=========" << endl;
+    cout << yaw << endl;
+    cout << roll  << endl;
+    cout << pitch << endl;
+    cout << "=========" << endl;
+    //btTransform tr;
+    /*
+    btTransform tr = mPhysicObject.rigidBody->getCenterOfMassTransform();
+    tr.setIdentity();
+    btQuaternion quat;
+    quat.setEuler(0, 1.57, 0); //or quat.setEulerZYX depending on the ordering you want
+    tr.setRotation(quat);
+    mPhysicObject.rigidBody->setCenterOfMassTransform(tr);
+    */
+    //mPhysicObject.rigidBody->setRotation(tr);
+
     glm::mat4 R = getRotationMatrix4();
-    glm::mat4 newRot = glm::yawPitchRoll(yaw, roll, pitch);
+    glm::mat4 newRot = glm::yawPitchRoll(_yaw, _roll, _pitch);
     setRotationMatrix(R * newRot);
 }

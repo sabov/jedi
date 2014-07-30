@@ -12,48 +12,64 @@
  * Class for the Droid
  */
 using namespace std;
+class Droid;
+typedef boost::shared_ptr<Droid> DroidPtr;
 
 class Droid : public ACGL::Scene::MoveableObject {
 public:
     Droid();
     ~Droid();
 
+    friend class MoveProcess;
+    friend class DestructionProcess;
+
     bool initialize(std::string _filename, glm::vec3 startPosition);
+    void reInit();
 
     void render(glm::mat4 &viewMatrix, glm::mat4 &projectionMatrix);
-    void animate();
-    void collide();
 
     glm::mat4 getModelMatrix() const { return mModelMatrix; }
 
-    ACGL::OpenGL::SharedVertexArrayObject mDroidGeometry;
-
     void transformPosition() ;  //move droid, update position
-    void baseRender();          //render geometry and texture
+    void baseRender(glm::vec3 moveDirection);          //render geometry and texture
+    void moveDroid(glm::vec3 movedirection);
 
     PhysicsObject mPhysicObject;
-    bool mDroidRenderFlag;
+
+    void setRenderFlag(bool _b) { mDroidRenderFlag = _b; }
+    void setAnimationFlag(bool _b) { mAnimationFlag = _b; }
+
 
     GameLogic::ProcessPointer getMoveProcess() const { return mMoveProcess; }
     GameLogic::ProcessPointer getDestrucionProcess() const { return mDestructionProcess; }
+
+    glm::vec3 moveDirection;
+    glm::vec3 droidStartPosition;
+    bool rigidflag;
 private:
     //The droid
-    ACGL::OpenGL::SharedShaderProgram     mDroidShader;
-    CGEngine::CMesh     mDroid  ;
+    ACGL::OpenGL::SharedShaderProgram       mDroidShader            ;
+    CGEngine::MeshPointer                         mDroid                  ;
+    std::vector<CGEngine::MeshPointer>      mDroidanimatedGeometry  ;
 
     glm::mat4 mModelMatrix   ;
 
-    btCollisionShape* cShape = new btSphereShape(1);
-    int animationFlag;
+    btCollisionShape* cShape = new btSphereShape(0.01);
+
+    bool mAnimationFlag;
+    bool mDroidRenderFlag;
 
     //
     //Movement and Destruction Processes
     //
     class MoveProcess : public GameLogic::CProcess
     {
+    private:
+        Droid* mDroid;
     public:
-        MoveProcess() : GameLogic::CProcess()
+        MoveProcess(Droid* droid) : GameLogic::CProcess()
         {
+            mDroid = droid;
             mTransform = glm::mat4(1.0f);
         }
         ~MoveProcess() {}
@@ -69,14 +85,19 @@ private:
 
     class DestructionProcess : public GameLogic::CProcess
     {
+    private:
+        Droid* mDroid;
     public:
         DestructionProcess() : GameLogic::CProcess() {}
+        DestructionProcess(Droid* droid) {mDroid = droid;}
         ~DestructionProcess() {}
 
+        int animationIndex ;
+
         virtual void VOnInitialize();
-        virtual void VOnUpdate(const int elapsedTim);
+        virtual void VOnUpdate(const int elapsedTime);
         virtual void VKill();
     };
 
-    GameLogic::ProcessPointer   mDestructionProcess ;
+    boost::shared_ptr<DestructionProcess>   mDestructionProcess ;
 };
