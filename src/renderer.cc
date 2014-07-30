@@ -224,25 +224,6 @@ void renderFrame() {
         gSimpleRiftControllerRenderer->getCamera()->setEye(GenericCamera::EYE_LEFT);
 
         renderScene();
-        //CGEngine::CFullScreenQuad quad;
-        //quad.LoadMesh("");
-        //gWorld->DSBlurPass();
-        //quad.VOnDraw();
-        /*
-
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        CGEngine::CFullScreenQuad quad;
-        quad.LoadMesh("");
-        ACGL::OpenGL::SharedShaderProgram pass_through = ShaderProgramFileManager::the()->get(ShaderProgramCreator("pass_through"));
-
-
-        pass_through->use();
-        glBindTexture(GL_TEXTURE_2D, gWorld->mFboBlur1);
-        pass_through->setUniform("renderedTexture", 0);
-
-
-        quad.VOnDraw();
-        */
 
     }
 }

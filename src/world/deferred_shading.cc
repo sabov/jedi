@@ -337,9 +337,9 @@ void World::DSBlurPass()
     //debug() << "==============" << std::endl;
 
     combine->setUniform("pixelSize" , glm::vec2(1.0/window_width, 1.0/window_height) );
-    combine->setTexture("uSamplerColor",  offScreenTextures[0], 0 );
+    //combine->setTexture("uSamplerColor",  offScreenTextures[0], 0 );
     combine->setTexture("uSamplerNormal" ,offScreenTextures[1], 1 );
-    combine->setUniform(combine->getUniformLocation("tex0"), m_GBuffer.getFinalTextureName());
+    combine->setUniform(combine->getUniformLocation("tex0"), GBuffer::GBUFFER_TEXTURE_TYPE_NORMAL);
 
     // attribute-less rendering:
     VertexArrayObject vao;
