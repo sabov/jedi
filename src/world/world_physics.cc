@@ -1,35 +1,36 @@
 #include "world.hh"
 
-void World::initializeBullet() {
-    btBroadphaseInterface* broadphase = new btDbvtBroadphase();
-    // Set up the collision configuration and dispatcher
-    btDefaultCollisionConfiguration* collisionConfiguration = new btDefaultCollisionConfiguration();
-    btCollisionDispatcher* dispatcher = new btCollisionDispatcher(collisionConfiguration);
+//void World::initializeBullet() {
+//    btBroadphaseInterface* broadphase = new btDbvtBroadphase();
+//    // Set up the collision configuration and dispatcher
+//    btDefaultCollisionConfiguration* collisionConfiguration = new btDefaultCollisionConfiguration();
+//    btCollisionDispatcher* dispatcher = new btCollisionDispatcher(collisionConfiguration);
 
-    // The actual physics solver
-    btSequentialImpulseConstraintSolver* solver = new btSequentialImpulseConstraintSolver;
+//    // The actual physics solver
+//    btSequentialImpulseConstraintSolver* solver = new btSequentialImpulseConstraintSolver;
 
-     // The world.
-    dynamicsWorld = new btDiscreteDynamicsWorld( dispatcher, broadphase, solver, collisionConfiguration);
-    //dynamicsWorld->setGravity(btVector3(0,-1,0));
+//     // The world.
+//    dynamicsWorld = new btDiscreteDynamicsWorld( dispatcher, broadphase, solver, collisionConfiguration);
+//    //dynamicsWorld->setGravity(btVector3(0,-1,0));
 
-    btCollisionShape* groundShape = new btStaticPlaneShape(btVector3(0, 1, 0), 1.0);
+//    btCollisionShape* groundShape = new btStaticPlaneShape(btVector3(0, 1, 0), 1.0);
 
-    /*
-    btScalar mass = 1.0;
-    btVector3 fallInertia(0,1,0);
-    */
+//    /*
+//    btScalar mass = 1.0;
+//    btVector3 fallInertia(0,1,0);
+//    */
 
-    btDefaultMotionState* groundMotionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, -10, 0)));
-    btRigidBody::btRigidBodyConstructionInfo groundRigidBodyCI(0, groundMotionState, groundShape, btVector3(0, 0, 0));
-    //btRigidBody* groundRigidBody = new btRigidBody(groundRigidBodyCI);
-    //dynamicsWorld->addRigidBody(groundRigidBody);
+//    btDefaultMotionState* groundMotionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, -10, 0)));
+//    btRigidBody::btRigidBodyConstructionInfo groundRigidBodyCI(0, groundMotionState, groundShape, btVector3(0, 0, 0));
+//    //btRigidBody* groundRigidBody = new btRigidBody(groundRigidBodyCI);
+//    //dynamicsWorld->addRigidBody(groundRigidBody);
 
-    dynamicsWorld->addRigidBody(mDroids[0].mPhysicObject.rigidBody);
-    dynamicsWorld->addRigidBody(mDroids[1].mPhysicObject.rigidBody);
-    dynamicsWorld->addRigidBody(mDroids[2].mPhysicObject.rigidBody);
-    dynamicsWorld->addRigidBody(mPlayer.mLightsaber.mPhysicObject.rigidBody);
-}
+//    //dynamicsWorld->addRigidBody(mDroids[0].mPhysicObject.rigidBody);
+//    //dynamicsWorld->addRigidBody(mDroids[1].mPhysicObject.rigidBody);
+//    //dynamicsWorld->addRigidBody(mDroids[2].mPhysicObject.rigidBody);
+//    dynamicsWorld->addRigidBody(mPlayer.mLightsaber.mPhysicObject.rigidBody);
+//    dynamicsWorld->addRigidBody(mPlayer.mPhysicObject.rigidBody);
+//}
 
 void World::updatePhysics()
 {
