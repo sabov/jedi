@@ -388,9 +388,9 @@ void World::DSRender()
 
     DSDirectionalLightPass();
 
-    //mPlayer.mLightsaber.render( mPlayer.getHMDViewMatrix(), mPlayer.getProjectionMatrix() );
+    mPlayer.mLightsaber.render( mPlayer.getHMDViewMatrix(), mPlayer.getProjectionMatrix() );
 
     DSFinalPass();
 
-    DSBlurPass();
+    //DSBlurPass();
 }
