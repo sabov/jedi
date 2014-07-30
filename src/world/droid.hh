@@ -24,13 +24,15 @@ public:
     friend class DestructionProcess;
 
     bool initialize(std::string _filename, glm::vec3 startPosition);
+    void reInit();
 
     void render(glm::mat4 &viewMatrix, glm::mat4 &projectionMatrix);
 
     glm::mat4 getModelMatrix() const { return mModelMatrix; }
 
     void transformPosition() ;  //move droid, update position
-    void baseRender();          //render geometry and texture
+    void baseRender(glm::vec3 moveDirection);          //render geometry and texture
+    void moveDroid(glm::vec3 movedirection);
 
     PhysicsObject mPhysicObject;
 
@@ -40,15 +42,19 @@ public:
 
     GameLogic::ProcessPointer getMoveProcess() const { return mMoveProcess; }
     GameLogic::ProcessPointer getDestrucionProcess() const { return mDestructionProcess; }
+
+    glm::vec3 moveDirection;
+    glm::vec3 droidStartPosition;
+    bool rigidflag;
 private:
     //The droid
     ACGL::OpenGL::SharedShaderProgram       mDroidShader            ;
-    CGEngine::CMesh                         mDroid                  ;
+    CGEngine::MeshPointer                         mDroid                  ;
     std::vector<CGEngine::MeshPointer>      mDroidanimatedGeometry  ;
 
     glm::mat4 mModelMatrix   ;
 
-    btCollisionShape* cShape = new btSphereShape(1);
+    btCollisionShape* cShape = new btSphereShape(0.01);
 
     bool mAnimationFlag;
     bool mDroidRenderFlag;
@@ -58,9 +64,12 @@ private:
     //
     class MoveProcess : public GameLogic::CProcess
     {
+    private:
+        Droid* mDroid;
     public:
-        MoveProcess() : GameLogic::CProcess()
+        MoveProcess(Droid* droid) : GameLogic::CProcess()
         {
+            mDroid = droid;
             mTransform = glm::mat4(1.0f);
         }
         ~MoveProcess() {}

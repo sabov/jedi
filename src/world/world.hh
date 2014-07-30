@@ -72,6 +72,8 @@ public:
     //initialize bullet physics engine
     void initializeBullet();
 
+    void createDroid(glm::vec3 position);
+
     void update(int time);
 
     void setWidthHeight(unsigned int _w, unsigned int _h);
@@ -85,7 +87,7 @@ private:
     unsigned int window_height;
 
     Player mPlayer;
-    Droid mDroids[3];
+    std::vector<Droid> mDroids;
 
     //Bullet
     btDiscreteDynamicsWorld* dynamicsWorld;

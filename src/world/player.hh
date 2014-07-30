@@ -45,9 +45,11 @@ public:
     void useForce();
 
     Lightsaber mLightsaber;
+    PhysicsObject mPhysicObject;
 private:
     ACGL::Scene::SharedHMDCamera mHMDCamera;
     float mHeight;
+    btCollisionShape* cShape = new btCylinderShape(btVector3(20, 20, 0.01));
 
     //game related stuff
     int     mPoints ;

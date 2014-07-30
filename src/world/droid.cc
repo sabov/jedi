@@ -24,16 +24,19 @@ Droid::~Droid()
 
 bool Droid::initialize(string _filename, glm::vec3 startPosition)
 {
+    droidStartPosition = startPosition;
     debug() << "loading droid..." << endl;
     mDroidShader   = ShaderProgramFileManager::the()->get( ShaderProgramCreator("droidShader") );
-    bool ret = mDroid.LoadMesh(_filename);
+    mDroid = CGEngine::MeshPointer( new CGEngine::CMesh() );
+    bool ret = mDroid->LoadMesh(_filename);
     mDroidRenderFlag = true;
+    rigidflag = true;
     setPosition(startPosition);
     mPhysicObject.Init(cShape, startPosition);
-    mModelMatrix = glm::scale( glm::vec3( 0.4f ) );
+    mModelMatrix = glm::scale( glm::vec3( 0.2f ) );
     mModelMatrix = glm::translate(glm::mat4(1.0), startPosition) * mModelMatrix;
 
-    mMoveProcess = GameLogic::ProcessPointer( new Droid::MoveProcess() );
+    mMoveProcess = GameLogic::ProcessPointer( new Droid::MoveProcess(this) );
     /*
      * The destruction process is started as soon as a collision is registered
      */
@@ -60,6 +63,15 @@ bool Droid::initialize(string _filename, glm::vec3 startPosition)
     return ret;
 }
 
+void Droid::reInit(){
+    mAnimationFlag = false;
+    mDroidRenderFlag = true;
+    mModelMatrix = glm::scale( glm::vec3( 0.2f ) );
+    mModelMatrix = glm::translate(glm::mat4(1.0), droidStartPosition) * mModelMatrix;
+    setPosition(droidStartPosition);
+    mPhysicObject.SetPosition(droidStartPosition);
+}
+
 void Droid::render(glm::mat4 &viewMatrix, glm::mat4 &projectionMatrix)
 {
     mDroidShader->use();
@@ -74,7 +86,7 @@ void Droid::render(glm::mat4 &viewMatrix, glm::mat4 &projectionMatrix)
     mDroidShader->setUniform("uProjectionMatrix", projectionMatrix);
     mDroidShader->setUniform("uNormalMatrix", glm::inverseTranspose(glm::mat3(viewMatrix) * glm::mat3(modelMatrix)));
 
-    mDroid.VOnDraw();
+    mDroid->VOnDraw();
 }
 
 void Droid::transformPosition()
@@ -85,12 +97,13 @@ void Droid::transformPosition()
     mPhysicObject.SetPosition(getPosition());
 }
 
-void Droid::baseRender()
+void Droid::baseRender(glm::vec3 moveDirection)
 {
     if (mDroidRenderFlag)
     {
         mPhysicObject.SetPosition(getPosition());
-        mDroid.VOnDraw();
+        mDroid->VOnDraw();
+        moveDroid(moveDirection);
     }
     else if ( mAnimationFlag )
     {
@@ -98,6 +111,12 @@ void Droid::baseRender()
     }
     else
         return;
+}
+
+void Droid::moveDroid(glm::vec3 moveDirection){
+    glm::mat4 translateMatrix = glm::translate( glm::mat4(), moveDirection );
+    mModelMatrix = translateMatrix * mModelMatrix;
+    move(moveDirection);
 }
 
 void Droid::MoveProcess::VOnInitialize()
@@ -115,7 +134,10 @@ void Droid::MoveProcess::VOnUpdate(const int elapsedTime)
      * update "mModelMatrix" here, for example mModelMatrix = translateMatrix * mModelMatrix
      * for some translateMatrix or whatever
      */
-
+    glm::vec3 moveDirection =glm::vec3(0.03f, 0.0f, 0.05f);
+    glm::mat4 translateMatrix = glm::translate( glm::mat4(), moveDirection );
+    mDroid->mModelMatrix = translateMatrix * mDroid->mModelMatrix;
+    mDroid->move(moveDirection);
 }
 
 void Droid::MoveProcess::VKill()
@@ -149,9 +171,4 @@ void Droid::DestructionProcess::VOnUpdate(const int elapsedTime)
         mDroid->mAnimationFlag = false;
         VKill();
     }
-    /*
-     * the variable animationIndex is the same as animationflag, it should be increased after each call of this function,
-     * or after a certain time period.
-     * If animationIndex is greater than 50, the process should be killed ( call VKill() ), or we will get errors.
-     */
 }

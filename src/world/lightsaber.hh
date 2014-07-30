@@ -54,5 +54,5 @@ private:
     float pitch;
     float roll;
 
-    btCollisionShape* cShape = new btCylinderShape(btVector3(0.1, 1, 0.1));
+    btCollisionShape* cShape = new btCylinderShape(btVector3(0.01, 0.5, 0.01));
 };
