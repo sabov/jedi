@@ -53,7 +53,7 @@ bool World::initializeWorld() {
 
     initializeBullet();
 
-    mDroids.resize(2);
+    mDroids.resize(3);
     for (int i = 0 ; i < mDroids.size() ; ++i)
     {
         mDroids[i].initialize("geometry/Droid/droid1.obj", droidPosition[i]);
