@@ -27,6 +27,7 @@ public:
     void rotate(float yaw, float pitch, float roll);
 
     void toggle();
+    bool isToggled() { return turnedOn; }
 
     PhysicsObject mPhysicObject;
 

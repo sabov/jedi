@@ -85,4 +85,18 @@ public:
     static GameLogic::EventType GetEventType() { return m_EventType; }
 };
 
+class CEvtData_CollisionPlayer : public GameLogic::CBaseEventData
+{
+private:
+    static const GameLogic::EventType   m_EventType ;
+public:
+    explicit CEvtData_CollisionPlayer () : GameLogic::CBaseEventData(0.0) {}
+    explicit CEvtData_CollisionPlayer (double _timeStamp) : GameLogic::CBaseEventData(_timeStamp) {}
+
+    virtual const GameLogic::EventType & VGetEventType() const { return m_EventType; }
+    virtual ~CEvtData_CollisionPlayer() {}
+    virtual void VSerialize(std::ostream &out) const { out << "Collision with player ..." ; }
+    static GameLogic::EventType GetEventType() { return m_EventType; }
+};
+
 #endif // EVENTS_HH
