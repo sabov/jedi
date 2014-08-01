@@ -30,7 +30,7 @@ macro(_FIND_BULLET_LIBRARY _var)
         ${BULLET_ROOT}/out/release8/libs
         ${BULLET_ROOT}/out/debug8/libs
      PATH_SUFFIXES lib
-     HINTS ${CMAKE_SOURCE_DIR}/extern/bullet3/build/lib
+     HINTS ${CMAKE_SOURCE_DIR}/extern/bullet/build2/lib
   )
   mark_as_advanced(${_var})
 endmacro()
@@ -48,7 +48,7 @@ find_path(BULLET_INCLUDE_DIR NAMES btBulletCollisionCommon.h
   PATHS
     ${BULLET_ROOT}/include
     ${BULLET_ROOT}/src
-    HINTS ${CMAKE_SOURCE_DIR}/extern/bullet3/build/lib
+    HINTS ${CMAKE_SOURCE_DIR}/extern/bullet/build2/include
 )
 
 # Find the libraries
