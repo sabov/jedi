@@ -32,26 +32,6 @@ Lightsaber::Lightsaber(const glm::vec3 &playerPosition) {
     setPlayerPosition(playerPosition);
     setPosition(mPlayerPosition);
     mPhysicObject.Init(cShape, getPosition());
-
-    /*
-    mPhysicObject.rigidBody->applyTorque(btVector3(0.9, 0, 0));
-    */
-
-    /*
-    btTransform tr = mPhysicObject.rigidBody->getCenterOfMassTransform();
-    //tr.setIdentity();
-    btQuaternion quat;
-    quat.setEuler(0, 0.8, 0); //or quat.setEulerZYX depending on the ordering you want
-    tr.setRotation(quat);
-    mPhysicObject.rigidBody->setCenterOfMassTransform(tr);
-    */
-
-    /*
-    tr.setIdentity();
-    quat.setEuler(0, 0.78, 0); //or quat.setEulerZYX depending on the ordering you want
-    tr.setRotation(quat);
-    mPhysicObject.rigidBody->setCenterOfMassTransform(tr);
-    */
 }
 
 Lightsaber::~Lightsaber() {
@@ -187,16 +167,7 @@ void Lightsaber::rotate(float _yaw, float _roll, float _pitch) {
     cout << roll  << endl;
     cout << pitch << endl;
     cout << "=========" << endl;
-    //btTransform tr;
-    /*
-    btTransform tr = mPhysicObject.rigidBody->getCenterOfMassTransform();
-    tr.setIdentity();
-    btQuaternion quat;
-    quat.setEuler(0, 1.57, 0); //or quat.setEulerZYX depending on the ordering you want
-    tr.setRotation(quat);
-    mPhysicObject.rigidBody->setCenterOfMassTransform(tr);
-    */
-    //mPhysicObject.rigidBody->setRotation(tr);
+
 
     glm::mat4 R = getRotationMatrix4();
     glm::mat4 newRot = glm::yawPitchRoll(_yaw, _roll, _pitch);

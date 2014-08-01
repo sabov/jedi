@@ -332,14 +332,23 @@ void World::DSBlurPass()
     glDisable(GL_DEPTH_TEST);
     glViewport( 0, 0, window_width, window_height );
 
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_GBuffer.getFBOName());
+    GLenum DrawBuffers[] = { GL_COLOR_ATTACHMENT4 };
+    glDrawBuffers(ARRAY_SIZE_IN_ELEMENTS(DrawBuffers), DrawBuffers);
+
     combine->use();
 
     //debug() << "==============" << std::endl;
 
     combine->setUniform("pixelSize" , glm::vec2(1.0/window_width, 1.0/window_height) );
     //combine->setTexture("uSamplerColor",  offScreenTextures[0], 0 );
+    glActiveTexture(GL_TEXTURE1);
     combine->setTexture("uSamplerNormal" ,offScreenTextures[1], 1 );
-    combine->setUniform(combine->getUniformLocation("tex0"), GBuffer::GBUFFER_TEXTURE_TYPE_NORMAL);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_GBuffer.getTexture());
+    combine->setUniform(combine->getUniformLocation("tex0"), 0);
+
 
     // attribute-less rendering:
     VertexArrayObject vao;
@@ -354,6 +363,41 @@ void World::DSFinalPass()
     glBlitFramebuffer(0, 0, (GLint)window_width, (GLint)window_height,
                       0, 0, (GLint)window_width, (GLint)window_height, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 }
+
+void World::DSRender() {
+    m_GBuffer.StartFrame();
+
+    DSGeometryPass();
+
+    // We need stencil to be enabled in the stencil pass to get the stencil buffer
+    // updated and we also need it in the light pass because we render the light
+    // only if the stencil passes.
+
+    glEnable(GL_STENCIL_TEST);
+
+    glDisable(GL_CULL_FACE);
+
+    unsigned int num_lights1 = mPointLights.size();
+
+    for (unsigned int i = 0; i < num_lights1; i++) {
+        DSStencilPass(i);
+        DSPointLightPass(i);
+    }
+
+    DSSpotStencilPass(0);
+    DSSpotLightPass(0);
+
+    // The directional light does not need a stencil test because its volume
+    // is unlimited and the final pass simply copies the texture.
+    glDisable(GL_STENCIL_TEST);
+
+    DSDirectionalLightPass();
+
+    mPlayer.mLightsaber.render( mPlayer.getHMDViewMatrix(), mPlayer.getProjectionMatrix() );
+
+    DSFinalPass();
+}
+
 
 float World::CalcPointLightBSphere(const CGEngine::CPositionalLight &Light)
 {

@@ -39,8 +39,10 @@ public:
         return m_finalTexture;
     }
     GLuint getTexture() const {
-        return GBuffer::GBUFFER_TEXTURE_TYPE_NORMAL;
+        return m_textures[GBUFFER_TEXTURE_TYPE_NORMAL];
     }
+
+    GLuint getFBOName() const {return m_fbo;}
 
 private:
 

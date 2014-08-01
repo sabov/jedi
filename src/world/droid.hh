@@ -54,7 +54,7 @@ private:
 
     glm::mat4 mModelMatrix   ;
 
-    btCollisionShape* cShape = new btSphereShape(0.1);
+    btCollisionShape* cShape = new btSphereShape(0.3);
 
     bool mAnimationFlag;
     bool mDroidRenderFlag;

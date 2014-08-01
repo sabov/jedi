@@ -208,8 +208,10 @@ int main(int argc, char *argv[]) {
     //Add sound and register at EventManager
     audioSystem->AddSound("audio/SaberOn.wav", CEvtData_ToggleSword::GetEventType());
     audioSystem->AddSound("audio/LSwall01.wav", CEvtData_CollisionLightSaber::GetEventType());
+    audioSystem->AddSound("audio/musiccensor.wav", CEvtData_CollisionPlayer::GetEventType());
     eventManager->VAddListener(audioSystem, CEvtData_ToggleSword::GetEventType());
     eventManager->VAddListener(audioSystem, CEvtData_CollisionLightSaber::GetEventType());
+    eventManager->VAddListener(audioSystem, CEvtData_CollisionPlayer::GetEventType());
 
     //
     // Create a world object
