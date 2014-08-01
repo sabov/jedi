@@ -59,11 +59,11 @@ set(EXECUTABLE_OUTPUT_PATH ${dir} CACHE PATH "Build directory" FORCE)
 # source and header files
 add_subdirectory(src)
 
-FILE(GLOB_RECURSE SOURCE_FILES_CC "${CMAKE_SOURCE_DIR}/*.cc")
+FILE(GLOB_RECURSE SOURCE_FILES_CC "${CMAKE_SOURCE_DIR}/src/*.cc")
 
 SET(SOURCE_FILES ${SOURCE_FILES} ${SOURCE_FILES_CC} ${cgengine_source} ${glg_source})
 
-FILE(GLOB_RECURSE HEADER_FILES_HH "${CMAKE_SOURCE_DIR}/*.hh")
+FILE(GLOB_RECURSE HEADER_FILES_HH "${CMAKE_SOURCE_DIR}/src/*.hh")
 
 SET(HEADER_FILES ${HEADER_FILES} ${HEADER_FILES_HH} ${cgengine_headers} ${glg_headers})
 
