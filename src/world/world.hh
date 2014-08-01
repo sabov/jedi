@@ -87,6 +87,13 @@ public:
     void DSRender();
     bool InitDS();
 
+    void SetRenderFBO(GLuint _fbo)
+    {
+        m_GBuffer.setRenderFBOName(_fbo);
+    }
+
+    void BlitCurrentDSBuffer();
+
     GLuint mFboScene;
     GLuint mFboBlur1;
     GLuint mFboBlur2;

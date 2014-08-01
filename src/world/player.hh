@@ -3,6 +3,8 @@
 #include <ACGL/Scene/MoveableObject.hh>
 #include <ACGL/Scene/HMDCamera.hh>
 #include "lightsaber.hh"
+#include "event_sys/GLGEventListener.h"
+#include "events.hh"
 
 /*
  * A player can be moved around, the position and orientation are the
@@ -18,7 +20,7 @@
  * relative to the bodies center.
  */
 
-class Player: public ACGL::Scene::MoveableObject {
+class Player: public ACGL::Scene::MoveableObject, GameLogic::IEventListener {
 public:
     Player();
     ~Player();
@@ -43,6 +45,8 @@ public:
 
     // player uses the force
     void useForce();
+
+    virtual bool VHandleEvent(const GameLogic::IEventData &_event);
 
     Lightsaber mLightsaber;
     PhysicsObject mPhysicObject;

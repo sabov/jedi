@@ -44,9 +44,12 @@ public:
 
     GLuint getFBOName() const {return m_fbo;}
 
+    void setRenderFBOName( GLuint _fboName ) { m_finalFbo = _fboName; }
+
 private:
 
     GLuint m_fbo;
+    GLuint m_finalFbo ;
     GLuint m_textures[GBUFFER_NUM_TEXTURES];
     GLuint m_depthTexture;
     GLuint m_finalTexture;

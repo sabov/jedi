@@ -120,6 +120,11 @@ bool World::InitDS()
     return true;
 }
 
+void World::BlitCurrentDSBuffer()
+{
+    DSFinalPass();
+}
+
 void World::DSGeometryPass()
 {
     m_GeometryPassShader->use();

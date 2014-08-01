@@ -10,39 +10,6 @@
 #include "event_sys/GLGBaseEvent.h"
 #include "event_sys/GLGEventManager.h"
 
-typedef unsigned int ActorID    ;
-
-class CEvtData_CreateActor : public GameLogic::CBaseEventData
-{
-private:
-    static const GameLogic::EventType   m_EventType ;
-    ActorID                             m_id        ;
-public:
-    explicit CEvtData_CreateActor ( ActorID _id )
-        : m_id(_id) {}
-
-    virtual const GameLogic::EventType & VGetEventType() const { return m_EventType; }
-    virtual ~CEvtData_CreateActor() {}
-    virtual void VSerialize(std::ostream &out) const { out << m_id; }
-    static GameLogic::EventType GetEventType() { return m_EventType; }
-};
-
-class CEvtData_DestroyActor : public GameLogic::CBaseEventData
-{
-private:
-    static const GameLogic::EventType   m_EventType ;
-    ActorID                             m_id        ;
-public:
-    explicit CEvtData_DestroyActor ( ActorID _id )
-        : m_id(_id) {}
-
-    virtual const GameLogic::EventType & VGetEventType() const { return m_EventType; }
-    virtual ~CEvtData_DestroyActor() {}
-    virtual void VSerialize(std::ostream &out) const { out << m_id; }
-    static GameLogic::EventType GetEventType() { return m_EventType; }
-
-};
-
 class CEvtData_WorldInitialized : public GameLogic::CBaseEventData
 {
 private:

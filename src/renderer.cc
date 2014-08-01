@@ -197,6 +197,7 @@ void renderFrame() {
         //
         gSimpleRiftControllerRenderer->getCamera()->setEye(GenericCamera::EYE_LEFT);
         gLeftEyeFBO->bind();
+        gWorld->SetRenderFBO(gLeftEyeFBO->getObjectName());
         renderScene();
 
         //
@@ -204,6 +205,7 @@ void renderFrame() {
         //
         gSimpleRiftControllerRenderer->getCamera()->setEye(GenericCamera::EYE_RIGHT);
         gRightEyeFBO->bind();
+        gWorld->SetRenderFBO(gRightEyeFBO->getObjectName());
         renderScene();
 
         //

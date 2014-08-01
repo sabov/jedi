@@ -46,3 +46,8 @@ void Player::duck(float duckingValue) {
 void Player::useForce() {
     //TODO do something useful
 }
+
+bool Player::VHandleEvent(const GameLogic::IEventData &_event)
+{
+    return true;
+}

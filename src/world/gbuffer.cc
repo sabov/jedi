@@ -10,6 +10,7 @@
 GBuffer::GBuffer()
 {
     m_fbo = 0;
+    m_finalFbo = 0;
     m_depthTexture = 0;
     m_finalTexture = 0;
     ZERO_MEM(m_textures);
@@ -134,7 +135,7 @@ void GBuffer::BindForBlurPass()
 
 void GBuffer::BindForFinalPass()
 {
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_finalFbo);
     glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fbo);
     glReadBuffer(GL_COLOR_ATTACHMENT3);
 }
