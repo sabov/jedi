@@ -267,7 +267,7 @@ ENDIF()
 
 IF(INSTALL_LIBS)
 	SET (LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)" )
-	SET (LIB_DESTINATION "${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}" CACHE STRING "Library directory name")
+	SET (LIB_DESTINATION "lib${LIB_SUFFIX}" CACHE STRING "Library directory name")
 	## the following are directories where stuff will be installed to
 	SET(INCLUDE_INSTALL_DIR      "${CMAKE_INSTALL_PREFIX}/include/bullet/" CACHE PATH "The subdirectory to the header prefix")
 	SET(PKGCONFIG_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/pkgconfig/" CACHE STRING "Base directory for pkgconfig files")
@@ -277,7 +277,7 @@ IF(INSTALL_LIBS)
 	    FILES
     	${CMAKE_CURRENT_BINARY_DIR}/bullet.pc
     	DESTINATION
-    	${PKGCONFIG_INSTALL_PREFIX})
+    	pkg-config)
 	ENDIF(NOT WIN32)
 ENDIF(INSTALL_LIBS)
 
