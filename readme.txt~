@@ -1,0 +1,16 @@
+Build: run ./build_jedi.sh
+If compiled successfully, run with run_jedi.sh
+
+For using Wiimote:
+activate Wii during start-up of program.
+
+Controls:
+Space Bar: Activate/Deactivate sword
+A : left
+D : right
+W : forward
+S : backward
+
+Known issues:
+- Program crashes while terminating, due to some memory deallocation. This has something to do with bullet engine and couldn't be solved.
+- Rendering for the rift decreases performance, which is why it is disabled by default, but can be set to true in "main.cc" 

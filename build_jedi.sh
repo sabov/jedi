@@ -6,11 +6,11 @@ make
 cd ../..
 echo "Building GLFW successful"
 
-echo "Building Bullet"
-cd extern/bullet3
-/bin/bash install.sh
-cd ../..
-echo "Building Bullet successful"
+#echo "Building Bullet"
+#cd extern/bullet
+#/bin/bash install.sh
+#cd ../..
+#echo "Building Bullet successful"
 
 echo "Building Jedi"
 cmake . -DCMAKE_BUILD_TYPE=RELEASE

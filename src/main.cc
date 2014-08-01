@@ -149,7 +149,7 @@ int main(int argc, char *argv[]) {
     // Create an OpenGL capable window:
     // parameter is whether the window should be fullscreen or not and which monitor to use if fullscreen
     //
-    GLFWwindow* myWindow = createWindow(false, 1);
+    GLFWwindow* myWindow = createWindow(true, 1);
     if (!myWindow) {
         glfwTerminate();
         exit(-1);
